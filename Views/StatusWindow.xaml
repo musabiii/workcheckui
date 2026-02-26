@@ -44,8 +44,8 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="🟢  Текущая сессия:" Foreground="#BAC2DE" FontSize="13.5"/>
-                    <TextBlock Grid.Column="1" Text="{Binding CurrentSessionText}" Foreground="#CDD6F4"
+                    <TextBlock Grid.Column="0" Text="🟢  Текущая сессия:" Foreground="{Binding SessionBrush}" FontSize="13.5"/>
+                    <TextBlock Grid.Column="1" Text="{Binding CurrentSessionText}" Foreground="{Binding SessionBrush}"
                                FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 

@@ -25,6 +25,7 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _awayTimeText = "0 мин";
     [ObservableProperty] private string _statusText = "Активен";
     [ObservableProperty] private Brush _statusBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
+    [ObservableProperty] private Brush _sessionBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
 
     private static readonly Brush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
     private static readonly Brush ShortBreakBrush = new SolidColorBrush(Color.FromRgb(0xF9, 0xE2, 0xAF));
@@ -83,9 +84,17 @@ public partial class StatusViewModel : ObservableObject
 
     private void UpdateDisplay()
     {
-        CurrentSessionText = TimeFormatter.FormatShort(_tracker.CurrentSession);
+        var session = _tracker.CurrentSession;
+        CurrentSessionText = TimeFormatter.FormatShort(session);
         WorkedTimeText = TimeFormatter.FormatShort(_tracker.DisplayWorkedTime);
         AwayTimeText = TimeFormatter.FormatShort(_tracker.DisplayAwayTime);
+
+        if (session >= _settings.Pomodoro2Time)
+            SessionBrush = InactiveBrush;
+        else if (session >= _settings.PomodoroTime)
+            SessionBrush = ShortBreakBrush;
+        else
+            SessionBrush = ActiveBrush;
 
         if (_tracker.UserActive && !_tracker.UserShortBreak)
         {
