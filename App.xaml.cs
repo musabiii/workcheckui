@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Threading;
+using Application = System.Windows.Application;
 using WorkCheck.Helpers;
 using WorkCheck.Models;
 using WorkCheck.Services;
@@ -29,8 +30,28 @@ public partial class App : Application
 
         ApplyCommandLineArgs(e.Args, _tracker);
 
-        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, settings);
-        var statusWindow = new StatusWindow { DataContext = statusVm };
+        StatusWindow? statusWindow = null;
+
+        var trayIcon = new TrayIconService(
+            onExit: () =>
+            {
+                statusWindow?.Shutdown();
+                Shutdown();
+            },
+            onToggleWindow: () =>
+            {
+                if (statusWindow == null) return;
+                if (statusWindow.IsVisible)
+                    statusWindow.Hide();
+                else
+                {
+                    statusWindow.Show();
+                    statusWindow.Activate();
+                }
+            });
+
+        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, settings, trayIcon);
+        statusWindow = new StatusWindow { DataContext = statusVm };
 
         MainWindow = statusWindow;
         statusWindow.Show();

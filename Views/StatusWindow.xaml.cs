@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using WorkCheck.ViewModels;
@@ -6,6 +7,8 @@ namespace WorkCheck.Views;
 
 public partial class StatusWindow : Window
 {
+    private bool _forceClose;
+
     public StatusWindow()
     {
         InitializeComponent();
@@ -25,10 +28,23 @@ public partial class StatusWindow : Window
         DragMove();
     }
 
-    protected override void OnClosed(EventArgs e)
+    protected override void OnClosing(CancelEventArgs e)
     {
+        if (!_forceClose)
+        {
+            e.Cancel = true;
+            Hide();
+            return;
+        }
+
         if (DataContext is StatusViewModel vm)
             vm.Cleanup();
-        base.OnClosed(e);
+        base.OnClosing(e);
+    }
+
+    public void Shutdown()
+    {
+        _forceClose = true;
+        Close();
     }
 }

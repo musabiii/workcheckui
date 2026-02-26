@@ -2,6 +2,9 @@ using System.Diagnostics;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
+using Application = System.Windows.Application;
+using Brush = System.Windows.Media.Brush;
+using Color = System.Windows.Media.Color;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WorkCheck.Helpers;
@@ -16,6 +19,7 @@ public partial class StatusViewModel : ObservableObject
     private readonly ActivityTracker _tracker;
     private readonly NotificationService _notifications;
     private readonly TelegramService _telegram;
+    private readonly TrayIconService _trayIcon;
     private readonly SettingsService _settingsService;
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
@@ -43,11 +47,13 @@ public partial class StatusViewModel : ObservableObject
         NotificationService notifications,
         TelegramService telegram,
         SettingsService settingsService,
-        AppSettings settings)
+        AppSettings settings,
+        TrayIconService trayIcon)
     {
         _tracker = tracker;
         _notifications = notifications;
         _telegram = telegram;
+        _trayIcon = trayIcon;
         _settingsService = settingsService;
         _settings = settings;
 
@@ -96,6 +102,8 @@ public partial class StatusViewModel : ObservableObject
         else
             SessionBrush = ActiveBrush;
 
+        _trayIcon.Update((int)session.TotalMinutes, session, _settings.PomodoroTime, _settings.Pomodoro2Time);
+
         if (_tracker.UserActive && !_tracker.UserShortBreak)
         {
             StatusText = "Активен";
@@ -131,8 +139,7 @@ public partial class StatusViewModel : ObservableObject
     [RelayCommand]
     private void CloseApp()
     {
-        Cleanup();
-        Application.Current.Shutdown();
+        Application.Current.MainWindow?.Hide();
     }
 
     public void Cleanup()
@@ -140,6 +147,7 @@ public partial class StatusViewModel : ObservableObject
         _timer.Stop();
         _tracker.StopHooks();
         _notifications.CloseAll();
+        _trayIcon.Dispose();
         Debug.WriteLine($"[WorkCheck] {_tracker.GetSummary()}");
     }
 }

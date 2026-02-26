@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Threading;
+using Application = System.Windows.Application;
 using WorkCheck.Helpers;
 using WorkCheck.Models;
 
