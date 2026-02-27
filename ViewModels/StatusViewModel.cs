@@ -30,7 +30,7 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _awayTimeText = "0 мин";
     [ObservableProperty] private string _statusText = "Дрейфую";
     [ObservableProperty] private Brush _statusBrush = DriftingGrayBrush;
-    [ObservableProperty] private Brush _sessionBrush = DriftingGrayBrush;
+    [ObservableProperty] private Brush _sessionBrush = NormalTextBrush;
     [ObservableProperty] private Brush _windowBgBrush = DriftingBgBrush;
     [ObservableProperty] private string _modeButtonText = "▶  В работе";
     [ObservableProperty] private string _awayLabel = "💤  Вне компьютера:";
@@ -40,8 +40,9 @@ public partial class StatusViewModel : ObservableObject
     private static readonly Brush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
     private static readonly Brush ShortBreakBrush = new SolidColorBrush(Color.FromRgb(0xF9, 0xE2, 0xAF));
     private static readonly Brush InactiveBrush = new SolidColorBrush(Color.FromRgb(0xF3, 0x8B, 0xA8));
+    private static readonly Brush NormalTextBrush = new SolidColorBrush(Color.FromRgb(0xBA, 0xC2, 0xDE));
     private static readonly Brush DriftingGrayBrush = new SolidColorBrush(Color.FromRgb(0x6C, 0x70, 0x86));
-    private static readonly Brush DriftingBgBrush = new SolidColorBrush(Color.FromRgb(0x24, 0x24, 0x36));
+    private static readonly Brush DriftingBgBrush = new SolidColorBrush(Color.FromRgb(0x31, 0x31, 0x31));
     private static readonly Brush WorkingBgBrush = new SolidColorBrush(Color.FromRgb(0x1E, 0x1E, 0x2E));
 
     static StatusViewModel()
@@ -49,6 +50,7 @@ public partial class StatusViewModel : ObservableObject
         ActiveBrush.Freeze();
         ShortBreakBrush.Freeze();
         InactiveBrush.Freeze();
+        NormalTextBrush.Freeze();
         DriftingGrayBrush.Freeze();
         DriftingBgBrush.Freeze();
         WorkingBgBrush.Freeze();
@@ -140,7 +142,7 @@ public partial class StatusViewModel : ObservableObject
         }
         else
         {
-            SessionBrush = DriftingGrayBrush;
+            SessionBrush = NormalTextBrush;
             StatusText = "Дрейфую";
             StatusBrush = DriftingGrayBrush;
 
