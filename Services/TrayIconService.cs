@@ -15,11 +15,11 @@ public sealed class TrayIconService : IDisposable
     private IntPtr _lastHIcon;
     private bool _disposed;
 
-    private static readonly Color Green = Color.FromArgb(0xA6, 0xE3, 0xA1);
+    private static readonly Color Green = Color.FromArgb(0x40, 0x98, 0x3E);
     private static readonly Color Yellow = Color.FromArgb(0xF9, 0xE2, 0xAF);
     private static readonly Color Red = Color.FromArgb(0xF3, 0x8B, 0xA8);
     private static readonly Color Gray = Color.FromArgb(0x6C, 0x70, 0x86);
-    private static readonly Color BgColor = Color.FromArgb(0xFF, 0x1E, 0x1E, 0x2E);
+    private static readonly Color TextColor = Color.White;
 
     public TrayIconService(Action onExit, Action onToggleWindow)
     {
@@ -37,7 +37,7 @@ public sealed class TrayIconService : IDisposable
 
         _notifyIcon.DoubleClick += (_, _) => onToggleWindow();
 
-        RenderIcon(0, Gray);
+        RenderIcon(0, Gray, TextColor);
     }
 
     public void Update(int minutes, TimeSpan session, TimeSpan pomodoroTime, TimeSpan pomodoro2Time,
@@ -57,7 +57,7 @@ public sealed class TrayIconService : IDisposable
         else
             color = Green;
 
-        RenderIcon(minutes, color);
+        RenderIcon(minutes, color, TextColor);
 
         var tip = isDrifting
             ? $"WorkCheck — дрейфую ({minutes} мин)"
@@ -65,7 +65,7 @@ public sealed class TrayIconService : IDisposable
         _notifyIcon.Text = tip.Length > 63 ? tip[..63] : tip;
     }
 
-    private void RenderIcon(int minutes, Color foreground)
+    private void RenderIcon(int minutes, Color background, Color foreground)
     {
         const int sz = 16;
         using var bmp = new Bitmap(sz, sz);
@@ -74,7 +74,7 @@ public sealed class TrayIconService : IDisposable
             g.SmoothingMode = SmoothingMode.AntiAlias;
             g.TextRenderingHint = TextRenderingHint.AntiAliasGridFit;
 
-            using var bgBrush = new SolidBrush(BgColor);
+            using var bgBrush = new SolidBrush(background);
             FillRoundedRect(g, bgBrush, new Rectangle(0, 0, sz, sz), 4);
 
             string text = Math.Min(minutes, 99).ToString();
