@@ -24,22 +24,34 @@ public partial class StatusViewModel : ObservableObject
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
 
+    [ObservableProperty] private bool _isWorkMode;
     [ObservableProperty] private string _currentSessionText = "0 мин";
     [ObservableProperty] private string _workedTimeText = "0 мин";
     [ObservableProperty] private string _awayTimeText = "0 мин";
-    [ObservableProperty] private string _statusText = "Активен";
-    [ObservableProperty] private Brush _statusBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
-    [ObservableProperty] private Brush _sessionBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
+    [ObservableProperty] private string _statusText = "Дрейфую";
+    [ObservableProperty] private Brush _statusBrush = DriftingGrayBrush;
+    [ObservableProperty] private Brush _sessionBrush = DriftingGrayBrush;
+    [ObservableProperty] private Brush _windowBgBrush = DriftingBgBrush;
+    [ObservableProperty] private string _modeButtonText = "▶  В работе";
+    [ObservableProperty] private string _awayLabel = "💤  Вне компьютера:";
+    [ObservableProperty] private string _sessionIcon = "🖥";
+    [ObservableProperty] private Visibility _workedRowVisibility = Visibility.Collapsed;
 
     private static readonly Brush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
     private static readonly Brush ShortBreakBrush = new SolidColorBrush(Color.FromRgb(0xF9, 0xE2, 0xAF));
     private static readonly Brush InactiveBrush = new SolidColorBrush(Color.FromRgb(0xF3, 0x8B, 0xA8));
+    private static readonly Brush DriftingGrayBrush = new SolidColorBrush(Color.FromRgb(0x6C, 0x70, 0x86));
+    private static readonly Brush DriftingBgBrush = new SolidColorBrush(Color.FromRgb(0x24, 0x24, 0x36));
+    private static readonly Brush WorkingBgBrush = new SolidColorBrush(Color.FromRgb(0x1E, 0x1E, 0x2E));
 
     static StatusViewModel()
     {
         ActiveBrush.Freeze();
         ShortBreakBrush.Freeze();
         InactiveBrush.Freeze();
+        DriftingGrayBrush.Freeze();
+        DriftingBgBrush.Freeze();
+        WorkingBgBrush.Freeze();
     }
 
     public StatusViewModel(
@@ -79,6 +91,8 @@ public partial class StatusViewModel : ObservableObject
     {
         var requests = _tracker.Tick();
 
+        if (!IsWorkMode) return;
+
         foreach (var req in requests)
         {
             _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
@@ -92,32 +106,70 @@ public partial class StatusViewModel : ObservableObject
     {
         var session = _tracker.CurrentSession;
         CurrentSessionText = TimeFormatter.FormatShort(session);
-        WorkedTimeText = TimeFormatter.FormatShort(_tracker.DisplayWorkedTime);
         AwayTimeText = TimeFormatter.FormatShort(_tracker.DisplayAwayTime);
 
-        if (session >= _settings.Pomodoro2Time)
-            SessionBrush = InactiveBrush;
-        else if (session >= _settings.PomodoroTime)
-            SessionBrush = ShortBreakBrush;
-        else
-            SessionBrush = ActiveBrush;
+        if (IsWorkMode)
+        {
+            WorkedTimeText = TimeFormatter.FormatShort(_tracker.DisplayWorkedTime);
 
-        _trayIcon.Update((int)session.TotalMinutes, session, _settings.PomodoroTime, _settings.Pomodoro2Time);
+            if (session >= _settings.Pomodoro2Time)
+                SessionBrush = InactiveBrush;
+            else if (session >= _settings.PomodoroTime)
+                SessionBrush = ShortBreakBrush;
+            else
+                SessionBrush = ActiveBrush;
 
-        if (_tracker.UserActive && !_tracker.UserShortBreak)
-        {
-            StatusText = "Активен";
-            StatusBrush = ActiveBrush;
-        }
-        else if (_tracker.UserShortBreak)
-        {
-            StatusText = "Короткий перерыв";
-            StatusBrush = ShortBreakBrush;
+            _trayIcon.Update((int)session.TotalMinutes, session,
+                _settings.PomodoroTime, _settings.Pomodoro2Time, isDrifting: false);
+
+            if (_tracker.UserActive && !_tracker.UserShortBreak)
+            {
+                StatusText = "Активен";
+                StatusBrush = ActiveBrush;
+            }
+            else if (_tracker.UserShortBreak)
+            {
+                StatusText = "Короткий перерыв";
+                StatusBrush = ShortBreakBrush;
+            }
+            else
+            {
+                StatusText = "Неактивен";
+                StatusBrush = InactiveBrush;
+            }
         }
         else
         {
-            StatusText = "Неактивен";
-            StatusBrush = InactiveBrush;
+            SessionBrush = DriftingGrayBrush;
+            StatusText = "Дрейфую";
+            StatusBrush = DriftingGrayBrush;
+
+            _trayIcon.Update((int)session.TotalMinutes, session,
+                _settings.PomodoroTime, _settings.Pomodoro2Time, isDrifting: true);
+        }
+    }
+
+    [RelayCommand]
+    private void ToggleMode()
+    {
+        IsWorkMode = !IsWorkMode;
+        _tracker.Reset();
+
+        if (IsWorkMode)
+        {
+            ModeButtonText = "⏸  Дрейфую";
+            WindowBgBrush = WorkingBgBrush;
+            WorkedRowVisibility = Visibility.Visible;
+            AwayLabel = "☕  Вне работы:";
+            SessionIcon = "🟢";
+        }
+        else
+        {
+            ModeButtonText = "▶  В работе";
+            WindowBgBrush = DriftingBgBrush;
+            WorkedRowVisibility = Visibility.Collapsed;
+            AwayLabel = "💤  Вне компьютера:";
+            SessionIcon = "🖥";
         }
     }
 

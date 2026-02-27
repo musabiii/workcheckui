@@ -10,7 +10,7 @@
         ShowInTaskbar="True"
         Width="340" Height="180">
 
-    <Border Background="#1E1E2E" CornerRadius="12"
+    <Border Background="{Binding WindowBgBrush}" CornerRadius="12"
             BorderBrush="#33FFFFFF" BorderThickness="1">
         <Border.Effect>
             <DropShadowEffect Color="Black" BlurRadius="16" Opacity="0.4" ShadowDepth="2"/>
@@ -39,17 +39,21 @@
 
             <!-- Stats -->
             <StackPanel Grid.Row="1" VerticalAlignment="Center">
+                <!-- Текущая сессия (всегда) -->
                 <Grid Margin="0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="🟢  Текущая сессия:" Foreground="{Binding SessionBrush}" FontSize="13.5"/>
+                    <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="13.5">
+                        <Run Text="{Binding SessionIcon, Mode=OneWay}"/><Run Text="  Текущая сессия:"/>
+                    </TextBlock>
                     <TextBlock Grid.Column="1" Text="{Binding CurrentSessionText}" Foreground="{Binding SessionBrush}"
                                FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
-                <Grid Margin="0,2">
+                <!-- Отработано (только В работе) -->
+                <Grid Margin="0,2" Visibility="{Binding WorkedRowVisibility}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -59,20 +63,30 @@
                                FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
+                <!-- Вне работы / Вне компьютера (всегда) -->
                 <Grid Margin="0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="☕  Вне работы:" Foreground="#BAC2DE" FontSize="13.5"/>
+                    <TextBlock Grid.Column="0" Text="{Binding AwayLabel}" Foreground="#BAC2DE" FontSize="13.5"/>
                     <TextBlock Grid.Column="1" Text="{Binding AwayTimeText}" Foreground="#CDD6F4"
                                FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
             </StackPanel>
 
-            <!-- Status bar -->
-            <TextBlock Grid.Row="2" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}"
-                       FontSize="11" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+            <!-- Footer: mode toggle + status -->
+            <Grid Grid.Row="2" Margin="0,6,0,0">
+                <Button Content="{Binding ModeButtonText}"
+                        Command="{Binding ToggleModeCommand}"
+                        HorizontalAlignment="Left"
+                        Style="{StaticResource HeaderButton}"
+                        FontSize="11"/>
+
+                <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusBrush}"
+                           FontSize="11" HorizontalAlignment="Right"
+                           VerticalAlignment="Center"/>
+            </Grid>
         </Grid>
     </Border>
 </Window>

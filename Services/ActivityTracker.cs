@@ -301,6 +301,21 @@ public sealed class ActivityTracker : IDisposable
         return notifications;
     }
 
+    public void Reset()
+    {
+        var now = DateTime.Now;
+        _lastActivityTime = now;
+        _lastInactivityTime = now;
+        _activeSessionStart = now;
+        _workedTime = TimeSpan.Zero;
+        _awayTime = TimeSpan.Zero;
+        _userActive = true;
+        _userShortBreak = false;
+        _pomodoroNotified = false;
+        _pomodoro2Notified = false;
+        _pending.Clear();
+    }
+
     public string GetSummary() =>
         $"Завершение. Всего отработано: {TimeFormatter.FormatHuman(DisplayWorkedTime)}; " +
         $"вне работы: {TimeFormatter.FormatHuman(DisplayAwayTime)}";

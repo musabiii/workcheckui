@@ -18,6 +18,7 @@ public sealed class TrayIconService : IDisposable
     private static readonly Color Green = Color.FromArgb(0xA6, 0xE3, 0xA1);
     private static readonly Color Yellow = Color.FromArgb(0xF9, 0xE2, 0xAF);
     private static readonly Color Red = Color.FromArgb(0xF3, 0x8B, 0xA8);
+    private static readonly Color Gray = Color.FromArgb(0x6C, 0x70, 0x86);
     private static readonly Color BgColor = Color.FromArgb(0xFF, 0x1E, 0x1E, 0x2E);
 
     public TrayIconService(Action onExit, Action onToggleWindow)
@@ -36,15 +37,20 @@ public sealed class TrayIconService : IDisposable
 
         _notifyIcon.DoubleClick += (_, _) => onToggleWindow();
 
-        RenderIcon(0, Green);
+        RenderIcon(0, Gray);
     }
 
-    public void Update(int minutes, TimeSpan session, TimeSpan pomodoroTime, TimeSpan pomodoro2Time)
+    public void Update(int minutes, TimeSpan session, TimeSpan pomodoroTime, TimeSpan pomodoro2Time,
+        bool isDrifting = false)
     {
         if (_disposed) return;
 
         Color color;
-        if (session >= pomodoro2Time)
+        if (isDrifting)
+        {
+            color = Gray;
+        }
+        else if (session >= pomodoro2Time)
             color = Red;
         else if (session >= pomodoroTime)
             color = Yellow;
@@ -53,7 +59,9 @@ public sealed class TrayIconService : IDisposable
 
         RenderIcon(minutes, color);
 
-        var tip = $"WorkCheck — сессия {minutes} мин";
+        var tip = isDrifting
+            ? $"WorkCheck — дрейфую ({minutes} мин)"
+            : $"WorkCheck — сессия {minutes} мин";
         _notifyIcon.Text = tip.Length > 63 ? tip[..63] : tip;
     }
 
