@@ -54,13 +54,13 @@
                                FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
-                <!-- Отработано (только В работе) -->
-                <Grid Margin="0,2" Visibility="{Binding WorkedRowVisibility}">
+                <!-- Отработано / За компьютером -->
+                <Grid Margin="0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="⏱  Отработано:" Foreground="#BAC2DE" FontSize="13.5"/>
+                    <TextBlock Grid.Column="0" Text="{Binding WorkedLabel}" Foreground="#BAC2DE" FontSize="13.5"/>
                     <TextBlock Grid.Column="1" Text="{Binding WorkedTimeText}" Foreground="#CDD6F4"
                                FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>

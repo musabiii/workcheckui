@@ -35,7 +35,7 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _modeButtonText = "▶  В работе";
     [ObservableProperty] private string _awayLabel = "💤  Вне компьютера:";
     [ObservableProperty] private string _sessionIcon = "🖥";
-    [ObservableProperty] private Visibility _workedRowVisibility = Visibility.Collapsed;
+    [ObservableProperty] private string _workedLabel = "🖥  За компьютером:";
 
     private static readonly Brush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
     private static readonly Brush ShortBreakBrush = new SolidColorBrush(Color.FromRgb(0xF9, 0xE2, 0xAF));
@@ -119,10 +119,10 @@ public partial class StatusViewModel : ObservableObject
         CurrentSessionText = TimeFormatter.FormatShort(session);
         AwayTimeText = TimeFormatter.FormatShort(_tracker.DisplayAwayTime);
 
+        WorkedTimeText = TimeFormatter.FormatShort(_tracker.DisplayWorkedTime);
+
         if (IsWorkMode)
         {
-            WorkedTimeText = TimeFormatter.FormatShort(_tracker.DisplayWorkedTime);
-
             if (session >= _settings.Pomodoro2Time)
                 SessionBrush = InactiveBrush;
             else if (session >= _settings.PomodoroTime)
@@ -179,7 +179,7 @@ public partial class StatusViewModel : ObservableObject
         {
             ModeButtonText = "⏸  Дрейфую";
             WindowBgBrush = WorkingBgBrush;
-            WorkedRowVisibility = Visibility.Visible;
+            WorkedLabel = "⏱  Отработано:";
             AwayLabel = "☕  Вне работы:";
             SessionIcon = "🟢";
         }
@@ -187,7 +187,7 @@ public partial class StatusViewModel : ObservableObject
         {
             ModeButtonText = "▶  В работе";
             WindowBgBrush = DriftingBgBrush;
-            WorkedRowVisibility = Visibility.Collapsed;
+            WorkedLabel = "🖥  За компьютером:";
             AwayLabel = "💤  Вне компьютера:";
             SessionIcon = "🖥";
         }
