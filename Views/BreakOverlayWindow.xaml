@@ -127,6 +127,23 @@
                                HorizontalAlignment="Center"
                                Margin="0,8,0,0"/>
 
+                    <!-- Break activity suggestions -->
+                    <Border Background="#11FFFFFF" CornerRadius="8"
+                            Margin="0,20,0,0" Padding="16,12">
+                        <StackPanel>
+                            <TextBlock Text="Чем заняться:" Foreground="#A6ADC8"
+                                       FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6"/>
+                            <TextBlock Text="•  Разомни шею" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  10 приседаний" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Разминка для глаз" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Выпей воды" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Убери стол" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Приоритеты на следующий час" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Планы на вечер" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Посчитай траты" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
+                        </StackPanel>
+                    </Border>
+
                     <Button x:Name="CancelBreakBtn" Content="Прервать"
                             Click="OnCancelBreakClick" Cursor="Hand"
                             FontSize="14" Foreground="#BAC2DE"
