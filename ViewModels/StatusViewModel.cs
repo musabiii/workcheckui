@@ -98,11 +98,17 @@ public partial class StatusViewModel : ObservableObject
         {
             if (req.Type is NotificationType.Pomodoro or NotificationType.Pomodoro2)
             {
+                var overlayShownAt = DateTime.Now;
+
                 _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
                     _settings.ShortBreakTime,
                     onBreakStarted: () => _tracker.IsPaused = true);
                 _tracker.IsPaused = false;
+
+                // Корректируем время: пока висел оверлей (ожидание + возможный перерыв),
+                // пользователь не работал — это не должно считаться рабочим временем
+                _tracker.AccountOverlayIdle(overlayShownAt);
             }
             else if (IsWorkMode)
             {
@@ -164,6 +170,23 @@ public partial class StatusViewModel : ObservableObject
             _trayIcon.Update((int)session.TotalMinutes, session,
                 _settings.PomodoroTime, _settings.Pomodoro2Time, isDrifting: true);
         }
+    }
+
+    [RelayCommand]
+    private void ManualBreak()
+    {
+        var overlayShownAt = DateTime.Now;
+
+        _notifications.ShowBreakOverlay(
+            NotificationType.Pomodoro,
+            "☕  Ручной перерыв",
+            $"Поработали {TimeFormatter.FormatShort(_tracker.CurrentSession)}",
+            _settings.ShortBreakTime,
+            onBreakStarted: () => _tracker.IsPaused = true,
+            skipPrompt: true);
+        _tracker.IsPaused = false;
+
+        _tracker.AccountOverlayIdle(overlayShownAt);
     }
 
     [RelayCommand]

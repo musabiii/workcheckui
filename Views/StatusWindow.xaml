@@ -30,6 +30,9 @@
                            VerticalAlignment="Center"/>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="☕" Command="{Binding ManualBreakCommand}"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
+                            ToolTip="Ручной перерыв"/>
                     <Button Content="↺" Command="{Binding ResetCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"/>
                     <Button Content="⚙" Command="{Binding OpenSettingsCommand}"

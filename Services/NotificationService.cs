@@ -87,11 +87,11 @@ public class NotificationService
     }
 
     public bool ShowBreakOverlay(NotificationType type, string title, string message,
-        TimeSpan breakDuration, Action? onBreakStarted = null)
+        TimeSpan breakDuration, Action? onBreakStarted = null, bool skipPrompt = false)
     {
         try
         {
-            var overlay = new BreakOverlayWindow(type, title, message, breakDuration);
+            var overlay = new BreakOverlayWindow(type, title, message, breakDuration, skipPrompt);
             overlay.OnBreakStarted = onBreakStarted;
             overlay.Loaded += (_, _) => overlay.PlayFadeIn();
             overlay.ShowWithOverlays();

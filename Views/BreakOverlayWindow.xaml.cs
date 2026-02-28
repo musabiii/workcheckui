@@ -31,14 +31,17 @@ public partial class BreakOverlayWindow : Window
     private DispatcherTimer? _countdownTimer;
     private TimeSpan _remaining;
 
+    private readonly bool _skipPrompt;
+
     public bool UserChoseBreak { get; private set; }
     public Action? OnBreakStarted { get; set; }
 
-    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration)
+    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false)
     {
         InitializeComponent();
 
         _breakDuration = breakDuration;
+        _skipPrompt = skipPrompt;
 
         TitleBlock.Text = title;
         MessageBlock.Text = message;
@@ -47,6 +50,11 @@ public partial class BreakOverlayWindow : Window
         Stripe.Background = new SolidColorBrush(color);
 
         CreateSecondaryOverlays();
+
+        if (_skipPrompt)
+        {
+            Loaded += (_, _) => SwitchToTimerMode();
+        }
     }
 
     private void CreateSecondaryOverlays()

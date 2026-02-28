@@ -305,6 +305,40 @@ public sealed class ActivityTracker : IDisposable
         return notifications;
     }
 
+    /// <summary>
+    /// Вызывается когда пользователь закрыл оверлей помодоро (нажал "Продолжить" или завершил перерыв).
+    /// Всё время от момента показа оверлея до сейчас считается перерывом, а не работой.
+    /// </summary>
+    public void AccountOverlayIdle(DateTime overlayShownAt)
+    {
+        var now = DateTime.Now;
+        var idleDuration = now - overlayShownAt;
+
+        if (idleDuration <= TimeSpan.Zero)
+            return;
+
+        // Фиксируем работу до момента показа оверлея
+        var realWork = overlayShownAt - _lastInactivityTime;
+        if (realWork > TimeSpan.Zero)
+            _workedTime += realWork;
+
+        // Время простоя пока висел оверлей — это away
+        _awayTime += idleDuration;
+
+        // Начинаем новую сессию с текущего момента
+        _lastActivityTime = now;
+        _lastInactivityTime = now;
+        _activeSessionStart = now;
+
+        // Сбрасываем флаги помодоро для новой сессии
+        _pomodoroNotified = false;
+        _pomodoro2Notified = false;
+
+        Debug.WriteLine($"[ActivityTracker] Overlay idle accounted: " +
+                        $"realWork={TimeFormatter.FormatHuman(realWork)}, " +
+                        $"idle={TimeFormatter.FormatHuman(idleDuration)}");
+    }
+
     public void Reset()
     {
         var now = DateTime.Now;
