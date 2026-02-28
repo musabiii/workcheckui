@@ -152,6 +152,15 @@ public partial class StatusViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void Reset()
+    {
+        _tracker.Reset();
+        CurrentSessionText = "0 мин";
+        WorkedTimeText = "0 мин";
+        AwayTimeText = "0 мин";
+    }
+
+    [RelayCommand]
     private void ToggleMode()
     {
         IsWorkMode = !IsWorkMode;
