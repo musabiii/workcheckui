@@ -93,8 +93,6 @@ public partial class StatusViewModel : ObservableObject
     {
         var requests = _tracker.Tick();
 
-        if (!IsWorkMode) return;
-
         foreach (var req in requests)
         {
             if (req.Type is NotificationType.Pomodoro or NotificationType.Pomodoro2)
@@ -105,10 +103,12 @@ public partial class StatusViewModel : ObservableObject
                     onBreakStarted: () => _tracker.IsPaused = true);
                 _tracker.IsPaused = false;
             }
-            else
+            else if (IsWorkMode)
+            {
                 _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
+            }
 
-            if (req.SendTelegram && !string.IsNullOrEmpty(req.TelegramText))
+            if (IsWorkMode && req.SendTelegram && !string.IsNullOrEmpty(req.TelegramText))
                 _ = _telegram.SendAsync(req.TelegramText, req.SilentTelegram);
         }
     }
