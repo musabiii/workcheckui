@@ -86,6 +86,22 @@ public class NotificationService
         }
     }
 
+    public bool ShowBreakOverlay(NotificationType type, string title, string message)
+    {
+        try
+        {
+            var overlay = new BreakOverlayWindow(type, title, message);
+            overlay.Loaded += (_, _) => overlay.PlayFadeIn();
+            overlay.ShowWithOverlays();
+            return overlay.UserChoseBreak;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[Notification] Ошибка показа оверлея: {ex.Message}");
+            return false;
+        }
+    }
+
     public void CloseAll()
     {
         var copy = _active.ToList();

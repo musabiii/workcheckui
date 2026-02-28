@@ -97,7 +97,10 @@ public partial class StatusViewModel : ObservableObject
 
         foreach (var req in requests)
         {
-            _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
+            if (req.Type is NotificationType.Pomodoro or NotificationType.Pomodoro2)
+                _notifications.ShowBreakOverlay(req.Type, req.Title, req.Message);
+            else
+                _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
 
             if (req.SendTelegram && !string.IsNullOrEmpty(req.TelegramText))
                 _ = _telegram.SendAsync(req.TelegramText, req.SilentTelegram);
