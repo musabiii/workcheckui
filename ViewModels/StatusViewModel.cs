@@ -98,7 +98,13 @@ public partial class StatusViewModel : ObservableObject
         foreach (var req in requests)
         {
             if (req.Type is NotificationType.Pomodoro or NotificationType.Pomodoro2)
-                _notifications.ShowBreakOverlay(req.Type, req.Title, req.Message);
+            {
+                _notifications.ShowBreakOverlay(
+                    req.Type, req.Title, req.Message,
+                    _settings.ShortBreakTime,
+                    onBreakStarted: () => _tracker.IsPaused = true);
+                _tracker.IsPaused = false;
+            }
             else
                 _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
 

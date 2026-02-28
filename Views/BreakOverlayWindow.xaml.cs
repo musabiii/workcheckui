@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Threading;
 using WorkCheck.Models;
 using Screen = System.Windows.Forms.Screen;
 using Color = System.Windows.Media.Color;
@@ -15,13 +16,21 @@ public partial class BreakOverlayWindow : Window
         [NotificationType.Pomodoro2] = Color.FromRgb(0xF3, 0x8B, 0xA8)
     };
 
+    private static readonly Color BreakStripeColor = Color.FromRgb(0x89, 0xB4, 0xFA);
+
     private readonly List<Window> _secondaryOverlays = [];
+    private readonly TimeSpan _breakDuration;
+    private DispatcherTimer? _countdownTimer;
+    private TimeSpan _remaining;
 
     public bool UserChoseBreak { get; private set; }
+    public Action? OnBreakStarted { get; set; }
 
-    public BreakOverlayWindow(NotificationType type, string title, string message)
+    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration)
     {
         InitializeComponent();
+
+        _breakDuration = breakDuration;
 
         TitleBlock.Text = title;
         MessageBlock.Text = message;
@@ -42,7 +51,7 @@ public partial class BreakOverlayWindow : Window
             {
                 WindowStyle = WindowStyle.None,
                 AllowsTransparency = true,
-                Background = new SolidColorBrush(System.Windows.Media.Color.FromArgb(0xDD, 0x1E, 0x1E, 0x2E)),
+                Background = new SolidColorBrush(Color.FromArgb(0xDD, 0x1E, 0x1E, 0x2E)),
                 ResizeMode = ResizeMode.NoResize,
                 Topmost = true,
                 ShowInTaskbar = false,
@@ -73,6 +82,49 @@ public partial class BreakOverlayWindow : Window
         OuterRoot.BeginAnimation(OpacityProperty, fadeIn);
     }
 
+    private void SwitchToTimerMode()
+    {
+        PromptPanel.Visibility = Visibility.Collapsed;
+        TimerPanel.Visibility = Visibility.Visible;
+        Stripe.Background = new SolidColorBrush(BreakStripeColor);
+
+        _remaining = _breakDuration;
+        UpdateCountdownDisplay();
+
+        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdownTimer.Tick += OnCountdownTick;
+        _countdownTimer.Start();
+
+        OnBreakStarted?.Invoke();
+    }
+
+    private void OnCountdownTick(object? sender, EventArgs e)
+    {
+        _remaining -= TimeSpan.FromSeconds(1);
+
+        if (_remaining <= TimeSpan.Zero)
+        {
+            _countdownTimer?.Stop();
+            Dismiss(choseBreak: true);
+            return;
+        }
+
+        UpdateCountdownDisplay();
+    }
+
+    private void UpdateCountdownDisplay()
+    {
+        CountdownBlock.Text = _remaining.ToString(@"m\:ss");
+    }
+
+    private void Dismiss(bool choseBreak)
+    {
+        _countdownTimer?.Stop();
+        UserChoseBreak = choseBreak;
+        CloseAll();
+        DialogResult = choseBreak;
+    }
+
     private void CloseAll()
     {
         foreach (var overlay in _secondaryOverlays)
@@ -85,15 +137,16 @@ public partial class BreakOverlayWindow : Window
 
     private void OnBreakClick(object sender, RoutedEventArgs e)
     {
-        UserChoseBreak = true;
-        CloseAll();
-        DialogResult = true;
+        SwitchToTimerMode();
     }
 
     private void OnContinueClick(object sender, RoutedEventArgs e)
     {
-        UserChoseBreak = false;
-        CloseAll();
-        DialogResult = false;
+        Dismiss(choseBreak: false);
+    }
+
+    private void OnCancelBreakClick(object sender, RoutedEventArgs e)
+    {
+        Dismiss(choseBreak: false);
     }
 }

@@ -59,6 +59,7 @@ public sealed class ActivityTracker : IDisposable
     private readonly Queue<NotificationRequest> _pending = new();
     private bool _disposed;
 
+    public bool IsPaused { get; set; }
     public bool UserActive => _userActive;
     public bool UserShortBreak => _userShortBreak;
 
@@ -175,7 +176,7 @@ public sealed class ActivityTracker : IDisposable
         if (now - _lastHookFire < HookThrottle) return;
         _lastHookFire = now;
 
-        if (_disposed) return;
+        if (_disposed || IsPaused) return;
 
         var dispatcher = Application.Current?.Dispatcher;
         if (dispatcher == null || dispatcher.HasShutdownStarted) return;
