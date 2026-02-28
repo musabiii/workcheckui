@@ -1,3 +1,4 @@
+using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -10,6 +11,13 @@ namespace WorkCheck.Views;
 
 public partial class BreakOverlayWindow : Window
 {
+    [DllImport("user32.dll")]
+    private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
+    private const byte VK_MEDIA_PLAY_PAUSE = 0xB3;
+    private const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
+    private const uint KEYEVENTF_KEYUP = 0x0002;
+
     private static readonly Dictionary<NotificationType, Color> StripeColors = new()
     {
         [NotificationType.Pomodoro] = Color.FromRgb(0xF9, 0xE2, 0xAF),
@@ -67,10 +75,18 @@ public partial class BreakOverlayWindow : Window
 
     public void ShowWithOverlays()
     {
+        SendMediaPause();
+
         foreach (var overlay in _secondaryOverlays)
             overlay.Show();
 
         ShowDialog();
+    }
+
+    private static void SendMediaPause()
+    {
+        keybd_event(VK_MEDIA_PLAY_PAUSE, 0, KEYEVENTF_EXTENDEDKEY, UIntPtr.Zero);
+        keybd_event(VK_MEDIA_PLAY_PAUSE, 0, KEYEVENTF_EXTENDEDKEY | KEYEVENTF_KEYUP, UIntPtr.Zero);
     }
 
     public void PlayFadeIn()
