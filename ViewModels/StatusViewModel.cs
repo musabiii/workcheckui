@@ -35,6 +35,7 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _modeButtonText = "▶  В работе";
     [ObservableProperty] private string _awayLabel = "💤  Вне компьютера:";
     [ObservableProperty] private string _sessionIcon = "🖥";
+    [ObservableProperty] private string _sessionLabel = "  Текущая сессия:";
     [ObservableProperty] private string _workedLabel = "🖥  За компьютером:";
 
     private static readonly Brush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
@@ -118,6 +119,11 @@ public partial class StatusViewModel : ObservableObject
         var session = _tracker.CurrentSession;
         CurrentSessionText = TimeFormatter.FormatShort(session);
         AwayTimeText = TimeFormatter.FormatShort(_tracker.DisplayAwayTime);
+
+        var sessions = _tracker.CompletedSessions;
+        SessionLabel = sessions > 0
+            ? $"  Текущая сессия ({sessions}):"
+            : "  Текущая сессия:";
 
         WorkedTimeText = TimeFormatter.FormatShort(_tracker.DisplayWorkedTime);
 

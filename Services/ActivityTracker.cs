@@ -46,6 +46,7 @@ public sealed class ActivityTracker : IDisposable
     private bool _userShortBreak;
     private bool _pomodoroNotified;
     private bool _pomodoro2Notified;
+    private int _completedSessions;
 
     private DateTime _lastActivityTime;
     private DateTime _lastInactivityTime;
@@ -62,6 +63,7 @@ public sealed class ActivityTracker : IDisposable
     public bool IsPaused { get; set; }
     public bool UserActive => _userActive;
     public bool UserShortBreak => _userShortBreak;
+    public int CompletedSessions => _completedSessions;
 
     public TimeSpan CurrentSession
     {
@@ -231,6 +233,7 @@ public sealed class ActivityTracker : IDisposable
         {
             if (sinceInactivity > _pomodoroTime && !_pomodoroNotified)
             {
+                _completedSessions++;
                 notifications.Add(new NotificationRequest
                 {
                     Type = NotificationType.Pomodoro,
@@ -314,6 +317,7 @@ public sealed class ActivityTracker : IDisposable
         _userShortBreak = false;
         _pomodoroNotified = false;
         _pomodoro2Notified = false;
+        _completedSessions = 0;
         _pending.Clear();
     }
 

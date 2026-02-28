@@ -48,7 +48,7 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="13.5">
-                        <Run Text="{Binding SessionIcon, Mode=OneWay}"/><Run Text="  Текущая сессия:"/>
+                        <Run Text="{Binding SessionIcon, Mode=OneWay}"/><Run Text="{Binding SessionLabel, Mode=OneWay}"/>
                     </TextBlock>
                     <TextBlock Grid.Column="1" Text="{Binding CurrentSessionText}" Foreground="{Binding SessionBrush}"
                                FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
