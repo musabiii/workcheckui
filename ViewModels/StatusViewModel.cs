@@ -21,6 +21,7 @@ public partial class StatusViewModel : ObservableObject
     private readonly TelegramService _telegram;
     private readonly TrayIconService _trayIcon;
     private readonly SettingsService _settingsService;
+    private readonly DataService _dataService;
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
 
@@ -28,6 +29,7 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _currentSessionText = "0 мин";
     [ObservableProperty] private string _workedTimeText = "0 мин";
     [ObservableProperty] private string _awayTimeText = "0 мин";
+    [ObservableProperty] private string _todayWorkedText = "0 мин";
     [ObservableProperty] private string _statusText = "Дрейфую";
     [ObservableProperty] private Brush _statusBrush = DriftingGrayBrush;
     [ObservableProperty] private Brush _sessionBrush = NormalTextBrush;
@@ -62,6 +64,7 @@ public partial class StatusViewModel : ObservableObject
         NotificationService notifications,
         TelegramService telegram,
         SettingsService settingsService,
+        DataService dataService,
         AppSettings settings,
         TrayIconService trayIcon)
     {
@@ -70,11 +73,14 @@ public partial class StatusViewModel : ObservableObject
         _telegram = telegram;
         _trayIcon = trayIcon;
         _settingsService = settingsService;
+        _dataService = dataService;
         _settings = settings;
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _timer.Tick += OnTick;
         _timer.Start();
+        
+        UpdateTodayWorkedText();
     }
 
     private void OnTick(object? sender, EventArgs e)
@@ -98,6 +104,13 @@ public partial class StatusViewModel : ObservableObject
         {
             if (req.Type is NotificationType.Pomodoro or NotificationType.Pomodoro2)
             {
+                // Сохраняем данные сессии для резюме
+                var sessionWork = _tracker.DisplayWorkedTime;
+                var sessionAway = _tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime;
+                var sessionStart = DateTime.Now - sessionWork;
+                var sessionEnd = DateTime.Now;
+                var isWorkMode = IsWorkMode;
+
                 var overlayShownAt = DateTime.Now;
 
                 _notifications.ShowBreakOverlay(
@@ -109,6 +122,9 @@ public partial class StatusViewModel : ObservableObject
                 // Корректируем время: пока висел оверлей (ожидание + возможный перерыв),
                 // пользователь не работал — это не должно считаться рабочим временем
                 _tracker.AccountOverlayIdle(overlayShownAt);
+
+                // Показываем резюме сессии
+                ShowSessionSummary(sessionWork, sessionAway, sessionStart, sessionEnd, isWorkMode);
             }
             else if (IsWorkMode)
             {
@@ -120,18 +136,34 @@ public partial class StatusViewModel : ObservableObject
         }
     }
 
+    private void ShowSessionSummary(TimeSpan workTime, TimeSpan awayTime, DateTime startTime, DateTime endTime, bool isWorkMode)
+    {
+        try
+        {
+            var summary = new SessionSummaryWindow(_dataService, workTime, awayTime, startTime, endTime, isWorkMode);
+            summary.Owner = Application.Current.MainWindow;
+            summary.ShowDialog();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[StatusVM] Ошибка показа резюме: {ex.Message}");
+        }
+    }
+
     private void UpdateDisplay()
     {
         var session = _tracker.CurrentSession;
         CurrentSessionText = TimeFormatter.FormatShort(session);
-        AwayTimeText = TimeFormatter.FormatShort(_tracker.DisplayAwayTime);
+        
+        var awayTime = _tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime;
+        AwayTimeText = TimeFormatter.FormatShort(awayTime);
 
         var sessions = _tracker.CompletedSessions;
         SessionLabel = sessions > 0
             ? $"  Текущая сессия ({sessions}):"
             : "  Текущая сессия:";
 
-        WorkedTimeText = TimeFormatter.FormatShort(_tracker.DisplayWorkedTime);
+        UpdateTodayWorkedText(session);
 
         if (IsWorkMode)
         {
@@ -172,6 +204,14 @@ public partial class StatusViewModel : ObservableObject
         }
     }
 
+    private void UpdateTodayWorkedText(TimeSpan currentSession = default)
+    {
+        var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode);
+        var totalWithCurrent = todayTotal + currentSession;
+        TodayWorkedText = TimeFormatter.FormatShort(totalWithCurrent);
+        WorkedTimeText = TodayWorkedText;
+    }
+
     [RelayCommand]
     private void ManualBreak()
     {
@@ -192,17 +232,29 @@ public partial class StatusViewModel : ObservableObject
     [RelayCommand]
     private void Reset()
     {
+        var session = _tracker.CurrentSession;
+        
         _tracker.Reset();
         CurrentSessionText = "0 мин";
-        WorkedTimeText = "0 мин";
         AwayTimeText = "0 мин";
+        UpdateTodayWorkedText();
     }
 
     [RelayCommand]
     private void ToggleMode()
     {
+        // Сохраняем текущую накопленную сессию и период неактивности в БД перед переключением
+        _tracker.SaveCurrentSession();
+        _tracker.SaveCurrentAwayPeriod();
+        
         IsWorkMode = !IsWorkMode;
+        _tracker.IsWorkMode = IsWorkMode;
         _tracker.Reset();
+
+        TodayWorkedText = TimeFormatter.FormatShort(_dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode));
+        WorkedTimeText = TodayWorkedText;
+        CurrentSessionText = "0 мин";
+        AwayTimeText = "0 мин";
 
         if (IsWorkMode)
         {
@@ -220,6 +272,13 @@ public partial class StatusViewModel : ObservableObject
             AwayLabel = "💤  Вне компьютера:";
             SessionIcon = "🖥";
         }
+    }
+
+    [RelayCommand]
+    private void OpenStatistics()
+    {
+        var window = new StatisticsWindow(_dataService) { Owner = Application.Current.MainWindow };
+        window.ShowDialog();
     }
 
     [RelayCommand]

@@ -24,9 +24,10 @@ public partial class App : Application
         var settingsService = new SettingsService();
         var settings = settingsService.Load();
 
+        var dataService = new DataService();
         var telegramService = new TelegramService(settings);
         var notificationService = new NotificationService();
-        _tracker = new ActivityTracker(settings);
+        _tracker = new ActivityTracker(settings, dataService);
 
         ApplyCommandLineArgs(e.Args, _tracker);
 
@@ -36,6 +37,7 @@ public partial class App : Application
             onExit: () =>
             {
                 statusWindow?.Shutdown();
+                dataService.Dispose();
                 Shutdown();
             },
             onToggleWindow: () =>
@@ -50,7 +52,7 @@ public partial class App : Application
                 }
             });
 
-        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, settings, trayIcon);
+        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, dataService, settings, trayIcon);
         statusWindow = new StatusWindow { DataContext = statusVm };
 
         MainWindow = statusWindow;

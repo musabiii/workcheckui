@@ -33,3 +33,5 @@ project.fragment.lock.json
 ## App-specific
 settings.json
 .env
+nul
+statistics.db

@@ -32,6 +32,7 @@ public partial class BreakOverlayWindow : Window
     private TimeSpan _remaining;
 
     private readonly bool _skipPrompt;
+    private bool _pauseSent;
 
     public bool UserChoseBreak { get; private set; }
     public Action? OnBreakStarted { get; set; }
@@ -83,7 +84,11 @@ public partial class BreakOverlayWindow : Window
 
     public void ShowWithOverlays()
     {
-        SendMediaPause();
+        if (!_pauseSent)
+        {
+            SendMediaPause();
+            _pauseSent = true;
+        }
 
         foreach (var overlay in _secondaryOverlays)
             overlay.Show();
@@ -172,5 +177,10 @@ public partial class BreakOverlayWindow : Window
     private void OnCancelBreakClick(object sender, RoutedEventArgs e)
     {
         Dismiss(choseBreak: false);
+    }
+
+    private void OnPlayPauseClick(object sender, RoutedEventArgs e)
+    {
+        SendMediaPause();
     }
 }

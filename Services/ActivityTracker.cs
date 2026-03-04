@@ -10,6 +10,15 @@ namespace WorkCheck.Services;
 
 public sealed class ActivityTracker : IDisposable
 {
+    private readonly DataService _dataService;
+    private bool _isWorkMode = false;
+
+    public bool IsWorkMode
+    {
+        get => _isWorkMode;
+        set => _isWorkMode = value;
+    }
+
     #region Win32 Hooks
 
     private const int WH_KEYBOARD_LL = 13;
@@ -86,6 +95,36 @@ public sealed class ActivityTracker : IDisposable
         }
     }
 
+    public void SaveCurrentSession()
+    {
+        var sessionWork = DisplayWorkedTime;
+        if (sessionWork > TimeSpan.Zero)
+        {
+            var sessionEnd = DateTime.Now;
+            var sessionStart = sessionEnd - sessionWork;
+            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode);
+            
+            Debug.WriteLine($"[ActivityTracker] Saved session: {sessionWork} in mode {_isWorkMode}");
+        }
+        
+        _workedTime = TimeSpan.Zero;
+    }
+
+    public void SaveCurrentAwayPeriod()
+    {
+        var sessionAway = DisplayAwayTime;
+        if (sessionAway > TimeSpan.Zero)
+        {
+            var sessionEnd = DateTime.Now;
+            var sessionStart = sessionEnd - sessionAway;
+            _dataService.SaveAwayPeriod(sessionStart, sessionEnd, sessionAway, _isWorkMode);
+            
+            Debug.WriteLine($"[ActivityTracker] Saved away period: {sessionAway} in mode {_isWorkMode}");
+        }
+        
+        _awayTime = TimeSpan.Zero;
+    }
+
     public TimeSpan DisplayAwayTime
     {
         get
@@ -97,8 +136,14 @@ public sealed class ActivityTracker : IDisposable
         }
     }
 
-    public ActivityTracker(AppSettings settings)
+    public TimeSpan GetAwayTimeFromDatabase()
     {
+        return _dataService.GetTotalAwayTimeByDate(DateTime.Today, _isWorkMode);
+    }
+
+    public ActivityTracker(AppSettings settings, DataService dataService)
+    {
+        _dataService = dataService;
         _keyboardProc = KeyboardHookCallback;
         _mouseProc = MouseHookCallback;
 
@@ -195,6 +240,11 @@ public sealed class ActivityTracker : IDisposable
             var awayInterval = now - _lastActivityTime;
             _awayTime += awayInterval;
 
+            // Сохраняем период неактивности в БД
+            var awayEnd = now;
+            var awayStart = awayEnd - awayInterval;
+            _dataService.SaveAwayPeriod(awayStart, awayEnd, awayInterval, _isWorkMode);
+
             _pending.Enqueue(new NotificationRequest
             {
                 Type = NotificationType.Welcome,
@@ -266,6 +316,11 @@ public sealed class ActivityTracker : IDisposable
             if (sessionWork > TimeSpan.Zero)
                 _workedTime += sessionWork;
 
+            // Сохраняем завершённую сессию в БД
+            var sessionEnd = _lastActivityTime;
+            var sessionStart = sessionEnd - sessionWork;
+            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode);
+
             notifications.Add(new NotificationRequest
             {
                 Type = NotificationType.ShortBreak,
@@ -320,7 +375,13 @@ public sealed class ActivityTracker : IDisposable
         // Фиксируем работу до момента показа оверлея
         var realWork = overlayShownAt - _lastInactivityTime;
         if (realWork > TimeSpan.Zero)
+        {
             _workedTime += realWork;
+            // Сохраняем завершённую сессию в БД
+            var sessionEnd = overlayShownAt;
+            var sessionStart = sessionEnd - realWork;
+            _dataService.SaveSession(sessionStart, sessionEnd, realWork, _isWorkMode);
+        }
 
         // Время простоя пока висел оверлей — это away
         _awayTime += idleDuration;
@@ -341,6 +402,8 @@ public sealed class ActivityTracker : IDisposable
 
     public void Reset()
     {
+        SaveCurrentSession();
+        
         var now = DateTime.Now;
         _lastActivityTime = now;
         _lastInactivityTime = now;

@@ -35,6 +35,9 @@
                             ToolTip="Ручной перерыв"/>
                     <Button Content="↺" Command="{Binding ResetCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"/>
+                    <Button Content="📊" Command="{Binding OpenStatisticsCommand}"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
+                            ToolTip="Статистика"/>
                     <Button Content="⚙" Command="{Binding OpenSettingsCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"/>
                     <Button Content="✕" Command="{Binding CloseAppCommand}"
@@ -65,7 +68,18 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="{Binding WorkedLabel}" Foreground="#BAC2DE" FontSize="13.5"/>
-                    <TextBlock Grid.Column="1" Text="{Binding WorkedTimeText}" Foreground="#CDD6F4"
+                    <TextBlock Grid.Column="1" Text="{Binding TodayWorkedText}" Foreground="#CDD6F4"
+                               FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                </Grid>
+
+                <!-- Сегодня отработано -->
+                <Grid Margin="0,2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="📊  Сегодня:" Foreground="#A6E3A1" FontSize="13.5"/>
+                    <TextBlock Grid.Column="1" Text="{Binding TodayWorkedText}" Foreground="#A6E3A1"
                                FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 

@@ -1,0 +1,148 @@
+<Window x:Class="WorkCheck.Views.SessionSummaryWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Резюме сессии"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Width="400" Height="350">
+
+    <Border Background="#1E1E2E" CornerRadius="12"
+            BorderBrush="#33FFFFFF" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="16" Opacity="0.4" ShadowDepth="2"/>
+        </Border.Effect>
+
+        <Grid Margin="24">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Grid Grid.Row="0" Margin="0,0,0,20">
+                <TextBlock Text="📊  Резюме сессии" Foreground="#A6E3A1"
+                           FontSize="18" FontWeight="Bold"
+                           VerticalAlignment="Center"/>
+
+                <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top"
+                        Click="OnCloseClick"
+                        Style="{StaticResource CloseButton}"/>
+            </Grid>
+
+            <!-- Summary Content -->
+            <Border Grid.Row="1" Background="#181825" CornerRadius="8" Padding="20">
+                <StackPanel>
+                    <!-- Время работы -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="⏱  Работа:" 
+                                   Foreground="#BAC2DE" FontSize="14"/>
+                        <TextBlock x:Name="WorkTimeText" Grid.Column="1" 
+                                   Text="0 мин" 
+                                   Foreground="#A6E3A1" FontSize="14" FontWeight="Bold"/>
+                    </Grid>
+
+                    <!-- Время вне работы -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="☕  Вне работы:" 
+                                   Foreground="#BAC2DE" FontSize="14"/>
+                        <TextBlock x:Name="AwayTimeText" Grid.Column="1" 
+                                   Text="0 мин" 
+                                   Foreground="#F38BA8" FontSize="14" FontWeight="Bold"/>
+                    </Grid>
+
+                    <!-- Начало сессии -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🕐  Начало:" 
+                                   Foreground="#BAC2DE" FontSize="14"/>
+                        <TextBlock x:Name="StartTimeText" Grid.Column="1" 
+                                   Text="--:--" 
+                                   Foreground="#CDD6F4" FontSize="14" FontWeight="SemiBold"/>
+                    </Grid>
+
+                    <!-- Конец сессии -->
+                    <Grid Margin="0,0,0,16">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🕐  Конец:" 
+                                   Foreground="#BAC2DE" FontSize="14"/>
+                        <TextBlock x:Name="EndTimeText" Grid.Column="1" 
+                                   Text="--:--" 
+                                   Foreground="#CDD6F4" FontSize="14" FontWeight="SemiBold"/>
+                    </Grid>
+
+                    <!-- Режим -->
+                    <Grid Margin="0,0,0,8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="🎯  Режим:" 
+                                   Foreground="#BAC2DE" FontSize="14"/>
+                        <TextBlock x:Name="ModeText" Grid.Column="1" 
+                                   Text="В работе" 
+                                   Foreground="#89B4FA" FontSize="14" FontWeight="SemiBold"/>
+                    </Grid>
+
+                    <!-- Разделитель -->
+                    <Border Height="1" Background="#45475A" Margin="0,8,0,16"/>
+
+                    <!-- Всего сессий сегодня -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Column="0" Text="📈  Сессий сегодня:" 
+                                   Foreground="#6C7086" FontSize="13"/>
+                        <TextBlock x:Name="SessionCountText" Grid.Column="1" 
+                                   Text="0" 
+                                   Foreground="#89B4FA" FontSize="13" FontWeight="SemiBold"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Footer -->
+            <Button Grid.Row="2" Content="Закрыть" Click="OnCloseClick"
+                    HorizontalAlignment="Stretch" Padding="12,8" Margin="0,16,0,0"
+                    FontSize="14" Cursor="Hand">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="8" Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                    </Border>
+                                    <ControlTemplate.Triggers>
+                                        <Trigger Property="IsMouseOver" Value="True">
+                                            <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
+                                        </Trigger>
+                                    </ControlTemplate.Triggers>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </Button.Style>
+            </Button>
+        </Grid>
+    </Border>
+</Window>
