@@ -104,7 +104,7 @@ public partial class StatusViewModel : ObservableObject
             {
                 var overlayShownAt = DateTime.Now;
 
-                _notifications.ShowBreakOverlay(
+                var (choseBreak, description, modeSelected) = _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
                     _settings.ShortBreakTime,
                     onBreakStarted: () => _tracker.IsPaused = true);
@@ -112,7 +112,24 @@ public partial class StatusViewModel : ObservableObject
 
                 // Корректируем время: пока висел оверлей (ожидание + возможный перерыв),
                 // пользователь не работал — это не должно считаться рабочим временем
-                _tracker.AccountOverlayIdle(overlayShownAt);
+                _tracker.AccountOverlayIdle(overlayShownAt, description);
+
+                // Если выбран режим после перерыва, переключаем
+                if (modeSelected.HasValue)
+                {
+                    if (modeSelected.Value == false)
+                    {
+                        // Продолжить работать
+                        if (!IsWorkMode)
+                            ToggleMode();
+                    }
+                    else
+                    {
+                        // Дрейфовать
+                        if (IsWorkMode)
+                            ToggleMode();
+                    }
+                }
             }
             else if (IsWorkMode)
             {
@@ -190,7 +207,7 @@ public partial class StatusViewModel : ObservableObject
     {
         var overlayShownAt = DateTime.Now;
 
-        _notifications.ShowBreakOverlay(
+        var (_, description, modeSelected) = _notifications.ShowBreakOverlay(
             NotificationType.Pomodoro,
             "☕  Ручной перерыв",
             $"Поработали {TimeFormatter.FormatShort(_tracker.CurrentSession)}",
@@ -199,7 +216,21 @@ public partial class StatusViewModel : ObservableObject
             skipPrompt: true);
         _tracker.IsPaused = false;
 
-        _tracker.AccountOverlayIdle(overlayShownAt);
+        _tracker.AccountOverlayIdle(overlayShownAt, description);
+
+        if (modeSelected.HasValue)
+        {
+            if (modeSelected.Value == false)
+            {
+                if (!IsWorkMode)
+                    ToggleMode();
+            }
+            else
+            {
+                if (IsWorkMode)
+                    ToggleMode();
+            }
+        }
     }
 
     [RelayCommand]

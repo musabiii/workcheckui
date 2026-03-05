@@ -35,12 +35,15 @@ public partial class BreakOverlayWindow : Window
     private bool _pauseSent;
 
     public bool UserChoseBreak { get; private set; }
+    public string SessionDescription { get; set; } = string.Empty;
+    public bool? ModeSelected { get; private set; }
     public Action? OnBreakStarted { get; set; }
 
     public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false)
     {
         InitializeComponent();
 
+        DataContext = this;
         _breakDuration = breakDuration;
         _skipPrompt = skipPrompt;
 
@@ -134,11 +137,18 @@ public partial class BreakOverlayWindow : Window
         if (_remaining <= TimeSpan.Zero)
         {
             _countdownTimer?.Stop();
-            Dismiss(choseBreak: true);
+            SwitchToModeSelection();
             return;
         }
 
         UpdateCountdownDisplay();
+    }
+
+    private void SwitchToModeSelection()
+    {
+        TimerPanel.Visibility = Visibility.Collapsed;
+        ModeSelectionPanel.Visibility = Visibility.Visible;
+        Stripe.Background = new SolidColorBrush(BreakStripeColor);
     }
 
     private void UpdateCountdownDisplay()
@@ -150,8 +160,18 @@ public partial class BreakOverlayWindow : Window
     {
         _countdownTimer?.Stop();
         UserChoseBreak = choseBreak;
+        ModeSelected = null;
         CloseAll();
         DialogResult = choseBreak;
+    }
+
+    private void DismissWithMode(bool driftMode)
+    {
+        _countdownTimer?.Stop();
+        UserChoseBreak = true;
+        ModeSelected = driftMode;
+        CloseAll();
+        DialogResult = true;
     }
 
     private void CloseAll()
@@ -177,6 +197,16 @@ public partial class BreakOverlayWindow : Window
     private void OnCancelBreakClick(object sender, RoutedEventArgs e)
     {
         Dismiss(choseBreak: false);
+    }
+
+    private void OnDriftClick(object sender, RoutedEventArgs e)
+    {
+        DismissWithMode(driftMode: true);
+    }
+
+    private void OnWorkClick(object sender, RoutedEventArgs e)
+    {
+        DismissWithMode(driftMode: false);
     }
 
     private void OnPlayPauseClick(object sender, RoutedEventArgs e)

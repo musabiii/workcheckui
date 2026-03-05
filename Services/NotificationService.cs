@@ -86,7 +86,7 @@ public class NotificationService
         }
     }
 
-    public bool ShowBreakOverlay(NotificationType type, string title, string message,
+    public (bool choseBreak, string description, bool? modeSelected) ShowBreakOverlay(NotificationType type, string title, string message,
         TimeSpan breakDuration, Action? onBreakStarted = null, bool skipPrompt = false)
     {
         try
@@ -95,12 +95,12 @@ public class NotificationService
             overlay.OnBreakStarted = onBreakStarted;
             overlay.Loaded += (_, _) => overlay.PlayFadeIn();
             overlay.ShowWithOverlays();
-            return overlay.UserChoseBreak;
+            return (overlay.UserChoseBreak, overlay.SessionDescription, overlay.ModeSelected);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Notification] Ошибка показа оверлея: {ex.Message}");
-            return false;
+            return (false, string.Empty, null);
         }
     }
 

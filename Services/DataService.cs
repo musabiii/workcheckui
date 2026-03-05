@@ -41,7 +41,8 @@ public class DataService : IDisposable
                     StartTime TEXT NOT NULL,
                     EndTime TEXT NOT NULL,
                     DurationTicks INTEGER NOT NULL,
-                    IsWorkMode INTEGER NOT NULL DEFAULT 1
+                    IsWorkMode INTEGER NOT NULL DEFAULT 1,
+                    Description TEXT
                 )
                 """;
 
@@ -69,6 +70,14 @@ public class DataService : IDisposable
             try { cmd3.ExecuteNonQuery(); }
             catch { /* Column already exists */ }
 
+            var addDescriptionColumn = """
+                ALTER TABLE Sessions ADD COLUMN Description TEXT
+                """;
+
+            using var cmd5 = new SqliteCommand(addDescriptionColumn, connection);
+            try { cmd5.ExecuteNonQuery(); }
+            catch { /* Column already exists */ }
+
             var addAwayColumn = """
                 ALTER TABLE AwayPeriods ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1
                 """;
@@ -93,14 +102,14 @@ public class DataService : IDisposable
         return _connection;
     }
 
-    public void SaveSession(DateTime startTime, DateTime endTime, TimeSpan duration, bool isWorkMode)
+    public void SaveSession(DateTime startTime, DateTime endTime, TimeSpan duration, bool isWorkMode, string description = "")
     {
         try
         {
             var connection = GetConnection();
             var insert = """
-                INSERT INTO Sessions (StartTime, EndTime, DurationTicks, IsWorkMode)
-                VALUES (@StartTime, @EndTime, @DurationTicks, @IsWorkMode)
+                INSERT INTO Sessions (StartTime, EndTime, DurationTicks, IsWorkMode, Description)
+                VALUES (@StartTime, @EndTime, @DurationTicks, @IsWorkMode, @Description)
                 """;
 
             using var cmd = new SqliteCommand(insert, connection);
@@ -108,6 +117,7 @@ public class DataService : IDisposable
             cmd.Parameters.AddWithValue("@EndTime", endTime.ToString("O"));
             cmd.Parameters.AddWithValue("@DurationTicks", duration.Ticks);
             cmd.Parameters.AddWithValue("@IsWorkMode", isWorkMode ? 1 : 0);
+            cmd.Parameters.AddWithValue("@Description", description);
 
             cmd.ExecuteNonQuery();
         }
@@ -147,7 +157,8 @@ public class DataService : IDisposable
                     StartTime = DateTime.Parse(reader.GetString(1)),
                     EndTime = DateTime.Parse(reader.GetString(2)),
                     Duration = TimeSpan.FromTicks(reader.GetInt64(3)),
-                    IsWorkMode = reader.GetInt32(4) == 1
+                    IsWorkMode = reader.GetInt32(4) == 1,
+                    Description = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
                 });
             }
         }

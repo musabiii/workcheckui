@@ -43,9 +43,27 @@
                                TextWrapping="Wrap"
                                TextAlignment="Center"/>
 
+                    <TextBox x:Name="DescriptionBox"
+                             Foreground="#CDD6F4"
+                             Background="#313244"
+                             BorderBrush="#45475A"
+                             BorderThickness="1"
+                             FontSize="14"
+                             Padding="12,10"
+                             Margin="0,20,0,0"
+                             Height="80"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             VerticalScrollBarVisibility="Auto"
+                             MaxLength="500">
+                        <TextBox.Text>
+                            <Binding Path="SessionDescription" RelativeSource="{RelativeSource AncestorType=Window}" UpdateSourceTrigger="PropertyChanged"/>
+                        </TextBox.Text>
+                    </TextBox>
+
                     <StackPanel Orientation="Horizontal"
                                 HorizontalAlignment="Center"
-                                Margin="0,28,0,0">
+                                Margin="0,16,0,0">
 
                         <Button x:Name="BreakBtn" Content="☕  Сделать перерыв"
                                 Click="OnBreakClick" Cursor="Hand"
@@ -194,6 +212,84 @@
                                                     <Trigger Property="IsMouseOver" Value="True">
                                                         <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
                                                         <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Mode Selection mode -->
+                <StackPanel x:Name="ModeSelectionPanel" Grid.Row="1" Margin="36,28,36,32"
+                            Visibility="Collapsed">
+                    <TextBlock Text="Перерыв завершён!"
+                               Foreground="#A6E3A1"
+                               FontSize="24" FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+
+                    <TextBlock Text="Выберите режим работы:"
+                               Foreground="#BAC2DE"
+                               FontSize="16"
+                               Margin="0,16,0,0"
+                               HorizontalAlignment="Center"
+                               TextAlignment="Center"/>
+
+                    <StackPanel Orientation="Horizontal"
+                                HorizontalAlignment="Center"
+                                Margin="0,28,0,0">
+
+                        <Button x:Name="DriftBtn" Content="💤  Дрейфовать"
+                                Click="OnDriftClick" Cursor="Hand"
+                                FontSize="14" Foreground="#1E1E2E"
+                                Padding="20,10" Margin="0,0,12,0">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder"
+                                                        Background="#6C7086"
+                                                        CornerRadius="8"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#7C8094"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+
+                        <Button x:Name="WorkBtn" Content="▶  В работе"
+                                Click="OnWorkClick" Cursor="Hand"
+                                FontSize="14" Foreground="#1E1E2E"
+                                Padding="20,10">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder"
+                                                        Background="#A6E3A1"
+                                                        CornerRadius="8"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center"
+                                                                      VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#B8EBB2"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>

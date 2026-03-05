@@ -95,14 +95,14 @@ public sealed class ActivityTracker : IDisposable
         }
     }
 
-    public void SaveCurrentSession()
+    public void SaveCurrentSession(string description = "")
     {
         var sessionWork = DisplayWorkedTime;
         if (sessionWork > TimeSpan.Zero)
         {
             var sessionEnd = DateTime.Now;
             var sessionStart = sessionEnd - sessionWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode);
+            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, description);
             
             Debug.WriteLine($"[ActivityTracker] Saved session: {sessionWork} in mode {_isWorkMode}");
         }
@@ -364,7 +364,7 @@ public sealed class ActivityTracker : IDisposable
     /// Вызывается когда пользователь закрыл оверлей помодоро (нажал "Продолжить" или завершил перерыв).
     /// Всё время от момента показа оверлея до сейчас считается перерывом, а не работой.
     /// </summary>
-    public void AccountOverlayIdle(DateTime overlayShownAt)
+    public void AccountOverlayIdle(DateTime overlayShownAt, string description = "")
     {
         var now = DateTime.Now;
         var idleDuration = now - overlayShownAt;
@@ -380,7 +380,7 @@ public sealed class ActivityTracker : IDisposable
             // Сохраняем завершённую сессию в БД
             var sessionEnd = overlayShownAt;
             var sessionStart = sessionEnd - realWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, realWork, _isWorkMode);
+            _dataService.SaveSession(sessionStart, sessionEnd, realWork, _isWorkMode, description);
         }
 
         // Время простоя пока висел оверлей — это away
