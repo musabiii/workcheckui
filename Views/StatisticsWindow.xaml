@@ -25,11 +25,26 @@
 
             <!-- Header -->
             <Grid Grid.Row="0" Margin="0,0,0,16">
-                <TextBlock Text="📊  Статистика за сегодня" Foreground="#A6E3A1"
-                           FontSize="18" FontWeight="Bold"
-                           VerticalAlignment="Center"/>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-                <Button Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top"
+                <Button Grid.Column="0" Content="◀" Click="OnPreviousDayClick" Cursor="Hand"
+                        Padding="8,4" FontSize="14" FontWeight="Bold"
+                        Style="{StaticResource CloseButton}"/>
+
+                <TextBlock Grid.Column="1" x:Name="DateText" Text="05.03.2026" Foreground="#A6E3A1"
+                           FontSize="18" FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"/>
+
+                <Button Grid.Column="2" Content="▶" Click="OnNextDayClick" Cursor="Hand"
+                        Padding="8,4" FontSize="14" FontWeight="Bold"
+                        Style="{StaticResource CloseButton}"/>
+
+                <Button Grid.Column="3" Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top"
                         Click="OnCloseClick"
                         Style="{StaticResource CloseButton}"/>
             </Grid>
@@ -59,26 +74,42 @@
                     <TextBlock Text="Сессии:" Foreground="#6C7086" FontSize="12" Margin="0,0,0,8"/>
 
                     <ScrollViewer MaxHeight="200" VerticalScrollBarVisibility="Auto">
-                        <ItemsControl x:Name="SessionsList">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid Margin="0,4">
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-                                        <TextBlock Grid.Column="0" Foreground="#BAC2DE" FontSize="13">
-                                            <Run Text="{Binding StartTime, StringFormat={}{0:HH:mm}}"/>
-                                            <Run Text=" - " Foreground="#6C7086"/>
-                                            <Run Text="{Binding EndTime, StringFormat={}{0:HH:mm}}"/>
-                                        </TextBlock>
-                                        <TextBlock Grid.Column="1" Foreground="#A6E3A1" FontSize="13" FontWeight="SemiBold">
-                                            <Run Text="{Binding DurationText}"/>
-                                        </TextBlock>
-                                    </Grid>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
+                        <DataGrid x:Name="SessionsGrid" AutoGenerateColumns="False" 
+                                  Background="Transparent" BorderThickness="0"
+                                  RowBackground="Transparent" AlternatingRowBackground="#11111A"
+                                  HeadersVisibility="Column"
+                                  CanUserAddRows="False" CanUserDeleteRows="False"
+                                  CanUserResizeRows="False" CanUserReorderColumns="False"
+                                  IsReadOnly="True">
+                            <DataGrid.ColumnHeaderStyle>
+                                <Style TargetType="DataGridColumnHeader">
+                                    <Setter Property="Background" Value="#313244"/>
+                                    <Setter Property="Foreground" Value="#A6ADC8"/>
+                                    <Setter Property="Padding" Value="8,6"/>
+                                    <Setter Property="FontSize" Value="12"/>
+                                    <Setter Property="FontWeight" Value="SemiBold"/>
+                                </Style>
+                            </DataGrid.ColumnHeaderStyle>
+                            <DataGrid.CellStyle>
+                                <Style TargetType="DataGridCell">
+                                    <Setter Property="Background" Value="Transparent"/>
+                                    <Setter Property="BorderThickness" Value="0"/>
+                                    <Setter Property="Padding" Value="8,6"/>
+                                    <Setter Property="FontSize" Value="13"/>
+                                    <Style.Triggers>
+                                        <Trigger Property="IsSelected" Value="True">
+                                            <Setter Property="Background" Value="#45475A"/>
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGrid.CellStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Начало" Binding="{Binding StartTime, StringFormat={}{0:HH:mm}}" Width="70"/>
+                                <DataGridTextColumn Header="Конец" Binding="{Binding EndTime, StringFormat={}{0:HH:mm}}" Width="70"/>
+                                <DataGridTextColumn Header="Длительность" Binding="{Binding DurationText}" Width="90"/>
+                                <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </ScrollViewer>
                 </StackPanel>
             </Border>

@@ -138,7 +138,7 @@ public class DataService : IDisposable
             var endDate = startDate.AddDays(1);
 
             var select = """
-                SELECT Id, StartTime, EndTime, DurationTicks, IsWorkMode
+                SELECT Id, StartTime, EndTime, DurationTicks, IsWorkMode, Description
                 FROM Sessions
                 WHERE StartTime >= @StartDate AND StartTime < @EndDate
                 ORDER BY StartTime DESC
