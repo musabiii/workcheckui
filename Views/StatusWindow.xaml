@@ -48,39 +48,30 @@
             <!-- Stats -->
             <StackPanel Grid.Row="1" VerticalAlignment="Center">
                 <!-- Текущая сессия (всегда) -->
-                <Grid Margin="0,2">
+                <Grid Margin="0,2,0,6">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="13.5"
+                    <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="15"
                                FontWeight="Bold">
                         <Run Text="{Binding SessionIcon, Mode=OneWay}"/><Run Text="{Binding SessionLabel, Mode=OneWay}"/>
                     </TextBlock>
                     <TextBlock Grid.Column="1" Text="{Binding CurrentSessionText}" Foreground="{Binding SessionBrush}"
-                               FontSize="13.5" FontWeight="Bold" HorizontalAlignment="Right"/>
+                               FontSize="15" FontWeight="Bold" HorizontalAlignment="Right"/>
                 </Grid>
 
-                <!-- Отработано / За компьютером -->
+                <Separator Grid.Row="1" Margin="0,0,0,6" Background="#33FFFFFF" Height="1"/>
+
+                <!-- Сегодня -->
                 <Grid Margin="0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding WorkedLabel}" Foreground="#BAC2DE" FontSize="13.5"/>
+                    <TextBlock Grid.Column="0" Text="📊  Сегодня:" Foreground="#BAC2DE" FontSize="12"/>
                     <TextBlock Grid.Column="1" Text="{Binding TodayWorkedText}" Foreground="#CDD6F4"
-                               FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
-                </Grid>
-
-                <!-- Сегодня отработано -->
-                <Grid Margin="0,2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="📊  Сегодня:" Foreground="#A6E3A1" FontSize="13.5"/>
-                    <TextBlock Grid.Column="1" Text="{Binding TodayWorkedText}" Foreground="#A6E3A1"
-                               FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                               FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
                 <!-- Вне работы / Вне компьютера (всегда) -->
@@ -89,9 +80,9 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding AwayLabel}" Foreground="#BAC2DE" FontSize="13.5"/>
+                    <TextBlock Grid.Column="0" Text="{Binding AwayLabel}" Foreground="#BAC2DE" FontSize="12"/>
                     <TextBlock Grid.Column="1" Text="{Binding AwayTimeText}" Foreground="#CDD6F4"
-                               FontSize="13.5" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                               FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
             </StackPanel>
 

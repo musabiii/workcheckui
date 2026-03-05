@@ -27,7 +27,6 @@ public partial class StatusViewModel : ObservableObject
 
     [ObservableProperty] private bool _isWorkMode;
     [ObservableProperty] private string _currentSessionText = "0 мин";
-    [ObservableProperty] private string _workedTimeText = "0 мин";
     [ObservableProperty] private string _awayTimeText = "0 мин";
     [ObservableProperty] private string _todayWorkedText = "0 мин";
     [ObservableProperty] private string _statusText = "Дрейфую";
@@ -38,7 +37,6 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _awayLabel = "💤  Вне компьютера:";
     [ObservableProperty] private string _sessionIcon = "🖥";
     [ObservableProperty] private string _sessionLabel = "  Текущая сессия:";
-    [ObservableProperty] private string _workedLabel = "🖥  За компьютером:";
 
     private static readonly Brush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
     private static readonly Brush ShortBreakBrush = new SolidColorBrush(Color.FromRgb(0xF9, 0xE2, 0xAF));
@@ -104,13 +102,6 @@ public partial class StatusViewModel : ObservableObject
         {
             if (req.Type is NotificationType.Pomodoro or NotificationType.Pomodoro2)
             {
-                // Сохраняем данные сессии для резюме
-                var sessionWork = _tracker.DisplayWorkedTime;
-                var sessionAway = _tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime;
-                var sessionStart = DateTime.Now - sessionWork;
-                var sessionEnd = DateTime.Now;
-                var isWorkMode = IsWorkMode;
-
                 var overlayShownAt = DateTime.Now;
 
                 _notifications.ShowBreakOverlay(
@@ -122,9 +113,6 @@ public partial class StatusViewModel : ObservableObject
                 // Корректируем время: пока висел оверлей (ожидание + возможный перерыв),
                 // пользователь не работал — это не должно считаться рабочим временем
                 _tracker.AccountOverlayIdle(overlayShownAt);
-
-                // Показываем резюме сессии
-                ShowSessionSummary(sessionWork, sessionAway, sessionStart, sessionEnd, isWorkMode);
             }
             else if (IsWorkMode)
             {
@@ -133,20 +121,6 @@ public partial class StatusViewModel : ObservableObject
 
             if (IsWorkMode && req.SendTelegram && !string.IsNullOrEmpty(req.TelegramText))
                 _ = _telegram.SendAsync(req.TelegramText, req.SilentTelegram);
-        }
-    }
-
-    private void ShowSessionSummary(TimeSpan workTime, TimeSpan awayTime, DateTime startTime, DateTime endTime, bool isWorkMode)
-    {
-        try
-        {
-            var summary = new SessionSummaryWindow(_dataService, workTime, awayTime, startTime, endTime, isWorkMode);
-            summary.Owner = Application.Current.MainWindow;
-            summary.ShowDialog();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[StatusVM] Ошибка показа резюме: {ex.Message}");
         }
     }
 
@@ -209,7 +183,6 @@ public partial class StatusViewModel : ObservableObject
         var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode);
         var totalWithCurrent = todayTotal + currentSession;
         TodayWorkedText = TimeFormatter.FormatShort(totalWithCurrent);
-        WorkedTimeText = TodayWorkedText;
     }
 
     [RelayCommand]
@@ -252,7 +225,6 @@ public partial class StatusViewModel : ObservableObject
         _tracker.Reset();
 
         TodayWorkedText = TimeFormatter.FormatShort(_dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode));
-        WorkedTimeText = TodayWorkedText;
         CurrentSessionText = "0 мин";
         AwayTimeText = "0 мин";
 
@@ -260,7 +232,6 @@ public partial class StatusViewModel : ObservableObject
         {
             ModeButtonText = "⏸  Дрейфую";
             WindowBgBrush = WorkingBgBrush;
-            WorkedLabel = "⏱  Отработано:";
             AwayLabel = "☕  Вне работы:";
             SessionIcon = "🟢";
         }
@@ -268,7 +239,6 @@ public partial class StatusViewModel : ObservableObject
         {
             ModeButtonText = "▶  В работе";
             WindowBgBrush = DriftingBgBrush;
-            WorkedLabel = "🖥  За компьютером:";
             AwayLabel = "💤  Вне компьютера:";
             SessionIcon = "🖥";
         }

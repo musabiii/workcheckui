@@ -400,6 +400,14 @@ public sealed class ActivityTracker : IDisposable
                         $"idle={TimeFormatter.FormatHuman(idleDuration)}");
     }
 
+    public void ResetSessionTimer()
+    {
+        var now = DateTime.Now;
+        _lastActivityTime = now;
+        _lastInactivityTime = now;
+        _activeSessionStart = now;
+    }
+
     public void Reset()
     {
         SaveCurrentSession();
