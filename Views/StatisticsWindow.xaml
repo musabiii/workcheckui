@@ -27,25 +27,28 @@
             <Grid Grid.Row="0" Margin="0,0,0,16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <Button Grid.Column="0" Content="◀" Click="OnPreviousDayClick" Cursor="Hand"
-                        Padding="8,4" FontSize="14" FontWeight="Bold"
+                        Padding="10,4" FontSize="14" FontWeight="Bold"
                         Style="{StaticResource CloseButton}"/>
 
                 <TextBlock Grid.Column="1" x:Name="DateText" Text="05.03.2026" Foreground="#A6E3A1"
                            FontSize="18" FontWeight="Bold"
                            VerticalAlignment="Center"
-                           HorizontalAlignment="Center"/>
+                           HorizontalAlignment="Center"
+                           Margin="12,0"/>
 
                 <Button Grid.Column="2" Content="▶" Click="OnNextDayClick" Cursor="Hand"
-                        Padding="8,4" FontSize="14" FontWeight="Bold"
+                        Padding="10,4" FontSize="14" FontWeight="Bold"
                         Style="{StaticResource CloseButton}"/>
 
-                <Button Grid.Column="3" Content="✕" HorizontalAlignment="Right" VerticalAlignment="Top"
-                        Click="OnCloseClick"
+                <Button Grid.Column="4" Content="✕" Click="OnCloseClick" Cursor="Hand"
+                        HorizontalAlignment="Right" VerticalAlignment="Top"
                         Style="{StaticResource CloseButton}"/>
             </Grid>
 
@@ -80,7 +83,8 @@
                                   HeadersVisibility="Column"
                                   CanUserAddRows="False" CanUserDeleteRows="False"
                                   CanUserResizeRows="False" CanUserReorderColumns="False"
-                                  IsReadOnly="True">
+                                  IsReadOnly="True"
+                                  Foreground="#CDD6F4">
                             <DataGrid.ColumnHeaderStyle>
                                 <Style TargetType="DataGridColumnHeader">
                                     <Setter Property="Background" Value="#313244"/>
@@ -96,6 +100,7 @@
                                     <Setter Property="BorderThickness" Value="0"/>
                                     <Setter Property="Padding" Value="8,6"/>
                                     <Setter Property="FontSize" Value="13"/>
+                                    <Setter Property="Foreground" Value="#CDD6F4"/>
                                     <Style.Triggers>
                                         <Trigger Property="IsSelected" Value="True">
                                             <Setter Property="Background" Value="#45475A"/>
