@@ -232,10 +232,17 @@
                                HorizontalAlignment="Center"
                                TextAlignment="Center"/>
 
+                    <TextBlock x:Name="LateTimerBlock"
+                               Foreground="#F38BA8"
+                               FontSize="42" FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               Margin="0,16,0,0"
+                               FontFamily="Consolas"/>
+
                     <TextBlock Text="Выберите режим работы:"
                                Foreground="#BAC2DE"
                                FontSize="16"
-                               Margin="0,16,0,0"
+                               Margin="0,8,0,0"
                                HorizontalAlignment="Center"
                                TextAlignment="Center"/>
 

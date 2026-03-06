@@ -29,7 +29,10 @@ public partial class BreakOverlayWindow : Window
     private readonly List<Window> _secondaryOverlays = [];
     private readonly TimeSpan _breakDuration;
     private DispatcherTimer? _countdownTimer;
+    private DispatcherTimer? _lateTimer;
     private TimeSpan _remaining;
+    private TimeSpan _lateTime;
+    private DateTime _modeSelectionStartTime;
 
     private readonly bool _skipPrompt;
     private bool _pauseSent;
@@ -149,6 +152,26 @@ public partial class BreakOverlayWindow : Window
         TimerPanel.Visibility = Visibility.Collapsed;
         ModeSelectionPanel.Visibility = Visibility.Visible;
         Stripe.Background = new SolidColorBrush(BreakStripeColor);
+
+        _modeSelectionStartTime = DateTime.Now;
+        _lateTime = TimeSpan.Zero;
+        UpdateLateTimerDisplay();
+
+        _lateTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _lateTimer.Tick += OnLateTimerTick;
+        _lateTimer.Start();
+    }
+
+    private void OnLateTimerTick(object? sender, EventArgs e)
+    {
+        _lateTime = DateTime.Now - _modeSelectionStartTime;
+        UpdateLateTimerDisplay();
+    }
+
+    private void UpdateLateTimerDisplay()
+    {
+        if (FindName("LateTimerBlock") is System.Windows.Controls.TextBlock lateTimerBlock)
+            lateTimerBlock.Text = _lateTime.ToString(@"hh\:mm\:ss");
     }
 
     private void UpdateCountdownDisplay()
@@ -168,6 +191,7 @@ public partial class BreakOverlayWindow : Window
     private void DismissWithMode(bool driftMode)
     {
         _countdownTimer?.Stop();
+        _lateTimer?.Stop();
         UserChoseBreak = true;
         ModeSelected = driftMode;
         CloseAll();
