@@ -110,9 +110,13 @@ public partial class StatusViewModel : ObservableObject
                     onBreakStarted: () => _tracker.IsPaused = true);
                 _tracker.IsPaused = false;
 
+                // Если пользователь нажал "Продолжить работать" сразу (не пошел на перерыв)
+                // тогда сессия продолжается до Pomodoro2
+                bool continueSession = !choseBreak;
+                
                 // Корректируем время: пока висел оверлей (ожидание + возможный перерыв),
                 // пользователь не работал — это не должно считаться рабочим временем
-                _tracker.AccountOverlayIdle(overlayShownAt, description);
+                _tracker.AccountOverlayIdle(overlayShownAt, description, continueSession);
 
                 // Если выбран режим после перерыва, переключаем
                 if (modeSelected.HasValue)
