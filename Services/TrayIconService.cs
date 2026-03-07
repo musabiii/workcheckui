@@ -59,9 +59,7 @@ public sealed class TrayIconService : IDisposable
 
         RenderIcon(minutes, color, TextColor);
 
-        var tip = isDrifting
-            ? $"WorkCheck — дрейфую ({minutes} мин)"
-            : $"WorkCheck — сессия {minutes} мин";
+        var tip = $"WorkCheck — сессия {minutes} мин";
         _notifyIcon.Text = tip.Length > 63 ? tip[..63] : tip;
     }
 

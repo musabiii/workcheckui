@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
         <!-- ========== Colors ========== -->
         <SolidColorBrush x:Key="BgBrush" Color="#1E1E2E"/>

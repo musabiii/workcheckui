@@ -74,8 +74,8 @@
                                FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
-                <!-- Вне работы / Вне компьютера (всегда) -->
-                <Grid Margin="0,2">
+                <!-- Вне компьютера (только в режиме работы) -->
+                <Grid Margin="0,2" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>

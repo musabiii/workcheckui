@@ -34,7 +34,7 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private Brush _sessionBrush = NormalTextBrush;
     [ObservableProperty] private Brush _windowBgBrush = DriftingBgBrush;
     [ObservableProperty] private string _modeButtonText = "▶  В работе";
-    [ObservableProperty] private string _awayLabel = "💤  Вне компьютера:";
+    [ObservableProperty] private string _awayLabel = "☕  Вне компьютера:";
     [ObservableProperty] private string _sessionIcon = "🖥";
     [ObservableProperty] private string _sessionLabel = "  Текущая сессия:";
 
@@ -267,14 +267,14 @@ public partial class StatusViewModel : ObservableObject
         {
             ModeButtonText = "⏸  Дрейфую";
             WindowBgBrush = WorkingBgBrush;
-            AwayLabel = "☕  Вне работы:";
+            AwayLabel = "☕  Вне компьютера:";
             SessionIcon = "🟢";
         }
         else
         {
             ModeButtonText = "▶  В работе";
             WindowBgBrush = DriftingBgBrush;
-            AwayLabel = "💤  Вне компьютера:";
+            AwayLabel = "";
             SessionIcon = "🖥";
         }
     }
