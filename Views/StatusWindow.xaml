@@ -77,7 +77,7 @@
                                FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
-                <!-- Вне компьютера (только в режиме работы) -->
+<!-- Вне компьютера (только в режиме работы) -->
                 <Grid Margin="0,2" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
@@ -85,6 +85,17 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Column="0" Text="{Binding AwayLabel}" Foreground="#BAC2DE" FontSize="12"/>
                     <TextBlock Grid.Column="1" Text="{Binding AwayTimeText}" Foreground="#CDD6F4"
+                               FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                </Grid>
+
+                <!-- Сумма -->
+                <Grid Margin="0,2" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="Сумма:" Foreground="#BAC2DE" FontSize="12"/>
+                    <TextBlock Grid.Column="1" Text="{Binding TotalEarnedText}" Foreground="#A6E3A1"
                                FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
             </StackPanel>
