@@ -373,6 +373,23 @@ public partial class StatusViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void OpenProjects()
+    {
+        var projects = _dataService.GetAllProjects();
+        var current = _selectedProject;
+        
+        var window = new ProjectsWindow(_dataService, current, project =>
+        {
+            _selectedProject = project;
+            _tracker.CurrentProjectId = project.Id;
+            ProjectName = project.Name;
+            UpdateTodayWorkedText();
+        });
+        
+        window.ShowDialog();
+    }
+
+    [RelayCommand]
     private void CloseApp()
     {
         Application.Current.MainWindow?.Hide();
