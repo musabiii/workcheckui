@@ -197,6 +197,41 @@ public List<Session> GetSessionsByDate(DateTime date, int? projectId = null)
         return sessions;
     }
 
+    public Session? GetLastSession()
+    {
+        try
+        {
+            var connection = GetConnection();
+            var sql = """
+                SELECT Id, StartTime, EndTime, DurationMinutes, IsWorkMode, Description, ProjectId
+                FROM Sessions
+                ORDER BY StartTime DESC
+                LIMIT 1
+                """;
+
+            using var cmd = new SqliteCommand(sql, connection);
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                return new Session
+                {
+                    Id = reader.GetInt32(0),
+                    StartTime = DateTime.Parse(reader.GetString(1)),
+                    EndTime = DateTime.Parse(reader.GetString(2)),
+                    Duration = TimeSpan.FromMinutes(reader.GetInt32(3)),
+                    IsWorkMode = reader.GetInt32(4) == 1,
+                    Description = reader.IsDBNull(5) ? "" : reader.GetString(5),
+                    ProjectId = reader.IsDBNull(6) ? null : reader.GetInt32(6)
+                };
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[DataService] Ошибка получения последней сессии: {ex.Message}");
+        }
+        return null;
+    }
+
     public TimeSpan GetTotalWorkTimeByDate(DateTime date, bool isWorkMode, int? projectId = null)
     {
         var sessions = GetSessionsByDate(date, projectId);

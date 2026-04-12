@@ -99,7 +99,10 @@ public partial class StatusViewModel : ObservableObject
         }
         else
         {
-            _selectedProject = _projects.LastOrDefault();
+            var lastSession = _dataService.GetLastSession();
+            _selectedProject = lastSession?.ProjectId != null 
+                ? _projects.FirstOrDefault(p => p.Id == lastSession.ProjectId) 
+                : _projects.LastOrDefault();
         }
 
         if (_selectedProject != null)

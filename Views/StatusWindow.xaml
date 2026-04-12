@@ -24,12 +24,12 @@
             </Grid.RowDefinitions>
 
             <!-- Header -->
-            <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid Grid.Row="0" Margin="0,0,0,4">
                 <TextBlock Text="WorkCheck" Foreground="#6C7086"
                            FontSize="12" FontWeight="SemiBold"
                            VerticalAlignment="Center"/>
 
-<StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="📁" Command="{Binding OpenProjectsCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
                             ToolTip="Проекты"/>
@@ -50,24 +50,30 @@
 
             <!-- Stats -->
             <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                <!-- Текущая сессия (всегда) -->
-                <Grid Margin="0,2,0,6">
+                <!-- Название проекта -->
+                <TextBlock Text="{Binding ProjectName}" Foreground="#F9E2AF" FontSize="12"
+                           FontWeight="SemiBold" HorizontalAlignment="Center"
+                           Margin="0"
+                           Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+                <!-- Текущая сессия -->
+                <Grid Margin="0,0,0,2">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="15"
+                    <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="13"
                                FontWeight="Bold">
                         <Run Text="{Binding SessionIcon, Mode=OneWay}"/><Run Text="{Binding SessionLabel, Mode=OneWay}"/>
                     </TextBlock>
                     <TextBlock Grid.Column="1" Text="{Binding CurrentSessionText}" Foreground="{Binding SessionBrush}"
-                               FontSize="15" FontWeight="Bold" HorizontalAlignment="Right"/>
+                               FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
                 </Grid>
 
-                <Separator Grid.Row="1" Margin="0,0,0,6" Background="#33FFFFFF" Height="1"/>
+                <Separator Grid.Row="1" Margin="0,0,0,2" Background="#33FFFFFF" Height="1"/>
 
                 <!-- Сегодня -->
-                <Grid Margin="0,2">
+                <Grid Margin="0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -77,8 +83,8 @@
                                FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
-<!-- Вне компьютера (только в режиме работы) -->
-                <Grid Margin="0,2" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                <!-- Вне компьютера -->
+                <Grid Margin="0,0" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -89,27 +95,27 @@
                 </Grid>
 
                 <!-- Сумма -->
-                <Grid Margin="0,2" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid Margin="0,0" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="Сумма:" Foreground="#BAC2DE" FontSize="12"/>
+                    <TextBlock Grid.Column="0" Text="💰  Сумма:" Foreground="#BAC2DE" FontSize="12"/>
                     <TextBlock Grid.Column="1" Text="{Binding TotalEarnedText}" Foreground="#A6E3A1"
                                FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
             </StackPanel>
 
             <!-- Footer: mode toggle + status -->
-            <Grid Grid.Row="2" Margin="0,6,0,0">
+            <Grid Grid.Row="2" Margin="0,4,0,0">
                 <Button Content="{Binding ModeButtonText}"
                         Command="{Binding ToggleModeCommand}"
                         HorizontalAlignment="Left"
                         Style="{StaticResource HeaderButton}"
-                        FontSize="11"/>
+                        FontSize="12"/>
 
                 <TextBlock Text="{Binding StatusText}" Foreground="{Binding StatusBrush}"
-                           FontSize="11" HorizontalAlignment="Right"
+                           FontSize="12" HorizontalAlignment="Right"
                            VerticalAlignment="Center"/>
             </Grid>
         </Grid>
