@@ -402,6 +402,7 @@ public sealed class ActivityTracker : IDisposable
         _lastActivityTime = now;
         _lastInactivityTime = now;
         _activeSessionStart = now;
+        _workedTime = TimeSpan.Zero;
 
         // Оставляем _pomodoroNotified = true, чтобы окно не появлялось снова
         // для той же сессии. Сбросим только когда будет новая полноценная сессия работы
@@ -423,7 +424,7 @@ public sealed class ActivityTracker : IDisposable
 
     public void Reset()
     {
-        SaveCurrentSession();
+        //SaveCurrentSession();
 
         var now = DateTime.Now;
         _lastActivityTime = now;
