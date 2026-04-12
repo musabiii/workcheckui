@@ -9,6 +9,7 @@ public class Session
     public DateTime Date => StartTime.Date;
     public bool IsWorkMode { get; set; }
     public string Description { get; set; } = string.Empty;
+    public int? ProjectId { get; set; }
 }
 
 public class AwayPeriod

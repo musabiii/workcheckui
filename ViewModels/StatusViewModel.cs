@@ -25,9 +25,12 @@ public partial class StatusViewModel : ObservableObject
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
     private bool _wasUserShortBreak;
+    private List<Project> _projects;
+    private Project? _selectedProject;
 
     [ObservableProperty] private bool _isWorkMode;
     [ObservableProperty] private string _currentSessionText = "0 мин";
+    [ObservableProperty] private string _projectName = "";
     [ObservableProperty] private string _awayTimeText = "0 мин";
     [ObservableProperty] private string _todayWorkedText = "0 мин";
     [ObservableProperty] private string _statusText = "Дрейфую";
@@ -75,9 +78,44 @@ public partial class StatusViewModel : ObservableObject
         _dataService = dataService;
         _settings = settings;
 
+        LoadProjects();
+
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _timer.Tick += OnTick;
         _timer.Start();
+        
+        UpdateTodayWorkedText();
+    }
+
+    private void LoadProjects()
+    {
+        _projects = _dataService.GetAllProjects();
+        
+        if (_projects.Count == 0)
+        {
+            _selectedProject = new Project { Id = _dataService.AddProject(new Project { Name = "По умолчанию", Rate = 0 }) };
+            _projects.Add(_selectedProject);
+        }
+        else
+        {
+            _selectedProject = _projects.LastOrDefault();
+        }
+
+        if (_selectedProject != null)
+        {
+            _tracker.CurrentProjectId = _selectedProject.Id;
+            ProjectName = _selectedProject.Name;
+        }
+    }
+
+    [RelayCommand]
+    private void SelectProject(Project? project)
+    {
+        if (project == null) return;
+        
+        _selectedProject = project;
+        _tracker.CurrentProjectId = project.Id;
+        ProjectName = project.Name;
         
         UpdateTodayWorkedText();
     }
@@ -234,7 +272,7 @@ public partial class StatusViewModel : ObservableObject
 
     private void UpdateTodayWorkedText(TimeSpan currentSession = default)
     {
-        var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode);
+        var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode, _tracker.CurrentProjectId);
         var totalWithCurrent = todayTotal + currentSession;
         TodayWorkedText = TimeFormatter.FormatShort(totalWithCurrent);
     }
@@ -292,7 +330,7 @@ public partial class StatusViewModel : ObservableObject
         _tracker.IsWorkMode = IsWorkMode;
         _tracker.Reset();
 
-        TodayWorkedText = TimeFormatter.FormatShort(_dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode));
+        TodayWorkedText = TimeFormatter.FormatShort(_dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode, _tracker.CurrentProjectId));
         CurrentSessionText = "0 мин";
         AwayTimeText = "0 мин";
 

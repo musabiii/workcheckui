@@ -62,12 +62,31 @@ public class DataService : IDisposable
             using var cmd2 = new SqliteCommand(createAwayTable, connection);
             cmd2.ExecuteNonQuery();
 
-            var addSessionColumn = """
+            var createProjectsTable = """
+                CREATE TABLE IF NOT EXISTS Projects (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    Name TEXT NOT NULL,
+                    Rate REAL NOT NULL DEFAULT 0
+                )
+                """;
+
+            using var cmdProjects = new SqliteCommand(createProjectsTable, connection);
+            cmdProjects.ExecuteNonQuery();
+
+            var addProjectIdColumn = """
+                ALTER TABLE Sessions ADD COLUMN ProjectId INTEGER
+                """;
+
+            using var cmdAddProjectId = new SqliteCommand(addProjectIdColumn, connection);
+            try { cmdAddProjectId.ExecuteNonQuery(); }
+            catch { /* Column already exists */ }
+
+            var addIsWorkModeColumn = """
                 ALTER TABLE Sessions ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1
                 """;
 
-            using var cmd3 = new SqliteCommand(addSessionColumn, connection);
-            try { cmd3.ExecuteNonQuery(); }
+            using var cmdIsWorkMode = new SqliteCommand(addIsWorkModeColumn, connection);
+            try { cmdIsWorkMode.ExecuteNonQuery(); }
             catch { /* Column already exists */ }
 
             var addDescriptionColumn = """
@@ -102,14 +121,14 @@ public class DataService : IDisposable
         return _connection;
     }
 
-    public void SaveSession(DateTime startTime, DateTime endTime, TimeSpan duration, bool isWorkMode, string description = "")
+    public void SaveSession(DateTime startTime, DateTime endTime, TimeSpan duration, bool isWorkMode, int? projectId = null, string description = "")
     {
         try
         {
             var connection = GetConnection();
             var insert = """
-                INSERT INTO Sessions (StartTime, EndTime, DurationMinutes, IsWorkMode, Description)
-                VALUES (@StartTime, @EndTime, @DurationMinutes, @IsWorkMode, @Description)
+                INSERT INTO Sessions (StartTime, EndTime, DurationMinutes, IsWorkMode, ProjectId, Description)
+                VALUES (@StartTime, @EndTime, @DurationMinutes, @IsWorkMode, @ProjectId, @Description)
                 """;
 
             using var cmd = new SqliteCommand(insert, connection);
@@ -117,6 +136,7 @@ public class DataService : IDisposable
             cmd.Parameters.AddWithValue("@EndTime", endTime.ToString("O"));
             cmd.Parameters.AddWithValue("@DurationMinutes", (int)duration.TotalMinutes);
             cmd.Parameters.AddWithValue("@IsWorkMode", isWorkMode ? 1 : 0);
+            cmd.Parameters.AddWithValue("@ProjectId", projectId.HasValue ? projectId.Value : DBNull.Value);
             cmd.Parameters.AddWithValue("@Description", description);
 
             cmd.ExecuteNonQuery();
@@ -127,26 +147,32 @@ public class DataService : IDisposable
         }
     }
 
-    public List<Session> GetSessionsByDate(DateTime date)
+public List<Session> GetSessionsByDate(DateTime date, int? projectId = null)
     {
         var sessions = new List<Session>();
-
         try
         {
             var connection = GetConnection();
             var startDate = date.Date;
             var endDate = startDate.AddDays(1);
 
-var select = """
-                SELECT Id, StartTime, EndTime, DurationMinutes, IsWorkMode, Description
+            var sql = """
+                SELECT Id, StartTime, EndTime, DurationMinutes, IsWorkMode, Description, ProjectId
                 FROM Sessions
                 WHERE StartTime >= @StartDate AND StartTime < @EndDate
-                ORDER BY StartTime DESC
                 """;
 
-            using var cmd = new SqliteCommand(select, connection);
+            if (projectId.HasValue)
+                sql += " AND ProjectId = @ProjectId";
+            
+            sql += " ORDER BY StartTime DESC";
+
+            using var cmd = new SqliteCommand(sql, connection);
             cmd.Parameters.AddWithValue("@StartDate", startDate.ToString("O"));
             cmd.Parameters.AddWithValue("@EndDate", endDate.ToString("O"));
+            
+            if (projectId.HasValue)
+                cmd.Parameters.AddWithValue("@ProjectId", projectId.Value);
 
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
@@ -158,7 +184,8 @@ var select = """
                     EndTime = DateTime.Parse(reader.GetString(2)),
                     Duration = TimeSpan.FromMinutes(reader.GetInt32(3)),
                     IsWorkMode = reader.GetInt32(4) == 1,
-                    Description = reader.IsDBNull(5) ? "" : reader.GetString(5)
+                    Description = reader.IsDBNull(5) ? "" : reader.GetString(5),
+                    ProjectId = reader.IsDBNull(6) ? null : reader.GetInt32(6)
                 });
             }
         }
@@ -170,9 +197,9 @@ var select = """
         return sessions;
     }
 
-    public TimeSpan GetTotalWorkTimeByDate(DateTime date, bool isWorkMode)
+    public TimeSpan GetTotalWorkTimeByDate(DateTime date, bool isWorkMode, int? projectId = null)
     {
-        var sessions = GetSessionsByDate(date);
+        var sessions = GetSessionsByDate(date, projectId);
         return TimeSpan.FromMinutes(sessions.Where(s => s.IsWorkMode == isWorkMode).Sum(s => s.Duration.TotalMinutes));
     }
 
@@ -259,6 +286,97 @@ var select = """
         {
             Debug.WriteLine($"[DataService] Ошибка подсчёта сессий: {ex.Message}");
             return 0;
+        }
+    }
+
+    public List<Project> GetAllProjects()
+    {
+        var projects = new List<Project>();
+        try
+        {
+            var connection = GetConnection();
+            var select = "SELECT Id, Name, Rate FROM Projects ORDER BY Name";
+
+            using var cmd = new SqliteCommand(select, connection);
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                projects.Add(new Project
+                {
+                    Id = reader.GetInt32(0),
+                    Name = reader.GetString(1),
+                    Rate = (decimal)reader.GetDouble(2)
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[DataService] Ошибка получения проектов: {ex.Message}");
+        }
+        return projects;
+    }
+
+    public int AddProject(Project project)
+    {
+        try
+        {
+            var connection = GetConnection();
+            var insert = """
+                INSERT INTO Projects (Name, Rate)
+                VALUES (@Name, @Rate)
+                """;
+
+            using var cmd = new SqliteCommand(insert, connection);
+            cmd.Parameters.AddWithValue("@Name", project.Name);
+            cmd.Parameters.AddWithValue("@Rate", (double)project.Rate);
+            cmd.ExecuteNonQuery();
+
+            using var cmdId = new SqliteCommand("SELECT last_insert_rowid()", connection);
+            return Convert.ToInt32(cmdId.ExecuteScalar());
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[DataService] Ошибка добавления проекта: {ex.Message}");
+            return 0;
+        }
+    }
+
+    public void UpdateProject(Project project)
+    {
+        try
+        {
+            var connection = GetConnection();
+            var update = """
+                UPDATE Projects SET Name = @Name, Rate = @Rate
+                WHERE Id = @Id
+                """;
+
+            using var cmd = new SqliteCommand(update, connection);
+            cmd.Parameters.AddWithValue("@Id", project.Id);
+            cmd.Parameters.AddWithValue("@Name", project.Name);
+            cmd.Parameters.AddWithValue("@Rate", (double)project.Rate);
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[DataService] Ошибка обновления проекта: {ex.Message}");
+        }
+    }
+
+    public void DeleteProject(int id)
+    {
+        try
+        {
+            var connection = GetConnection();
+            var delete = "DELETE FROM Projects WHERE Id = @Id";
+
+            using var cmd = new SqliteCommand(delete, connection);
+            cmd.Parameters.AddWithValue("@Id", id);
+            cmd.ExecuteNonQuery();
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"[DataService] Ошибка удаления проекта: {ex.Message}");
         }
     }
 

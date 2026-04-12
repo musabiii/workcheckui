@@ -10,8 +10,15 @@ namespace WorkCheck.Services;
 
 public sealed class ActivityTracker : IDisposable
 {
-    private readonly DataService _dataService;
+private readonly DataService _dataService;
     private bool _isWorkMode = false;
+    private int? _currentProjectId;
+
+    public int? CurrentProjectId
+    {
+        get => _currentProjectId;
+        set => _currentProjectId = value;
+    }
 
     public bool IsWorkMode
     {
@@ -102,7 +109,7 @@ public sealed class ActivityTracker : IDisposable
         {
             var sessionEnd = DateTime.Now;
             var sessionStart = sessionEnd - sessionWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, description);
+            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, _currentProjectId, description);
             
             Debug.WriteLine($"[ActivityTracker] Saved session: {sessionWork} in mode {_isWorkMode}");
         }
@@ -316,10 +323,10 @@ public sealed class ActivityTracker : IDisposable
             if (sessionWork > TimeSpan.Zero)
                 _workedTime += sessionWork;
 
-            // Сохраняем завершённую сессию в БД
+// Сохраняем завершённую сессию в БД
             var sessionEnd = _lastActivityTime;
             var sessionStart = sessionEnd - sessionWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode);
+            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, _currentProjectId);
 
             notifications.Add(new NotificationRequest
             {
@@ -392,7 +399,7 @@ public sealed class ActivityTracker : IDisposable
             // Сохраняем завершённую сессию в БД
             var sessionEnd = overlayShownAt;
             var sessionStart = sessionEnd - realWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, realWork, _isWorkMode, description);
+            _dataService.SaveSession(sessionStart, sessionEnd, realWork, _isWorkMode, _currentProjectId, description);
         }
 
         // Время простоя пока висел оверлей — это away
