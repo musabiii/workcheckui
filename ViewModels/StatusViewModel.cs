@@ -24,6 +24,7 @@ public partial class StatusViewModel : ObservableObject
     private readonly DataService _dataService;
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
+    private bool _wasUserShortBreak;
 
     [ObservableProperty] private bool _isWorkMode;
     [ObservableProperty] private string _currentSessionText = "0 мин";
@@ -135,6 +136,35 @@ public partial class StatusViewModel : ObservableObject
                     }
                 }
             }
+            else if (req.Type is NotificationType.ShortBreak && !_wasUserShortBreak)
+            {
+                _wasUserShortBreak = true;
+                var overlayShownAt = DateTime.Now;
+
+                var (_, _, modeSelected) = _notifications.ShowBreakOverlay(
+                    req.Type, req.Title, req.Message,
+                    _settings.ShortBreakTime,
+                    onBreakStarted: () => _tracker.IsPaused = true,
+                    skipPrompt: true,
+                    showChoice: true);
+                _tracker.IsPaused = false;
+
+                _tracker.AccountOverlayIdle(overlayShownAt, "");
+
+                if (modeSelected.HasValue)
+                {
+                    if (modeSelected.Value == false)
+                    {
+                        if (!IsWorkMode)
+                            ToggleMode();
+                    }
+                    else
+                    {
+                        if (IsWorkMode)
+                            ToggleMode();
+                    }
+                }
+            }
             else if (IsWorkMode)
             {
                 _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
@@ -174,6 +204,7 @@ public partial class StatusViewModel : ObservableObject
 
             if (_tracker.UserActive && !_tracker.UserShortBreak)
             {
+                _wasUserShortBreak = false;
                 StatusText = "Активен";
                 StatusBrush = ActiveBrush;
             }
@@ -184,12 +215,14 @@ public partial class StatusViewModel : ObservableObject
             }
             else
             {
+                _wasUserShortBreak = false;
                 StatusText = "Неактивен";
                 StatusBrush = InactiveBrush;
             }
         }
         else
         {
+            _wasUserShortBreak = false;
             SessionBrush = NormalTextBrush;
             StatusText = "Дрейфую";
             StatusBrush = DriftingGrayBrush;

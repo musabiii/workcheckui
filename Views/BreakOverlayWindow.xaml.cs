@@ -36,20 +36,22 @@ private readonly TimeSpan _breakDuration;
     private DateTime _modeSelectionStartTime;
     private TimeSpan _choiceRemaining;
 
-    private readonly bool _skipPrompt;
+private readonly bool _skipPrompt;
+    private readonly bool _showChoice;
 
     public bool UserChoseBreak { get; private set; }
     public string SessionDescription { get; set; } = string.Empty;
     public bool? ModeSelected { get; private set; }
     public Action? OnBreakStarted { get; set; }
 
-    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false)
+    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false, bool showChoice = false)
     {
         InitializeComponent();
 
         DataContext = this;
-        _breakDuration = breakDuration;
+_breakDuration = breakDuration;
         _skipPrompt = skipPrompt;
+        _showChoice = showChoice;
 
         TitleBlock.Text = title;
         MessageBlock.Text = message;
@@ -59,9 +61,15 @@ private readonly TimeSpan _breakDuration;
 
         CreateSecondaryOverlays();
 
-        if (_skipPrompt)
+        if (_skipPrompt || _showChoice)
         {
-            Loaded += (_, _) => SwitchToTimerMode();
+            Loaded += (_, _) =>
+            {
+                if (_showChoice)
+                    SwitchToModeSelection();
+                else
+                    SwitchToTimerMode();
+            };
         }
         else
         {
@@ -155,6 +163,7 @@ public void ShowWithOverlays()
     {
         PromptPanel.Visibility = Visibility.Collapsed;
         TimerPanel.Visibility = Visibility.Visible;
+        ModeSelectionPanel.Visibility = Visibility.Collapsed;
         Stripe.Background = new SolidColorBrush(BreakStripeColor);
 
         _remaining = _breakDuration;
@@ -181,8 +190,9 @@ public void ShowWithOverlays()
         UpdateCountdownDisplay();
     }
 
-    private void SwitchToModeSelection()
+private void SwitchToModeSelection()
     {
+        PromptPanel.Visibility = Visibility.Collapsed;
         TimerPanel.Visibility = Visibility.Collapsed;
         ModeSelectionPanel.Visibility = Visibility.Visible;
         Stripe.Background = new SolidColorBrush(BreakStripeColor);

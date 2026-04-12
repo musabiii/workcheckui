@@ -86,12 +86,12 @@ public class NotificationService
         }
     }
 
-    public (bool choseBreak, string description, bool? modeSelected) ShowBreakOverlay(NotificationType type, string title, string message,
-        TimeSpan breakDuration, Action? onBreakStarted = null, bool skipPrompt = false)
+public (bool choseBreak, string description, bool? modeSelected) ShowBreakOverlay(NotificationType type, string title, string message,
+        TimeSpan breakDuration, Action? onBreakStarted = null, bool skipPrompt = false, bool showChoice = false)
     {
         try
         {
-            var overlay = new BreakOverlayWindow(type, title, message, breakDuration, skipPrompt);
+            var overlay = new BreakOverlayWindow(type, title, message, breakDuration, skipPrompt, showChoice);
             overlay.OnBreakStarted = onBreakStarted;
             overlay.Loaded += (_, _) => overlay.PlayFadeIn();
             overlay.ShowWithOverlays();

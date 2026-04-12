@@ -233,7 +233,7 @@
                 <!-- Mode Selection mode -->
                 <StackPanel x:Name="ModeSelectionPanel" Grid.Row="1" Margin="36,28,36,32"
                             Visibility="Collapsed">
-                    <TextBlock Text="Перерыв завершён!"
+                    <TextBlock Text="Не у компьютера!"
                                Foreground="#A6E3A1"
                                FontSize="24" FontWeight="Bold"
                                HorizontalAlignment="Center"
