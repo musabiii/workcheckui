@@ -424,7 +424,7 @@ public sealed class ActivityTracker : IDisposable
     public void Reset()
     {
         SaveCurrentSession();
-        
+
         var now = DateTime.Now;
         _lastActivityTime = now;
         _lastInactivityTime = now;

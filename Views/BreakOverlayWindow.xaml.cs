@@ -27,15 +27,16 @@ public partial class BreakOverlayWindow : Window
     private static readonly Color BreakStripeColor = Color.FromRgb(0x89, 0xB4, 0xFA);
 
     private readonly List<Window> _secondaryOverlays = [];
-    private readonly TimeSpan _breakDuration;
+private readonly TimeSpan _breakDuration;
     private DispatcherTimer? _countdownTimer;
     private DispatcherTimer? _lateTimer;
+    private DispatcherTimer? _choiceTimer;
     private TimeSpan _remaining;
     private TimeSpan _lateTime;
     private DateTime _modeSelectionStartTime;
+    private TimeSpan _choiceRemaining;
 
     private readonly bool _skipPrompt;
-    private bool _pauseSent;
 
     public bool UserChoseBreak { get; private set; }
     public string SessionDescription { get; set; } = string.Empty;
@@ -62,6 +63,45 @@ public partial class BreakOverlayWindow : Window
         {
             Loaded += (_, _) => SwitchToTimerMode();
         }
+        else
+        {
+            StartChoiceTimer();
+        }
+    }
+
+    private void StartChoiceTimer()
+    {
+        _choiceRemaining = TimeSpan.FromSeconds(10);
+        UpdateChoiceCountdownDisplay();
+
+        _choiceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _choiceTimer.Tick += OnChoiceTick;
+        _choiceTimer.Start();
+    }
+
+    private void OnChoiceTick(object? sender, EventArgs e)
+    {
+        _choiceRemaining -= TimeSpan.FromSeconds(1);
+
+        if (_choiceRemaining <= TimeSpan.Zero)
+        {
+            _choiceTimer?.Stop();
+            SwitchToTimerMode();
+            return;
+        }
+
+        UpdateChoiceCountdownDisplay();
+    }
+
+    private void UpdateChoiceCountdownDisplay()
+    {
+        ChoiceCountdownBlock.Text = $"Перерыв через {_choiceRemaining.Seconds}...";
+    }
+
+    public void ExtendChoiceTimer()
+    {
+        _choiceRemaining = TimeSpan.FromSeconds(10);
+        UpdateChoiceCountdownDisplay();
     }
 
     private void CreateSecondaryOverlays()
@@ -88,14 +128,8 @@ public partial class BreakOverlayWindow : Window
         }
     }
 
-    public void ShowWithOverlays()
+public void ShowWithOverlays()
     {
-        if (!_pauseSent)
-        {
-            SendMediaPause();
-            _pauseSent = true;
-        }
-
         foreach (var overlay in _secondaryOverlays)
             overlay.Show();
 
@@ -208,13 +242,15 @@ public partial class BreakOverlayWindow : Window
         _secondaryOverlays.Clear();
     }
 
-    private void OnBreakClick(object sender, RoutedEventArgs e)
+private void OnBreakClick(object sender, RoutedEventArgs e)
     {
+        _choiceTimer?.Stop();
         SwitchToTimerMode();
     }
 
     private void OnContinueClick(object sender, RoutedEventArgs e)
     {
+        _choiceTimer?.Stop();
         Dismiss(choseBreak: false);
     }
 

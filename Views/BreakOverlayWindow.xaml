@@ -35,13 +35,20 @@
                                TextWrapping="Wrap"
                                TextAlignment="Center"/>
 
-                    <TextBlock x:Name="MessageBlock"
+<TextBlock x:Name="MessageBlock"
                                Foreground="#BAC2DE"
                                FontSize="15"
                                Margin="0,12,0,0"
                                HorizontalAlignment="Center"
                                TextWrapping="Wrap"
                                TextAlignment="Center"/>
+
+                    <TextBlock x:Name="ChoiceCountdownBlock"
+                               Foreground="#F9E2AF"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Margin="0,8,0,0"
+                               HorizontalAlignment="Center"/>
 
                     <TextBox x:Name="DescriptionBox"
                              Foreground="#CDD6F4"
@@ -61,7 +68,7 @@
                         </TextBox.Text>
                     </TextBox>
 
-                    <StackPanel Orientation="Horizontal"
+<StackPanel Orientation="Horizontal"
                                 HorizontalAlignment="Center"
                                 Margin="0,16,0,0">
 
