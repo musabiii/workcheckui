@@ -40,7 +40,7 @@ public class DataService : IDisposable
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     StartTime TEXT NOT NULL,
                     EndTime TEXT NOT NULL,
-                    DurationTicks INTEGER NOT NULL,
+                    DurationMinutes INTEGER NOT NULL,
                     IsWorkMode INTEGER NOT NULL DEFAULT 1,
                     Description TEXT
                 )
@@ -54,7 +54,7 @@ public class DataService : IDisposable
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
                     StartTime TEXT NOT NULL,
                     EndTime TEXT NOT NULL,
-                    DurationTicks INTEGER NOT NULL,
+                    DurationMinutes INTEGER NOT NULL,
                     IsWorkMode INTEGER NOT NULL DEFAULT 1
                 )
                 """;
@@ -108,14 +108,14 @@ public class DataService : IDisposable
         {
             var connection = GetConnection();
             var insert = """
-                INSERT INTO Sessions (StartTime, EndTime, DurationTicks, IsWorkMode, Description)
-                VALUES (@StartTime, @EndTime, @DurationTicks, @IsWorkMode, @Description)
+                INSERT INTO Sessions (StartTime, EndTime, DurationMinutes, IsWorkMode, Description)
+                VALUES (@StartTime, @EndTime, @DurationMinutes, @IsWorkMode, @Description)
                 """;
 
             using var cmd = new SqliteCommand(insert, connection);
             cmd.Parameters.AddWithValue("@StartTime", startTime.ToString("O"));
             cmd.Parameters.AddWithValue("@EndTime", endTime.ToString("O"));
-            cmd.Parameters.AddWithValue("@DurationTicks", duration.Ticks);
+            cmd.Parameters.AddWithValue("@DurationMinutes", (int)duration.TotalMinutes);
             cmd.Parameters.AddWithValue("@IsWorkMode", isWorkMode ? 1 : 0);
             cmd.Parameters.AddWithValue("@Description", description);
 
@@ -137,8 +137,8 @@ public class DataService : IDisposable
             var startDate = date.Date;
             var endDate = startDate.AddDays(1);
 
-            var select = """
-                SELECT Id, StartTime, EndTime, DurationTicks, IsWorkMode, Description
+var select = """
+                SELECT Id, StartTime, EndTime, DurationMinutes, IsWorkMode, Description
                 FROM Sessions
                 WHERE StartTime >= @StartDate AND StartTime < @EndDate
                 ORDER BY StartTime DESC
@@ -156,9 +156,9 @@ public class DataService : IDisposable
                     Id = reader.GetInt32(0),
                     StartTime = DateTime.Parse(reader.GetString(1)),
                     EndTime = DateTime.Parse(reader.GetString(2)),
-                    Duration = TimeSpan.FromTicks(reader.GetInt64(3)),
+                    Duration = TimeSpan.FromMinutes(reader.GetInt32(3)),
                     IsWorkMode = reader.GetInt32(4) == 1,
-                    Description = reader.IsDBNull(5) ? string.Empty : reader.GetString(5)
+                    Description = reader.IsDBNull(5) ? "" : reader.GetString(5)
                 });
             }
         }
@@ -173,7 +173,7 @@ public class DataService : IDisposable
     public TimeSpan GetTotalWorkTimeByDate(DateTime date, bool isWorkMode)
     {
         var sessions = GetSessionsByDate(date);
-        return TimeSpan.FromTicks(sessions.Where(s => s.IsWorkMode == isWorkMode).Sum(s => s.Duration.Ticks));
+        return TimeSpan.FromMinutes(sessions.Where(s => s.IsWorkMode == isWorkMode).Sum(s => s.Duration.TotalMinutes));
     }
 
     public void SaveAwayPeriod(DateTime startTime, DateTime endTime, TimeSpan duration, bool isWorkMode)
@@ -182,14 +182,14 @@ public class DataService : IDisposable
         {
             var connection = GetConnection();
             var insert = """
-                INSERT INTO AwayPeriods (StartTime, EndTime, DurationTicks, IsWorkMode)
-                VALUES (@StartTime, @EndTime, @DurationTicks, @IsWorkMode)
+                INSERT INTO AwayPeriods (StartTime, EndTime, DurationMinutes, IsWorkMode)
+                VALUES (@StartTime, @EndTime, @DurationMinutes, @IsWorkMode)
                 """;
 
             using var cmd = new SqliteCommand(insert, connection);
             cmd.Parameters.AddWithValue("@StartTime", startTime.ToString("O"));
             cmd.Parameters.AddWithValue("@EndTime", endTime.ToString("O"));
-            cmd.Parameters.AddWithValue("@DurationTicks", duration.Ticks);
+            cmd.Parameters.AddWithValue("@DurationMinutes", (int)duration.TotalMinutes);
             cmd.Parameters.AddWithValue("@IsWorkMode", isWorkMode ? 1 : 0);
 
             cmd.ExecuteNonQuery();
@@ -209,7 +209,7 @@ public class DataService : IDisposable
             var endDate = startDate.AddDays(1);
 
             var select = """
-                SELECT SUM(DurationTicks)
+                SELECT SUM(DurationMinutes)
                 FROM AwayPeriods
                 WHERE StartTime >= @StartDate AND StartTime < @EndDate
                 AND IsWorkMode = @IsWorkMode
@@ -224,7 +224,7 @@ public class DataService : IDisposable
             if (result == DBNull.Value || result == null)
                 return TimeSpan.Zero;
 
-            return TimeSpan.FromTicks(Convert.ToInt64(result));
+            return TimeSpan.FromMinutes(Convert.ToDouble(result));
         }
         catch (Exception ex)
         {
