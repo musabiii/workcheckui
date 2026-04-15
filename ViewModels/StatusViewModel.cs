@@ -289,6 +289,7 @@ public partial class StatusViewModel : ObservableObject
     [RelayCommand]
     private void ManualBreak()
     {
+        _tracker.IsPaused = true;
         var overlayShownAt = DateTime.Now;
 
         var (_, description, modeSelected) = _notifications.ShowBreakOverlay(
@@ -296,8 +297,8 @@ public partial class StatusViewModel : ObservableObject
             "☕  Ручной перерыв",
             $"Поработали {TimeFormatter.FormatShort(_tracker.CurrentSession)}",
             _settings.ShortBreakTime,
-            onBreakStarted: () => _tracker.IsPaused = true,
             skipPrompt: true);
+        
         _tracker.IsPaused = false;
 
         _tracker.AccountOverlayIdle(overlayShownAt, description);
@@ -375,21 +376,6 @@ var rate = _selectedProject?.Rate ?? 0;
     }
 
     [RelayCommand]
-    private void OpenSettings()
-    {
-        var vm = new SettingsViewModel(_settings, _settingsService);
-        var window = new SettingsWindow { DataContext = vm };
-        vm.RequestClose += result => { window.DialogResult = result; };
-
-        if (window.ShowDialog() == true)
-        {
-            _settings = _settingsService.Load();
-            _tracker.ApplySettings(_settings);
-            _telegram.Settings = _settings;
-        }
-    }
-
-    [RelayCommand]
     private void OpenProjects()
     {
         var projects = _dataService.GetAllProjects();
@@ -404,6 +390,21 @@ var rate = _selectedProject?.Rate ?? 0;
         });
         
         window.ShowDialog();
+    }
+
+    [RelayCommand]
+    private void OpenSettings()
+    {
+        var vm = new SettingsViewModel(_settings, _settingsService);
+        var window = new SettingsWindow { DataContext = vm };
+        vm.RequestClose += result => { window.DialogResult = result; };
+
+        if (window.ShowDialog() == true)
+        {
+            _settings = _settingsService.Load();
+            _tracker.ApplySettings(_settings);
+            _telegram.Settings = _settings;
+        }
     }
 
     [RelayCommand]

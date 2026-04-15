@@ -279,12 +279,21 @@ private readonly DataService _dataService;
         while (_pending.Count > 0)
             notifications.Add(_pending.Dequeue());
 
-        if (!_userActive)
+        if (!_userActive || IsPaused)
             return notifications;
 
         var now = DateTime.Now;
         var sinceLast = now - _lastActivityTime;
         var sinceInactivity = now - _lastInactivityTime;
+
+        Debug.WriteLine($"[Tick] sinceLast={sinceLast:mm\\:ss}, sinceInactivity={sinceInactivity:mm\\:ss}, " +
+                       $"userShortBreak={_userShortBreak}, pomodoroNotified={_pomodoroNotified}, IsPaused={IsPaused}");
+
+        Debug.WriteLine($"[Tick] sinceLast={sinceLast:mm\\:ss}, sinceInactivity={sinceInactivity:mm\\:ss}, " +
+                       $"userShortBreak={_userShortBreak}, pomodoroNotified={_pomodoroNotified}, IsPaused={IsPaused}");
+
+        Debug.WriteLine($"[Tick] sinceLast={sinceLast:mm\\:ss}, sinceInactivity={sinceInactivity:mm\\:ss}, " +
+                       $"userShortBreak={_userShortBreak}, pomodoroNotified={_pomodoroNotified}, IsPaused={IsPaused}");
 
         if (!_userShortBreak)
         {
@@ -376,8 +385,14 @@ private readonly DataService _dataService;
         var now = DateTime.Now;
         var idleDuration = now - overlayShownAt;
 
+        Debug.WriteLine($"[AccountOverlayIdle] START - continueSession={continueSession}, overlayShownAt={overlayShownAt:HH:mm:ss}, now={now:HH:mm:ss}, idle={idleDuration:mm\\:ss}");
+        Debug.WriteLine($"[AccountOverlayIdle] BEFORE - _lastInactivityTime={_lastInactivityTime:HH:mm:ss}, _pomodoroNotified={_pomodoroNotified}");
+
         if (idleDuration <= TimeSpan.Zero)
+        {
+            Debug.WriteLine($"[AccountOverlayIdle] idleDuration <= 0, returning");
             return;
+        }
 
         if (continueSession)
         {
@@ -386,13 +401,15 @@ private readonly DataService _dataService;
             // чтобы sinceInactivity продолжал расти от начала сессии для проверки Pomodoro2.
             _lastActivityTime = now;
             
-            Debug.WriteLine($"[ActivityTracker] Continuing session after overlay");
+            Debug.WriteLine($"[AccountOverlayIdle] Continuing session - _lastActivityTime set to now");
             return;
         }
 
         // Был перерыв - завершаем сессию и начинаем новую
         // Фиксируем работу до момента показа оверлея
         var realWork = overlayShownAt - _lastInactivityTime;
+        Debug.WriteLine($"[AccountOverlayIdle] realWork={realWork:mm\\:ss}");
+        
         if (realWork > TimeSpan.Zero)
         {
             _workedTime += realWork;
@@ -411,14 +428,12 @@ private readonly DataService _dataService;
         _activeSessionStart = now;
         _workedTime = TimeSpan.Zero;
 
-        // Оставляем _pomodoroNotified = true, чтобы окно не появлялось снова
-        // для той же сессии. Сбросим только когда будет новая полноценная сессия работы
-        _pomodoroNotified = true;
+        // Сбрасываем флаги, чтобы следующее уведомление пришло только после новой сессии
+        _pomodoroNotified = false;
         _pomodoro2Notified = false;
+        _userShortBreak = false;
 
-        Debug.WriteLine($"[ActivityTracker] Overlay idle accounted: " +
-                        $"realWork={TimeFormatter.FormatHuman(realWork)}, " +
-                        $"idle={TimeFormatter.FormatHuman(idleDuration)}");
+        Debug.WriteLine($"[AccountOverlayIdle] AFTER - _lastInactivityTime={_lastInactivityTime:HH:mm:ss}, flags reset (pomodoro={_pomodoroNotified}, pomodoro2={_pomodoro2Notified}, userShortBreak={_userShortBreak})");
     }
 
     public void ResetSessionTimer()
