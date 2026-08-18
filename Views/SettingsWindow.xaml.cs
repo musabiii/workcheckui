@@ -38,4 +38,13 @@ public partial class SettingsWindow : Window
         if (DataContext is SettingsViewModel vm)
             vm.CancelCommand.Execute(null);
     }
+
+    private void OnTestTelegramClick(object sender, RoutedEventArgs e)
+    {
+        if (DataContext is SettingsViewModel vm)
+        {
+            vm.TelegramBotToken = TokenBox.Password;
+            vm.TestTelegramCommand.Execute(null);
+        }
+    }
 }

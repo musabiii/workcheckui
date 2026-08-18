@@ -395,7 +395,7 @@ var rate = _selectedProject?.Rate ?? 0;
     [RelayCommand]
     private void OpenSettings()
     {
-        var vm = new SettingsViewModel(_settings, _settingsService);
+        var vm = new SettingsViewModel(_settings, _settingsService, _telegram);
         var window = new SettingsWindow { DataContext = vm };
         vm.RequestClose += result => { window.DialogResult = result; };
 

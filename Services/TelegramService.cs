@@ -44,4 +44,31 @@ public class TelegramService
             Debug.WriteLine($"[Telegram] Исключение: {ex.Message}");
         }
     }
+
+    public async Task<(bool Success, string? Error)> SendTestAsync(string token, string chatId)
+    {
+        if (string.IsNullOrWhiteSpace(token) || string.IsNullOrWhiteSpace(chatId))
+            return (false, "Укажите токен и Chat ID");
+
+        try
+        {
+            var url = $"https://api.telegram.org/bot{token}/sendMessage";
+            var parameters = new Dictionary<string, string>
+            {
+                ["chat_id"] = chatId,
+                ["text"] = "🔔 Тестовое сообщение от WorkCheck"
+            };
+
+            using var response = await Http.PostAsync(url, new FormUrlEncodedContent(parameters));
+            if (response.IsSuccessStatusCode)
+                return (true, null);
+
+            var body = await response.Content.ReadAsStringAsync();
+            return (false, $"{(int)response.StatusCode} {response.StatusCode}: {body}");
+        }
+        catch (Exception ex)
+        {
+            return (false, ex.Message);
+        }
+    }
 }
