@@ -1,0 +1,33 @@
+<Window x:Class="WorkCheck.Views.CompactStatusWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="WorkCheck"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ResizeMode="NoResize"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Width="220" Height="36">
+
+    <Border Background="{Binding WindowBgBrush}" CornerRadius="10"
+            BorderBrush="#33FFFFFF" BorderThickness="1">
+        <Border.Effect>
+            <DropShadowEffect Color="Black" BlurRadius="16" Opacity="0.4" ShadowDepth="2"/>
+        </Border.Effect>
+
+        <Grid Margin="12,0,4,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="{Binding CurrentSessionText}"
+                       Foreground="#CDD6F4" FontSize="14" FontWeight="Bold"
+                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+
+            <Button Grid.Column="1" Content="⛶" Click="OnExpandClick"
+                    Style="{StaticResource HeaderButton}" ToolTip="Развернуть"/>
+        </Grid>
+    </Border>
+</Window>

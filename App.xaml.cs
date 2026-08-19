@@ -33,6 +33,21 @@ public partial class App : Application
         ApplyCommandLineArgs(e.Args, _tracker);
 
         StatusWindow? statusWindow = null;
+        CompactStatusWindow? compactWindow = null;
+
+        Action ShowNormal = () =>
+        {
+            compactWindow?.Hide();
+            statusWindow?.Show();
+            statusWindow?.Activate();
+        };
+
+        Action ShowCompact = () =>
+        {
+            statusWindow?.Hide();
+            compactWindow?.Show();
+            compactWindow?.Activate();
+        };
 
         var trayIcon = new TrayIconService(
             onExit: () =>
@@ -41,20 +56,14 @@ public partial class App : Application
                 dataService.Dispose();
                 Shutdown();
             },
-            onToggleWindow: () =>
-            {
-                if (statusWindow == null) return;
-                if (statusWindow.IsVisible)
-                    statusWindow.Hide();
-                else
-                {
-                    statusWindow.Show();
-                    statusWindow.Activate();
-                }
-            });
+            onToggleWindow: ShowNormal);
 
         var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, dataService, settings, trayIcon, soundService);
         statusWindow = new StatusWindow { DataContext = statusVm };
+        statusWindow.OnMinimize = ShowCompact;
+
+        compactWindow = new CompactStatusWindow { DataContext = statusVm };
+        compactWindow.OnExpand = ShowNormal;
 
         MainWindow = statusWindow;
         statusWindow.Show();

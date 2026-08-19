@@ -43,6 +43,9 @@
                             ToolTip="Статистика"/>
                     <Button Content="⚙" Command="{Binding OpenSettingsCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"/>
+                    <Button Content="🖃" Click="OnMinimizeClick"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
+                            ToolTip="Свернуть"/>
                     <Button Content="✕" Command="{Binding CloseAppCommand}"
                             Style="{StaticResource CloseButton}"/>
                 </StackPanel>
