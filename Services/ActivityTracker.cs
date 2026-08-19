@@ -138,7 +138,20 @@ private readonly DataService _dataService;
         {
             var total = _awayTime;
             if (!_userActive || _userShortBreak)
-                total += DateTime.Now - _lastActivityTime;
+            {
+                var currentInterval = DateTime.Now - _lastActivityTime;
+                if (_userShortBreak)
+                {
+                    // Время перерыва не зачитывается как "вне компьютера" — только время сверх перерыва
+                    var breakExcess = currentInterval - _shortBreakTime;
+                    if (breakExcess > TimeSpan.Zero)
+                        total += breakExcess;
+                }
+                else
+                {
+                    total += currentInterval;
+                }
+            }
             return total;
         }
     }
@@ -245,12 +258,28 @@ private readonly DataService _dataService;
         if (!_userActive || _userShortBreak)
         {
             var awayInterval = now - _lastActivityTime;
-            _awayTime += awayInterval;
+
+            TimeSpan awayToAdd;
+            if (_userShortBreak)
+            {
+                // Время перерыва не зачитывается как "вне компьютера" — только время сверх перерыва
+                var breakExcess = awayInterval - _shortBreakTime;
+                awayToAdd = breakExcess > TimeSpan.Zero ? breakExcess : TimeSpan.Zero;
+            }
+            else
+            {
+                awayToAdd = awayInterval;
+            }
+
+            _awayTime += awayToAdd;
 
             // Сохраняем период неактивности в БД
-            var awayEnd = now;
-            var awayStart = awayEnd - awayInterval;
-            _dataService.SaveAwayPeriod(awayStart, awayEnd, awayInterval, _isWorkMode);
+            if (awayToAdd > TimeSpan.Zero)
+            {
+                var awayEnd = now;
+                var awayStart = awayEnd - awayToAdd;
+                _dataService.SaveAwayPeriod(awayStart, awayEnd, awayToAdd, _isWorkMode);
+            }
 
             _pending.Enqueue(new NotificationRequest
             {
@@ -419,8 +448,10 @@ private readonly DataService _dataService;
             _dataService.SaveSession(sessionStart, sessionEnd, realWork, _isWorkMode, _currentProjectId, description);
         }
 
-        // Время простоя пока висел оверлей — это away
-        _awayTime += idleDuration;
+        // Время простоя пока висел оверлей — это away (минус время, выделенное на перерыв)
+        var excessIdle = idleDuration - _shortBreakTime;
+        if (excessIdle > TimeSpan.Zero)
+            _awayTime += excessIdle;
 
         // Начинаем новую сессию с текущего момента
         _lastActivityTime = now;
