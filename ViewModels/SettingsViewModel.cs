@@ -18,6 +18,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _telegramBotToken = "";
     [ObservableProperty] private string _telegramChatId = "";
     [ObservableProperty] private bool _telegramEnabled;
+    [ObservableProperty] private bool _soundEnabled;
     [ObservableProperty] private string _testStatus = "";
     [ObservableProperty] private bool _isTesting;
 
@@ -35,6 +36,7 @@ public partial class SettingsViewModel : ObservableObject
         TelegramBotToken = current.TelegramBotToken;
         TelegramChatId = current.TelegramChatId;
         TelegramEnabled = current.TelegramEnabled;
+        SoundEnabled = current.SoundEnabled;
     }
 
     [RelayCommand]
@@ -60,7 +62,8 @@ public partial class SettingsViewModel : ObservableObject
             InactivityMinutes = InactivityMinutes,
             TelegramBotToken = TelegramBotToken,
             TelegramChatId = TelegramChatId,
-            TelegramEnabled = TelegramEnabled
+            TelegramEnabled = TelegramEnabled,
+            SoundEnabled = SoundEnabled
         };
         _settingsService.Save(settings);
         RequestClose?.Invoke(true);

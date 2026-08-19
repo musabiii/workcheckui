@@ -9,6 +9,7 @@ public class AppSettings
     public string TelegramBotToken { get; set; } = "";
     public string TelegramChatId { get; set; } = "";
     public bool TelegramEnabled { get; set; }
+    public bool SoundEnabled { get; set; } = true;
 
     public TimeSpan PomodoroTime => TimeSpan.FromMinutes(PomodoroMinutes);
     public TimeSpan Pomodoro2Time => TimeSpan.FromMinutes(Pomodoro2Minutes);

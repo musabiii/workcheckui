@@ -4,6 +4,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
 using WorkCheck.Models;
+using WorkCheck.Services;
 using Screen = System.Windows.Forms.Screen;
 using Color = System.Windows.Media.Color;
 
@@ -38,20 +39,26 @@ private readonly TimeSpan _breakDuration;
 
 private readonly bool _skipPrompt;
     private readonly bool _showChoice;
+    private readonly SoundService? _soundService;
+    private readonly bool _playSoundOnBreakEnd;
 
     public bool UserChoseBreak { get; private set; }
     public string SessionDescription { get; set; } = string.Empty;
     public bool? ModeSelected { get; private set; }
     public Action? OnBreakStarted { get; set; }
 
-    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false, bool showChoice = false)
+    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false, bool showChoice = false, SoundService? soundService = null, bool playSoundOnBreakEnd = false, bool fromWorkMode = false)
     {
         InitializeComponent();
 
         DataContext = this;
 _breakDuration = breakDuration;
-        _skipPrompt = skipPrompt;
+_skipPrompt = skipPrompt;
         _showChoice = showChoice;
+        _soundService = soundService;
+_playSoundOnBreakEnd = playSoundOnBreakEnd;
+        if (fromWorkMode)
+            _playSoundOnBreakEnd = true;
 
         TitleBlock.Text = title;
         MessageBlock.Text = message;
@@ -183,6 +190,8 @@ public void ShowWithOverlays()
         if (_remaining <= TimeSpan.Zero)
         {
             _countdownTimer?.Stop();
+            if (_playSoundOnBreakEnd)
+                _soundService?.PlayBreakEnd();
             SwitchToModeSelection();
             return;
         }

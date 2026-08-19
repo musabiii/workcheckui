@@ -22,6 +22,7 @@ public partial class StatusViewModel : ObservableObject
     private readonly TrayIconService _trayIcon;
     private readonly SettingsService _settingsService;
     private readonly DataService _dataService;
+    private readonly SoundService _soundService;
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
     private bool _wasUserShortBreak;
@@ -69,7 +70,8 @@ public partial class StatusViewModel : ObservableObject
         SettingsService settingsService,
         DataService dataService,
         AppSettings settings,
-        TrayIconService trayIcon)
+        TrayIconService trayIcon,
+        SoundService soundService)
     {
         _tracker = tracker;
         _notifications = notifications;
@@ -77,6 +79,7 @@ public partial class StatusViewModel : ObservableObject
         _trayIcon = trayIcon;
         _settingsService = settingsService;
         _dataService = dataService;
+        _soundService = soundService;
         _settings = settings;
 
         LoadProjects();
@@ -150,7 +153,9 @@ public partial class StatusViewModel : ObservableObject
                 var (choseBreak, description, modeSelected) = _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
                     _settings.ShortBreakTime,
-                    onBreakStarted: () => _tracker.IsPaused = true);
+                    onBreakStarted: () => _tracker.IsPaused = true,
+                    soundService: _soundService,
+                    playSoundOnBreakEnd: true);
                 _tracker.IsPaused = false;
 
                 // Если пользователь нажал "Продолжить работать" сразу (не пошел на перерыв)
@@ -188,7 +193,9 @@ public partial class StatusViewModel : ObservableObject
                     _settings.ShortBreakTime,
                     onBreakStarted: () => _tracker.IsPaused = true,
                     skipPrompt: true,
-                    showChoice: true);
+                    showChoice: true,
+                    soundService: _soundService,
+                    fromWorkMode: true);
                 _tracker.IsPaused = false;
 
                 _tracker.AccountOverlayIdle(overlayShownAt, "");
@@ -297,7 +304,9 @@ public partial class StatusViewModel : ObservableObject
             "☕  Ручной перерыв",
             $"Поработали {TimeFormatter.FormatShort(_tracker.CurrentSession)}",
             _settings.ShortBreakTime,
-            skipPrompt: true);
+            skipPrompt: true,
+            soundService: _soundService,
+            fromWorkMode: IsWorkMode);
         
         _tracker.IsPaused = false;
 
@@ -404,6 +413,7 @@ var rate = _selectedProject?.Rate ?? 0;
             _settings = _settingsService.Load();
             _tracker.ApplySettings(_settings);
             _telegram.Settings = _settings;
+            _soundService.Enabled = _settings.SoundEnabled;
         }
     }
 

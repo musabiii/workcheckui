@@ -27,6 +27,7 @@ public partial class App : Application
         var dataService = new DataService();
         var telegramService = new TelegramService(settings);
         var notificationService = new NotificationService();
+        var soundService = new SoundService { Enabled = settings.SoundEnabled };
         _tracker = new ActivityTracker(settings, dataService);
 
         ApplyCommandLineArgs(e.Args, _tracker);
@@ -52,7 +53,7 @@ public partial class App : Application
                 }
             });
 
-        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, dataService, settings, trayIcon);
+        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, dataService, settings, trayIcon, soundService);
         statusWindow = new StatusWindow { DataContext = statusVm };
 
         MainWindow = statusWindow;
