@@ -229,7 +229,9 @@ private void SwitchToModeSelection()
 
     private void UpdateCountdownDisplay()
     {
-        CountdownBlock.Text = _remaining.ToString(@"m\:ss");
+        CountdownBlock.Text = _remaining.TotalHours >= 1
+            ? _remaining.ToString(@"h\:mm\:ss")
+            : _remaining.ToString(@"m\:ss");
     }
 
     private void Dismiss(bool choseBreak)
@@ -291,5 +293,45 @@ private void OnBreakClick(object sender, RoutedEventArgs e)
     private void OnPlayPauseClick(object sender, RoutedEventArgs e)
     {
         SendMediaPause();
+    }
+
+    private void OnSet5Min(object sender, RoutedEventArgs e)
+    {
+        _countdownTimer?.Stop();
+        _remaining = TimeSpan.FromMinutes(5);
+        UpdateCountdownDisplay();
+        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdownTimer.Tick += OnCountdownTick;
+        _countdownTimer.Start();
+    }
+
+    private void OnSet15Min(object sender, RoutedEventArgs e)
+    {
+        _countdownTimer?.Stop();
+        _remaining = TimeSpan.FromMinutes(15);
+        UpdateCountdownDisplay();
+        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdownTimer.Tick += OnCountdownTick;
+        _countdownTimer.Start();
+    }
+
+    private void OnSet30Min(object sender, RoutedEventArgs e)
+    {
+        _countdownTimer?.Stop();
+        _remaining = TimeSpan.FromMinutes(30);
+        UpdateCountdownDisplay();
+        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdownTimer.Tick += OnCountdownTick;
+        _countdownTimer.Start();
+    }
+
+    private void OnSet1Hour(object sender, RoutedEventArgs e)
+    {
+        _countdownTimer?.Stop();
+        _remaining = TimeSpan.FromHours(1);
+        UpdateCountdownDisplay();
+        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdownTimer.Tick += OnCountdownTick;
+        _countdownTimer.Start();
     }
 }
