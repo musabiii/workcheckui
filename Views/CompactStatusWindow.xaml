@@ -23,7 +23,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="0" Text="{Binding CurrentSessionText}"
-                       Foreground="#CDD6F4" FontSize="14" FontWeight="Bold"
+                       Foreground="{Binding CompactSessionBrush}" FontSize="14" FontWeight="Bold"
                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
 
             <Button Grid.Column="1" Content="⛶" Click="OnExpandClick"

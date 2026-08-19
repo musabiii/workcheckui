@@ -43,7 +43,7 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _awayLabel = "☕  Вне компьютера:";
     [ObservableProperty] private string _sessionIcon = "🖥";
     [ObservableProperty] private string _sessionLabel = "  Текущая сессия:";
-
+    [ObservableProperty] private Brush _compactSessionBrush = DriftingGrayBrush;
     private static readonly Brush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
     private static readonly Brush ShortBreakBrush = new SolidColorBrush(Color.FromRgb(0xF9, 0xE2, 0xAF));
     private static readonly Brush InactiveBrush = new SolidColorBrush(Color.FromRgb(0xF3, 0x8B, 0xA8));
@@ -248,6 +248,8 @@ public partial class StatusViewModel : ObservableObject
             else
                 SessionBrush = ActiveBrush;
 
+            CompactSessionBrush = SessionBrush;
+
             _trayIcon.Update((int)session.TotalMinutes, session,
                 _settings.PomodoroTime, _settings.Pomodoro2Time, isDrifting: false);
 
@@ -273,6 +275,7 @@ public partial class StatusViewModel : ObservableObject
         {
             _wasUserShortBreak = false;
             SessionBrush = NormalTextBrush;
+            CompactSessionBrush = DriftingGrayBrush;
             StatusText = "Дрейфую";
             StatusBrush = DriftingGrayBrush;
 
