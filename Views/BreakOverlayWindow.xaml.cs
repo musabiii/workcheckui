@@ -334,4 +334,16 @@ private void OnBreakClick(object sender, RoutedEventArgs e)
         _countdownTimer.Tick += OnCountdownTick;
         _countdownTimer.Start();
     }
+
+    private void OnAdd5Min(object sender, RoutedEventArgs e) => AddTime(TimeSpan.FromMinutes(5));
+
+    private void OnAdd10Min(object sender, RoutedEventArgs e) => AddTime(TimeSpan.FromMinutes(10));
+
+    private void OnAdd30Min(object sender, RoutedEventArgs e) => AddTime(TimeSpan.FromMinutes(30));
+
+    private void AddTime(TimeSpan amount)
+    {
+        _remaining += amount;
+        UpdateCountdownDisplay();
+    }
 }
