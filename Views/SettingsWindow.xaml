@@ -59,6 +59,10 @@
                 <TextBox Text="{Binding TelegramChatId, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource DarkTextBox}"/>
 
+                <TextBlock Text="SOCKS5 Прокси (user:pass@host:port)" Foreground="#BAC2DE" FontSize="12" Margin="0,10,0,4"/>
+                <TextBox Text="{Binding ProxyUrl, UpdateSourceTrigger=PropertyChanged}"
+                         Style="{StaticResource DarkTextBox}" ToolTip="Пример: botuser:BotPass2024@213.193.199.106:1080"/>
+
                 <Grid Margin="0,10,0,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>

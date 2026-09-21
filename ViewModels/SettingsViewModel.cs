@@ -17,6 +17,7 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private int _inactivityMinutes;
     [ObservableProperty] private string _telegramBotToken = "";
     [ObservableProperty] private string _telegramChatId = "";
+    [ObservableProperty] private string _proxyUrl = "";
     [ObservableProperty] private bool _telegramEnabled;
     [ObservableProperty] private bool _soundEnabled;
     [ObservableProperty] private string _testStatus = "";
@@ -35,6 +36,7 @@ public partial class SettingsViewModel : ObservableObject
         InactivityMinutes = current.InactivityMinutes;
         TelegramBotToken = current.TelegramBotToken;
         TelegramChatId = current.TelegramChatId;
+        ProxyUrl = current.ProxyUrl;
         TelegramEnabled = current.TelegramEnabled;
         SoundEnabled = current.SoundEnabled;
     }
@@ -45,7 +47,7 @@ public partial class SettingsViewModel : ObservableObject
         IsTesting = true;
         TestStatus = "Отправка...";
 
-        var (success, error) = await _telegramService.SendTestAsync(TelegramBotToken, TelegramChatId);
+        var (success, error) = await _telegramService.SendTestAsync(TelegramBotToken, TelegramChatId, ProxyUrl);
 
         TestStatus = success ? "✅ Сообщение отправлено" : $"❌ Ошибка: {error}";
         IsTesting = false;
@@ -62,6 +64,7 @@ public partial class SettingsViewModel : ObservableObject
             InactivityMinutes = InactivityMinutes,
             TelegramBotToken = TelegramBotToken,
             TelegramChatId = TelegramChatId,
+            ProxyUrl = ProxyUrl,
             TelegramEnabled = TelegramEnabled,
             SoundEnabled = SoundEnabled
         };
