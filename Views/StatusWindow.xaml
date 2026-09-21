@@ -97,16 +97,6 @@
                                FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
-                <!-- Сумма -->
-                <Grid Margin="0,0" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="💰  Сумма:" Foreground="#BAC2DE" FontSize="12"/>
-                    <TextBlock Grid.Column="1" Text="{Binding TotalEarnedText}" Foreground="#A6E3A1"
-                               FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
-                </Grid>
             </StackPanel>
 
             <!-- Footer: mode toggle + status -->

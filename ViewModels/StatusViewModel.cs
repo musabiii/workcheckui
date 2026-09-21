@@ -33,7 +33,6 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _currentSessionText = "0 мин";
     [ObservableProperty] private string _projectName = "";
     [ObservableProperty] private string _awayTimeText = "0 мин";
-    [ObservableProperty] private string _totalEarnedText = "0 ₽";
     [ObservableProperty] private string _todayWorkedText = "0 мин";
     [ObservableProperty] private string _statusText = "Дрейфую";
     [ObservableProperty] private Brush _statusBrush = DriftingGrayBrush;
@@ -289,11 +288,6 @@ public partial class StatusViewModel : ObservableObject
         var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode, _tracker.CurrentProjectId);
         var totalWithCurrent = todayTotal + currentSession;
         TodayWorkedText = TimeFormatter.FormatShort(totalWithCurrent);
-
-        var rate = _selectedProject?.Rate ?? 0;
-        var fullMinutes = (int)totalWithCurrent.TotalMinutes;
-        var earned = (decimal)fullMinutes * rate;
-        TotalEarnedText = $"{earned:F0} ₽";
     }
 
     [RelayCommand]
@@ -352,15 +346,6 @@ public partial class StatusViewModel : ObservableObject
         _tracker.IsWorkMode = IsWorkMode;
         _tracker.Reset();
 
-        var session = _tracker.CurrentSession;
-        var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode, _tracker.CurrentProjectId);
-        var totalWithCurrent = todayTotal + session;
-var rate = _selectedProject?.Rate ?? 0;
-        var fullMinutes = (int)totalWithCurrent.TotalMinutes;
-        var earned = (decimal)fullMinutes * rate;
-        TotalEarnedText = $"{earned:F0} ₽";
-        CurrentSessionText = "0 мин";
-        AwayTimeText = "0 мин";
         CurrentSessionText = "0 мин";
         AwayTimeText = "0 мин";
 
