@@ -8,7 +8,9 @@ public class AppSettings
     public int InactivityMinutes { get; set; } = 15;
     public string TelegramBotToken { get; set; } = "";
     public string TelegramChatId { get; set; } = "";
+    public string ProxyUrl { get; set; } = "";
     public bool TelegramEnabled { get; set; }
+    public bool SoundEnabled { get; set; } = true;
 
     public TimeSpan PomodoroTime => TimeSpan.FromMinutes(PomodoroMinutes);
     public TimeSpan Pomodoro2Time => TimeSpan.FromMinutes(Pomodoro2Minutes);

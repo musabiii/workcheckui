@@ -22,11 +22,16 @@ public partial class StatusViewModel : ObservableObject
     private readonly TrayIconService _trayIcon;
     private readonly SettingsService _settingsService;
     private readonly DataService _dataService;
+    private readonly SoundService _soundService;
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
+    private bool _wasUserShortBreak;
+    private List<Project> _projects;
+    private Project? _selectedProject;
 
     [ObservableProperty] private bool _isWorkMode;
     [ObservableProperty] private string _currentSessionText = "0 мин";
+    [ObservableProperty] private string _projectName = "";
     [ObservableProperty] private string _awayTimeText = "0 мин";
     [ObservableProperty] private string _todayWorkedText = "0 мин";
     [ObservableProperty] private string _statusText = "Дрейфую";
@@ -37,7 +42,7 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _awayLabel = "☕  Вне компьютера:";
     [ObservableProperty] private string _sessionIcon = "🖥";
     [ObservableProperty] private string _sessionLabel = "  Текущая сессия:";
-
+    [ObservableProperty] private Brush _compactSessionBrush = DriftingGrayBrush;
     private static readonly Brush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
     private static readonly Brush ShortBreakBrush = new SolidColorBrush(Color.FromRgb(0xF9, 0xE2, 0xAF));
     private static readonly Brush InactiveBrush = new SolidColorBrush(Color.FromRgb(0xF3, 0x8B, 0xA8));
@@ -64,7 +69,8 @@ public partial class StatusViewModel : ObservableObject
         SettingsService settingsService,
         DataService dataService,
         AppSettings settings,
-        TrayIconService trayIcon)
+        TrayIconService trayIcon,
+        SoundService soundService)
     {
         _tracker = tracker;
         _notifications = notifications;
@@ -72,11 +78,50 @@ public partial class StatusViewModel : ObservableObject
         _trayIcon = trayIcon;
         _settingsService = settingsService;
         _dataService = dataService;
+        _soundService = soundService;
         _settings = settings;
+
+        LoadProjects();
 
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _timer.Tick += OnTick;
         _timer.Start();
+        
+        UpdateTodayWorkedText();
+    }
+
+    private void LoadProjects()
+    {
+        _projects = _dataService.GetAllProjects();
+        
+        if (_projects.Count == 0)
+        {
+            _selectedProject = new Project { Id = _dataService.AddProject(new Project { Name = "По умолчанию", Rate = 0 }) };
+            _projects.Add(_selectedProject);
+        }
+        else
+        {
+            var lastSession = _dataService.GetLastSession();
+            _selectedProject = lastSession?.ProjectId != null 
+                ? _projects.FirstOrDefault(p => p.Id == lastSession.ProjectId) 
+                : _projects.LastOrDefault();
+        }
+
+        if (_selectedProject != null)
+        {
+            _tracker.CurrentProjectId = _selectedProject.Id;
+            ProjectName = _selectedProject.Name;
+        }
+    }
+
+    [RelayCommand]
+    private void SelectProject(Project? project)
+    {
+        if (project == null) return;
+        
+        _selectedProject = project;
+        _tracker.CurrentProjectId = project.Id;
+        ProjectName = project.Name;
         
         UpdateTodayWorkedText();
     }
@@ -107,7 +152,11 @@ public partial class StatusViewModel : ObservableObject
                 var (choseBreak, description, modeSelected) = _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
                     _settings.ShortBreakTime,
-                    onBreakStarted: () => _tracker.IsPaused = true);
+                    onBreakStarted: () => _tracker.IsPaused = true,
+                    soundService: _soundService,
+                    playSoundOnBreakEnd: true,
+                    awayBase: GetAwayBase(),
+                    todayBase: GetTodayBase());
                 _tracker.IsPaused = false;
 
                 // Если пользователь нажал "Продолжить работать" сразу (не пошел на перерыв)
@@ -135,6 +184,39 @@ public partial class StatusViewModel : ObservableObject
                     }
                 }
             }
+            else if (req.Type is NotificationType.ShortBreak && !_wasUserShortBreak)
+            {
+                _wasUserShortBreak = true;
+                var overlayShownAt = DateTime.Now;
+
+                var (_, _, modeSelected) = _notifications.ShowBreakOverlay(
+                    req.Type, req.Title, req.Message,
+                    _settings.ShortBreakTime,
+                    onBreakStarted: () => _tracker.IsPaused = true,
+                    skipPrompt: true,
+                    showChoice: true,
+                    soundService: _soundService,
+                    fromWorkMode: true,
+                    awayBase: GetAwayBase(),
+                    todayBase: GetTodayBase());
+                _tracker.IsPaused = false;
+
+                _tracker.AccountOverlayIdle(overlayShownAt, "");
+
+                if (modeSelected.HasValue)
+                {
+                    if (modeSelected.Value == false)
+                    {
+                        if (!IsWorkMode)
+                            ToggleMode();
+                    }
+                    else
+                    {
+                        if (IsWorkMode)
+                            ToggleMode();
+                    }
+                }
+            }
             else if (IsWorkMode)
             {
                 _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
@@ -145,13 +227,20 @@ public partial class StatusViewModel : ObservableObject
         }
     }
 
+    private TimeSpan? GetAwayBase() =>
+        IsWorkMode ? _tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime : null;
+
+    private TimeSpan? GetTodayBase() =>
+        IsWorkMode
+            ? _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode, _tracker.CurrentProjectId) + _tracker.CurrentSession
+            : null;
+
     private void UpdateDisplay()
     {
         var session = _tracker.CurrentSession;
         CurrentSessionText = TimeFormatter.FormatShort(session);
         
-        var awayTime = _tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime;
-        AwayTimeText = TimeFormatter.FormatShort(awayTime);
+        AwayTimeText = TimeFormatter.FormatShort(_tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime);
 
         var sessions = _tracker.CompletedSessions;
         SessionLabel = sessions > 0
@@ -169,11 +258,14 @@ public partial class StatusViewModel : ObservableObject
             else
                 SessionBrush = ActiveBrush;
 
+            CompactSessionBrush = SessionBrush;
+
             _trayIcon.Update((int)session.TotalMinutes, session,
                 _settings.PomodoroTime, _settings.Pomodoro2Time, isDrifting: false);
 
             if (_tracker.UserActive && !_tracker.UserShortBreak)
             {
+                _wasUserShortBreak = false;
                 StatusText = "Активен";
                 StatusBrush = ActiveBrush;
             }
@@ -184,13 +276,16 @@ public partial class StatusViewModel : ObservableObject
             }
             else
             {
+                _wasUserShortBreak = false;
                 StatusText = "Неактивен";
                 StatusBrush = InactiveBrush;
             }
         }
         else
         {
+            _wasUserShortBreak = false;
             SessionBrush = NormalTextBrush;
+            CompactSessionBrush = DriftingGrayBrush;
             StatusText = "Дрейфую";
             StatusBrush = DriftingGrayBrush;
 
@@ -201,7 +296,7 @@ public partial class StatusViewModel : ObservableObject
 
     private void UpdateTodayWorkedText(TimeSpan currentSession = default)
     {
-        var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode);
+        var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode, _tracker.CurrentProjectId);
         var totalWithCurrent = todayTotal + currentSession;
         TodayWorkedText = TimeFormatter.FormatShort(totalWithCurrent);
     }
@@ -209,6 +304,7 @@ public partial class StatusViewModel : ObservableObject
     [RelayCommand]
     private void ManualBreak()
     {
+        _tracker.IsPaused = true;
         var overlayShownAt = DateTime.Now;
 
         var (_, description, modeSelected) = _notifications.ShowBreakOverlay(
@@ -216,8 +312,12 @@ public partial class StatusViewModel : ObservableObject
             "☕  Ручной перерыв",
             $"Поработали {TimeFormatter.FormatShort(_tracker.CurrentSession)}",
             _settings.ShortBreakTime,
-            onBreakStarted: () => _tracker.IsPaused = true,
-            skipPrompt: true);
+            skipPrompt: true,
+            soundService: _soundService,
+            fromWorkMode: IsWorkMode,
+            awayBase: GetAwayBase(),
+                    todayBase: GetTodayBase());
+        
         _tracker.IsPaused = false;
 
         _tracker.AccountOverlayIdle(overlayShownAt, description);
@@ -259,7 +359,6 @@ public partial class StatusViewModel : ObservableObject
         _tracker.IsWorkMode = IsWorkMode;
         _tracker.Reset();
 
-        TodayWorkedText = TimeFormatter.FormatShort(_dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode));
         CurrentSessionText = "0 мин";
         AwayTimeText = "0 мин";
 
@@ -287,9 +386,26 @@ public partial class StatusViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private void OpenProjects()
+    {
+        var projects = _dataService.GetAllProjects();
+        var current = _selectedProject;
+        
+        var window = new ProjectsWindow(_dataService, current, project =>
+        {
+            _selectedProject = project;
+            _tracker.CurrentProjectId = project.Id;
+            ProjectName = project.Name;
+            UpdateTodayWorkedText();
+        });
+        
+        window.ShowDialog();
+    }
+
+    [RelayCommand]
     private void OpenSettings()
     {
-        var vm = new SettingsViewModel(_settings, _settingsService);
+        var vm = new SettingsViewModel(_settings, _settingsService, _telegram);
         var window = new SettingsWindow { DataContext = vm };
         vm.RequestClose += result => { window.DialogResult = result; };
 
@@ -298,6 +414,7 @@ public partial class StatusViewModel : ObservableObject
             _settings = _settingsService.Load();
             _tracker.ApplySettings(_settings);
             _telegram.Settings = _settings;
+            _soundService.Enabled = _settings.SoundEnabled;
         }
     }
 

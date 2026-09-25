@@ -1,16 +1,14 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using WorkCheck.ViewModels;
 
 namespace WorkCheck.Views;
 
-public partial class StatusWindow : Window
+public partial class CompactStatusWindow : Window
 {
-    private bool _forceClose;
-    public Action? OnMinimize;
+    public Action? OnExpand;
 
-    public StatusWindow()
+    public CompactStatusWindow()
     {
         InitializeComponent();
         PositionBottomRight();
@@ -31,26 +29,12 @@ public partial class StatusWindow : Window
 
     protected override void OnClosing(CancelEventArgs e)
     {
-        if (!_forceClose)
-        {
-            e.Cancel = true;
-            Hide();
-            return;
-        }
-
-        if (DataContext is StatusViewModel vm)
-            vm.Cleanup();
-        base.OnClosing(e);
+        e.Cancel = true;
+        Hide();
     }
 
-    private void OnMinimizeClick(object sender, RoutedEventArgs e)
+    protected void OnExpandClick(object sender, RoutedEventArgs e)
     {
-        OnMinimize?.Invoke();
-    }
-
-    public void Shutdown()
-    {
-        _forceClose = true;
-        Close();
+        OnExpand?.Invoke();
     }
 }

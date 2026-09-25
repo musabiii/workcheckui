@@ -35,13 +35,20 @@
                                TextWrapping="Wrap"
                                TextAlignment="Center"/>
 
-                    <TextBlock x:Name="MessageBlock"
+<TextBlock x:Name="MessageBlock"
                                Foreground="#BAC2DE"
                                FontSize="15"
                                Margin="0,12,0,0"
                                HorizontalAlignment="Center"
                                TextWrapping="Wrap"
                                TextAlignment="Center"/>
+
+                    <TextBlock x:Name="ChoiceCountdownBlock"
+                               Foreground="#F9E2AF"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               Margin="0,8,0,0"
+                               HorizontalAlignment="Center"/>
 
                     <TextBox x:Name="DescriptionBox"
                              Foreground="#CDD6F4"
@@ -61,7 +68,7 @@
                         </TextBox.Text>
                     </TextBox>
 
-                    <StackPanel Orientation="Horizontal"
+<StackPanel Orientation="Horizontal"
                                 HorizontalAlignment="Center"
                                 Margin="0,16,0,0">
 
@@ -145,6 +152,175 @@
                                HorizontalAlignment="Center"
                                Margin="0,8,0,0"/>
 
+                    <!-- Time selection buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+                        <Button Content="5 мин" Click="OnSet5Min" Cursor="Hand"
+                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
+                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Content="15 мин" Click="OnSet15Min" Cursor="Hand"
+                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
+                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Content="30 мин" Click="OnSet30Min" Cursor="Hand"
+                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
+                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Content="1 час" Click="OnSet1Hour" Cursor="Hand"
+                                FontSize="13" Foreground="#BAC2DE" Padding="16,8">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
+                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+
+                    <!-- Time addition buttons -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                        <Button Content="+5 мин" Click="OnAdd5Min" Cursor="Hand"
+                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
+                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Content="+10 мин" Click="OnAdd10Min" Cursor="Hand"
+                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
+                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                        <Button Content="+30 мин" Click="OnAdd30Min" Cursor="Hand"
+                                FontSize="13" Foreground="#BAC2DE" Padding="16,8">
+                            <Button.Style>
+                                <Style TargetType="Button">
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="Button">
+                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                        Padding="{TemplateBinding Padding}">
+                                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                                </Border>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="IsMouseOver" Value="True">
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
+                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </Style>
+                            </Button.Style>
+                        </Button>
+                    </StackPanel>
+
                     <!-- Break activity suggestions -->
                     <Border Background="#11FFFFFF" CornerRadius="8"
                             Margin="0,20,0,0" Padding="16,12">
@@ -226,7 +402,7 @@
                 <!-- Mode Selection mode -->
                 <StackPanel x:Name="ModeSelectionPanel" Grid.Row="1" Margin="36,28,36,32"
                             Visibility="Collapsed">
-                    <TextBlock Text="Перерыв завершён!"
+                    <TextBlock Text="Не у компьютера!"
                                Foreground="#A6E3A1"
                                FontSize="24" FontWeight="Bold"
                                HorizontalAlignment="Center"
@@ -238,6 +414,30 @@
                                HorizontalAlignment="Center"
                                Margin="0,16,0,0"
                                FontFamily="Consolas"/>
+
+                    <Grid x:Name="TotalsGrid" HorizontalAlignment="Center" Margin="0,8,0,0" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Всего вне компьютера:" Foreground="#BAC2DE" FontSize="16"
+                                   HorizontalAlignment="Right" Margin="0,2,6,2"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TotalAwayValue" Foreground="#F38BA8" FontSize="16"
+                                   FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Сегодня:" Foreground="#BAC2DE" FontSize="16"
+                                   HorizontalAlignment="Right" Margin="0,2,6,2"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TodayValue" Foreground="#A6E3A1" FontSize="16"
+                                   FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Общее время:" Foreground="#BAC2DE" FontSize="16"
+                                   HorizontalAlignment="Right" Margin="0,2,6,2"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="GrandTotalValue" Foreground="#89B4FA" FontSize="16"
+                                   FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
+                    </Grid>
 
                     <TextBlock Text="Выберите режим работы:"
                                Foreground="#BAC2DE"

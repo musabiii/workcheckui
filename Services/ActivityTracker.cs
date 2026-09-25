@@ -10,8 +10,15 @@ namespace WorkCheck.Services;
 
 public sealed class ActivityTracker : IDisposable
 {
-    private readonly DataService _dataService;
+private readonly DataService _dataService;
     private bool _isWorkMode = false;
+    private int? _currentProjectId;
+
+    public int? CurrentProjectId
+    {
+        get => _currentProjectId;
+        set => _currentProjectId = value;
+    }
 
     public bool IsWorkMode
     {
@@ -102,7 +109,7 @@ public sealed class ActivityTracker : IDisposable
         {
             var sessionEnd = DateTime.Now;
             var sessionStart = sessionEnd - sessionWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, description);
+            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, _currentProjectId, description);
             
             Debug.WriteLine($"[ActivityTracker] Saved session: {sessionWork} in mode {_isWorkMode}");
         }
@@ -131,7 +138,20 @@ public sealed class ActivityTracker : IDisposable
         {
             var total = _awayTime;
             if (!_userActive || _userShortBreak)
-                total += DateTime.Now - _lastActivityTime;
+            {
+                var currentInterval = DateTime.Now - _lastActivityTime;
+                if (_userShortBreak)
+                {
+                    // Время перерыва не зачитывается как "вне компьютера" — только время сверх перерыва
+                    var breakExcess = currentInterval - _shortBreakTime;
+                    if (breakExcess > TimeSpan.Zero)
+                        total += breakExcess;
+                }
+                else
+                {
+                    total += currentInterval;
+                }
+            }
             return total;
         }
     }
@@ -238,12 +258,28 @@ public sealed class ActivityTracker : IDisposable
         if (!_userActive || _userShortBreak)
         {
             var awayInterval = now - _lastActivityTime;
-            _awayTime += awayInterval;
+
+            TimeSpan awayToAdd;
+            if (_userShortBreak)
+            {
+                // Время перерыва не зачитывается как "вне компьютера" — только время сверх перерыва
+                var breakExcess = awayInterval - _shortBreakTime;
+                awayToAdd = breakExcess > TimeSpan.Zero ? breakExcess : TimeSpan.Zero;
+            }
+            else
+            {
+                awayToAdd = awayInterval;
+            }
+
+            _awayTime += awayToAdd;
 
             // Сохраняем период неактивности в БД
-            var awayEnd = now;
-            var awayStart = awayEnd - awayInterval;
-            _dataService.SaveAwayPeriod(awayStart, awayEnd, awayInterval, _isWorkMode);
+            if (awayToAdd > TimeSpan.Zero)
+            {
+                var awayEnd = now;
+                var awayStart = awayEnd - awayToAdd;
+                _dataService.SaveAwayPeriod(awayStart, awayEnd, awayToAdd, _isWorkMode);
+            }
 
             _pending.Enqueue(new NotificationRequest
             {
@@ -272,12 +308,21 @@ public sealed class ActivityTracker : IDisposable
         while (_pending.Count > 0)
             notifications.Add(_pending.Dequeue());
 
-        if (!_userActive)
+        if (!_userActive || IsPaused)
             return notifications;
 
         var now = DateTime.Now;
         var sinceLast = now - _lastActivityTime;
         var sinceInactivity = now - _lastInactivityTime;
+
+        Debug.WriteLine($"[Tick] sinceLast={sinceLast:mm\\:ss}, sinceInactivity={sinceInactivity:mm\\:ss}, " +
+                       $"userShortBreak={_userShortBreak}, pomodoroNotified={_pomodoroNotified}, IsPaused={IsPaused}");
+
+        Debug.WriteLine($"[Tick] sinceLast={sinceLast:mm\\:ss}, sinceInactivity={sinceInactivity:mm\\:ss}, " +
+                       $"userShortBreak={_userShortBreak}, pomodoroNotified={_pomodoroNotified}, IsPaused={IsPaused}");
+
+        Debug.WriteLine($"[Tick] sinceLast={sinceLast:mm\\:ss}, sinceInactivity={sinceInactivity:mm\\:ss}, " +
+                       $"userShortBreak={_userShortBreak}, pomodoroNotified={_pomodoroNotified}, IsPaused={IsPaused}");
 
         if (!_userShortBreak)
         {
@@ -316,10 +361,10 @@ public sealed class ActivityTracker : IDisposable
             if (sessionWork > TimeSpan.Zero)
                 _workedTime += sessionWork;
 
-            // Сохраняем завершённую сессию в БД
+// Сохраняем завершённую сессию в БД
             var sessionEnd = _lastActivityTime;
             var sessionStart = sessionEnd - sessionWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode);
+            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, _currentProjectId);
 
             notifications.Add(new NotificationRequest
             {
@@ -369,8 +414,14 @@ public sealed class ActivityTracker : IDisposable
         var now = DateTime.Now;
         var idleDuration = now - overlayShownAt;
 
+        Debug.WriteLine($"[AccountOverlayIdle] START - continueSession={continueSession}, overlayShownAt={overlayShownAt:HH:mm:ss}, now={now:HH:mm:ss}, idle={idleDuration:mm\\:ss}");
+        Debug.WriteLine($"[AccountOverlayIdle] BEFORE - _lastInactivityTime={_lastInactivityTime:HH:mm:ss}, _pomodoroNotified={_pomodoroNotified}");
+
         if (idleDuration <= TimeSpan.Zero)
+        {
+            Debug.WriteLine($"[AccountOverlayIdle] idleDuration <= 0, returning");
             return;
+        }
 
         if (continueSession)
         {
@@ -379,38 +430,41 @@ public sealed class ActivityTracker : IDisposable
             // чтобы sinceInactivity продолжал расти от начала сессии для проверки Pomodoro2.
             _lastActivityTime = now;
             
-            Debug.WriteLine($"[ActivityTracker] Continuing session after overlay");
+            Debug.WriteLine($"[AccountOverlayIdle] Continuing session - _lastActivityTime set to now");
             return;
         }
 
         // Был перерыв - завершаем сессию и начинаем новую
         // Фиксируем работу до момента показа оверлея
         var realWork = overlayShownAt - _lastInactivityTime;
+        Debug.WriteLine($"[AccountOverlayIdle] realWork={realWork:mm\\:ss}");
+        
         if (realWork > TimeSpan.Zero)
         {
             _workedTime += realWork;
             // Сохраняем завершённую сессию в БД
             var sessionEnd = overlayShownAt;
             var sessionStart = sessionEnd - realWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, realWork, _isWorkMode, description);
+            _dataService.SaveSession(sessionStart, sessionEnd, realWork, _isWorkMode, _currentProjectId, description);
         }
 
-        // Время простоя пока висел оверлей — это away
-        _awayTime += idleDuration;
+        // Время простоя пока висел оверлей — это away (минус время, выделенное на перерыв)
+        var excessIdle = idleDuration - _shortBreakTime;
+        if (excessIdle > TimeSpan.Zero)
+            _awayTime += excessIdle;
 
         // Начинаем новую сессию с текущего момента
         _lastActivityTime = now;
         _lastInactivityTime = now;
         _activeSessionStart = now;
+        _workedTime = TimeSpan.Zero;
 
-        // Оставляем _pomodoroNotified = true, чтобы окно не появлялось снова
-        // для той же сессии. Сбросим только когда будет новая полноценная сессия работы
-        _pomodoroNotified = true;
+        // Сбрасываем флаги, чтобы следующее уведомление пришло только после новой сессии
+        _pomodoroNotified = false;
         _pomodoro2Notified = false;
+        _userShortBreak = false;
 
-        Debug.WriteLine($"[ActivityTracker] Overlay idle accounted: " +
-                        $"realWork={TimeFormatter.FormatHuman(realWork)}, " +
-                        $"idle={TimeFormatter.FormatHuman(idleDuration)}");
+        Debug.WriteLine($"[AccountOverlayIdle] AFTER - _lastInactivityTime={_lastInactivityTime:HH:mm:ss}, flags reset (pomodoro={_pomodoroNotified}, pomodoro2={_pomodoro2Notified}, userShortBreak={_userShortBreak})");
     }
 
     public void ResetSessionTimer()
@@ -423,8 +477,8 @@ public sealed class ActivityTracker : IDisposable
 
     public void Reset()
     {
-        SaveCurrentSession();
-        
+        //SaveCurrentSession();
+
         var now = DateTime.Now;
         _lastActivityTime = now;
         _lastInactivityTime = now;

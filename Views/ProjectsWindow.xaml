@@ -1,0 +1,84 @@
+<Window x:Class="WorkCheck.Views.ProjectsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="#DD1E1E2E"
+        ResizeMode="NoResize"
+        Topmost="True"
+        ShowInTaskbar="False"
+        Width="350" Height="400"
+        WindowStartupLocation="CenterScreen">
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid>
+            <TextBlock Text="Проекты" Foreground="#CDD6F4"
+                       FontSize="18" FontWeight="Bold"/>
+            <Button Content="✕" HorizontalAlignment="Right"
+                   Click="OnCloseClick"
+                   Background="Transparent" Foreground="#6C7086"
+                   BorderThickness="0" FontSize="14" Cursor="Hand"
+                   Padding="4,0"/>
+        </Grid>
+
+        <!-- Projects List -->
+        <ListBox x:Name="ProjectsList" Grid.Row="1"
+                 Background="Transparent"
+                 BorderThickness="0"
+                 Foreground="#CDD6F4">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding Name}" FontSize="14" Foreground="#CDD6F4"/>
+                            <TextBlock Text="{Binding Rate, StringFormat='Ставка: {0:F0} ₽/мин'}" 
+                                       FontSize="11" Foreground="#6C7086"/>
+                        </StackPanel>
+                        <Button Grid.Column="1" Content="✕"
+                                Click="OnDeleteClick" Tag="{Binding Id}"
+                                Background="Transparent" Foreground="#F38BA8"
+                                BorderThickness="0" FontSize="12" Cursor="Hand"
+                                Padding="8,4"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Add New Project -->
+        <StackPanel Grid.Row="2" Margin="0,16,0,0">
+            <TextBox x:Name="NewProjectName" 
+                    Foreground="#CDD6F4" Background="#313244"
+                    BorderBrush="#45475A" BorderThickness="1"
+                    FontSize="14" Padding="8,6"
+                    Margin="0,0,0,8"
+                    ToolTip="Название проекта"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBox x:Name="NewProjectRate"
+                        Grid.Column="0"
+                        Foreground="#CDD6F4" Background="#313244"
+                        BorderBrush="#45475A" BorderThickness="1"
+                        FontSize="14" Padding="8,6"
+                        ToolTip="Ставка за минуту"
+                        Margin="0,0,8,0"/>
+                <Button Grid.Column="1" Content="Добавить" Click="OnAddClick"
+                        Background="#A6E3A1" Foreground="#1E1E2E"
+                        Padding="12,6"/>
+            </Grid>
+        </StackPanel>
+    </Grid>
+</Window>

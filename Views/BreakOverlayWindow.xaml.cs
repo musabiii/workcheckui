@@ -3,7 +3,9 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using WorkCheck.Helpers;
 using WorkCheck.Models;
+using WorkCheck.Services;
 using Screen = System.Windows.Forms.Screen;
 using Color = System.Windows.Media.Color;
 
@@ -27,28 +29,41 @@ public partial class BreakOverlayWindow : Window
     private static readonly Color BreakStripeColor = Color.FromRgb(0x89, 0xB4, 0xFA);
 
     private readonly List<Window> _secondaryOverlays = [];
-    private readonly TimeSpan _breakDuration;
+private readonly TimeSpan _breakDuration;
     private DispatcherTimer? _countdownTimer;
     private DispatcherTimer? _lateTimer;
+    private DispatcherTimer? _choiceTimer;
     private TimeSpan _remaining;
     private TimeSpan _lateTime;
     private DateTime _modeSelectionStartTime;
+    private readonly TimeSpan? _awayBase;
+    private readonly TimeSpan? _todayBase;
+    private TimeSpan _choiceRemaining;
 
-    private readonly bool _skipPrompt;
-    private bool _pauseSent;
+private readonly bool _skipPrompt;
+    private readonly bool _showChoice;
+    private readonly SoundService? _soundService;
+    private readonly bool _playSoundOnBreakEnd;
 
     public bool UserChoseBreak { get; private set; }
     public string SessionDescription { get; set; } = string.Empty;
     public bool? ModeSelected { get; private set; }
     public Action? OnBreakStarted { get; set; }
 
-    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false)
+    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false, bool showChoice = false, SoundService? soundService = null, bool playSoundOnBreakEnd = false, bool fromWorkMode = false, TimeSpan? awayBase = null, TimeSpan? todayBase = null)
     {
+        _awayBase = awayBase;
+        _todayBase = todayBase;
         InitializeComponent();
 
         DataContext = this;
-        _breakDuration = breakDuration;
-        _skipPrompt = skipPrompt;
+_breakDuration = breakDuration;
+_skipPrompt = skipPrompt;
+        _showChoice = showChoice;
+        _soundService = soundService;
+_playSoundOnBreakEnd = playSoundOnBreakEnd;
+        if (fromWorkMode)
+            _playSoundOnBreakEnd = true;
 
         TitleBlock.Text = title;
         MessageBlock.Text = message;
@@ -58,10 +73,55 @@ public partial class BreakOverlayWindow : Window
 
         CreateSecondaryOverlays();
 
-        if (_skipPrompt)
+        if (_skipPrompt || _showChoice)
         {
-            Loaded += (_, _) => SwitchToTimerMode();
+            Loaded += (_, _) =>
+            {
+                if (_showChoice)
+                    SwitchToModeSelection();
+                else
+                    SwitchToTimerMode();
+            };
         }
+        else
+        {
+            StartChoiceTimer();
+        }
+    }
+
+    private void StartChoiceTimer()
+    {
+        _choiceRemaining = TimeSpan.FromSeconds(10);
+        UpdateChoiceCountdownDisplay();
+
+        _choiceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _choiceTimer.Tick += OnChoiceTick;
+        _choiceTimer.Start();
+    }
+
+    private void OnChoiceTick(object? sender, EventArgs e)
+    {
+        _choiceRemaining -= TimeSpan.FromSeconds(1);
+
+        if (_choiceRemaining <= TimeSpan.Zero)
+        {
+            _choiceTimer?.Stop();
+            SwitchToTimerMode();
+            return;
+        }
+
+        UpdateChoiceCountdownDisplay();
+    }
+
+    private void UpdateChoiceCountdownDisplay()
+    {
+        ChoiceCountdownBlock.Text = $"Перерыв через {_choiceRemaining.Seconds}...";
+    }
+
+    public void ExtendChoiceTimer()
+    {
+        _choiceRemaining = TimeSpan.FromSeconds(10);
+        UpdateChoiceCountdownDisplay();
     }
 
     private void CreateSecondaryOverlays()
@@ -88,14 +148,8 @@ public partial class BreakOverlayWindow : Window
         }
     }
 
-    public void ShowWithOverlays()
+public void ShowWithOverlays()
     {
-        if (!_pauseSent)
-        {
-            SendMediaPause();
-            _pauseSent = true;
-        }
-
         foreach (var overlay in _secondaryOverlays)
             overlay.Show();
 
@@ -121,6 +175,7 @@ public partial class BreakOverlayWindow : Window
     {
         PromptPanel.Visibility = Visibility.Collapsed;
         TimerPanel.Visibility = Visibility.Visible;
+        ModeSelectionPanel.Visibility = Visibility.Collapsed;
         Stripe.Background = new SolidColorBrush(BreakStripeColor);
 
         _remaining = _breakDuration;
@@ -140,6 +195,8 @@ public partial class BreakOverlayWindow : Window
         if (_remaining <= TimeSpan.Zero)
         {
             _countdownTimer?.Stop();
+            if (_playSoundOnBreakEnd)
+                _soundService?.PlayBreakEnd();
             SwitchToModeSelection();
             return;
         }
@@ -147,8 +204,9 @@ public partial class BreakOverlayWindow : Window
         UpdateCountdownDisplay();
     }
 
-    private void SwitchToModeSelection()
+private void SwitchToModeSelection()
     {
+        PromptPanel.Visibility = Visibility.Collapsed;
         TimerPanel.Visibility = Visibility.Collapsed;
         ModeSelectionPanel.Visibility = Visibility.Visible;
         Stripe.Background = new SolidColorBrush(BreakStripeColor);
@@ -172,11 +230,21 @@ public partial class BreakOverlayWindow : Window
     {
         if (FindName("LateTimerBlock") is System.Windows.Controls.TextBlock lateTimerBlock)
             lateTimerBlock.Text = _lateTime.ToString(@"hh\:mm\:ss");
+
+        if (_awayBase.HasValue && _todayBase.HasValue)
+        {
+            TotalAwayValue.Text = TimeFormatter.FormatShort(_awayBase.Value + _lateTime);
+            TodayValue.Text = TimeFormatter.FormatShort(_todayBase.Value);
+            GrandTotalValue.Text = TimeFormatter.FormatShort(_todayBase.Value + _awayBase.Value + _lateTime);
+            TotalsGrid.Visibility = Visibility.Visible;
+        }
     }
 
     private void UpdateCountdownDisplay()
     {
-        CountdownBlock.Text = _remaining.ToString(@"m\:ss");
+        CountdownBlock.Text = _remaining.TotalHours >= 1
+            ? _remaining.ToString(@"h\:mm\:ss")
+            : _remaining.ToString(@"m\:ss");
     }
 
     private void Dismiss(bool choseBreak)
@@ -208,13 +276,15 @@ public partial class BreakOverlayWindow : Window
         _secondaryOverlays.Clear();
     }
 
-    private void OnBreakClick(object sender, RoutedEventArgs e)
+private void OnBreakClick(object sender, RoutedEventArgs e)
     {
+        _choiceTimer?.Stop();
         SwitchToTimerMode();
     }
 
     private void OnContinueClick(object sender, RoutedEventArgs e)
     {
+        _choiceTimer?.Stop();
         Dismiss(choseBreak: false);
     }
 
@@ -236,5 +306,57 @@ public partial class BreakOverlayWindow : Window
     private void OnPlayPauseClick(object sender, RoutedEventArgs e)
     {
         SendMediaPause();
+    }
+
+    private void OnSet5Min(object sender, RoutedEventArgs e)
+    {
+        _countdownTimer?.Stop();
+        _remaining = TimeSpan.FromMinutes(5);
+        UpdateCountdownDisplay();
+        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdownTimer.Tick += OnCountdownTick;
+        _countdownTimer.Start();
+    }
+
+    private void OnSet15Min(object sender, RoutedEventArgs e)
+    {
+        _countdownTimer?.Stop();
+        _remaining = TimeSpan.FromMinutes(15);
+        UpdateCountdownDisplay();
+        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdownTimer.Tick += OnCountdownTick;
+        _countdownTimer.Start();
+    }
+
+    private void OnSet30Min(object sender, RoutedEventArgs e)
+    {
+        _countdownTimer?.Stop();
+        _remaining = TimeSpan.FromMinutes(30);
+        UpdateCountdownDisplay();
+        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdownTimer.Tick += OnCountdownTick;
+        _countdownTimer.Start();
+    }
+
+    private void OnSet1Hour(object sender, RoutedEventArgs e)
+    {
+        _countdownTimer?.Stop();
+        _remaining = TimeSpan.FromHours(1);
+        UpdateCountdownDisplay();
+        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _countdownTimer.Tick += OnCountdownTick;
+        _countdownTimer.Start();
+    }
+
+    private void OnAdd5Min(object sender, RoutedEventArgs e) => AddTime(TimeSpan.FromMinutes(5));
+
+    private void OnAdd10Min(object sender, RoutedEventArgs e) => AddTime(TimeSpan.FromMinutes(10));
+
+    private void OnAdd30Min(object sender, RoutedEventArgs e) => AddTime(TimeSpan.FromMinutes(30));
+
+    private void AddTime(TimeSpan amount)
+    {
+        _remaining += amount;
+        UpdateCountdownDisplay();
     }
 }
