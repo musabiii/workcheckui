@@ -30,19 +30,52 @@
                            VerticalAlignment="Center"/>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="☰" Click="OnMenuClick"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
+                            ToolTip="Меню">
+                        <Button.ContextMenu>
+                            <ContextMenu Background="#1E1E2E" Foreground="#CDD6F4" BorderBrush="#33FFFFFF">
+                                <ContextMenu.Template>
+                                    <ControlTemplate TargetType="ContextMenu">
+                                        <Border Background="{TemplateBinding Background}"
+                                                BorderBrush="{TemplateBinding BorderBrush}"
+                                                BorderThickness="1" CornerRadius="6" Padding="4">
+                                            <StackPanel IsItemsHost="True"/>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ContextMenu.Template>
+                                <ContextMenu.Resources>
+                                    <Style TargetType="MenuItem">
+                                        <Setter Property="Template">
+                                            <Setter.Value>
+                                                <ControlTemplate TargetType="MenuItem">
+                                                    <Border x:Name="ItemBorder" Background="Transparent"
+                                                            Padding="12,6" CornerRadius="4">
+                                                        <ContentPresenter ContentSource="Header"
+                                                                          TextElement.Foreground="#CDD6F4"/>
+                                                    </Border>
+                                                    <ControlTemplate.Triggers>
+                                                        <Trigger Property="IsHighlighted" Value="True">
+                                                            <Setter TargetName="ItemBorder" Property="Background" Value="#33FFFFFF"/>
+                                                        </Trigger>
+                                                    </ControlTemplate.Triggers>
+                                                </ControlTemplate>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ContextMenu.Resources>
+                                <MenuItem Header="⚙  Настройки" Command="{Binding OpenSettingsCommand}"/>
+                                <MenuItem Header="📊  Статистика" Command="{Binding OpenStatisticsCommand}"/>
+                                <MenuItem Header="↺  Обнулить" Command="{Binding ResetCommand}"/>
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                    </Button>
                     <Button Content="📁" Command="{Binding OpenProjectsCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
                             ToolTip="Проекты"/>
                     <Button Content="☕" Command="{Binding ManualBreakCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
                             ToolTip="Ручной перерыв"/>
-                    <Button Content="↺" Command="{Binding ResetCommand}"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"/>
-                    <Button Content="📊" Command="{Binding OpenStatisticsCommand}"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
-                            ToolTip="Статистика"/>
-                    <Button Content="⚙" Command="{Binding OpenSettingsCommand}"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"/>
                     <Button Content="🖃" Click="OnMinimizeClick"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
                             ToolTip="Свернуть"/>

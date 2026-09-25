@@ -43,6 +43,14 @@ public partial class StatusWindow : Window
         base.OnClosing(e);
     }
 
+    private void OnMenuClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not System.Windows.Controls.Button { ContextMenu: { } menu } button) return;
+        menu.PlacementTarget = button;
+        menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+        menu.IsOpen = true;
+    }
+
     private void OnMinimizeClick(object sender, RoutedEventArgs e)
     {
         OnMinimize?.Invoke();
