@@ -154,7 +154,9 @@ public partial class StatusViewModel : ObservableObject
                     _settings.ShortBreakTime,
                     onBreakStarted: () => _tracker.IsPaused = true,
                     soundService: _soundService,
-                    playSoundOnBreakEnd: true);
+                    playSoundOnBreakEnd: true,
+                    awayBase: GetAwayBase(),
+                    todayBase: GetTodayBase());
                 _tracker.IsPaused = false;
 
                 // Если пользователь нажал "Продолжить работать" сразу (не пошел на перерыв)
@@ -194,7 +196,9 @@ public partial class StatusViewModel : ObservableObject
                     skipPrompt: true,
                     showChoice: true,
                     soundService: _soundService,
-                    fromWorkMode: true);
+                    fromWorkMode: true,
+                    awayBase: GetAwayBase(),
+                    todayBase: GetTodayBase());
                 _tracker.IsPaused = false;
 
                 _tracker.AccountOverlayIdle(overlayShownAt, "");
@@ -223,13 +227,20 @@ public partial class StatusViewModel : ObservableObject
         }
     }
 
+    private TimeSpan? GetAwayBase() =>
+        IsWorkMode ? _tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime : null;
+
+    private TimeSpan? GetTodayBase() =>
+        IsWorkMode
+            ? _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode, _tracker.CurrentProjectId) + _tracker.CurrentSession
+            : null;
+
     private void UpdateDisplay()
     {
         var session = _tracker.CurrentSession;
         CurrentSessionText = TimeFormatter.FormatShort(session);
         
-        var awayTime = _tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime;
-        AwayTimeText = TimeFormatter.FormatShort(awayTime);
+        AwayTimeText = TimeFormatter.FormatShort(_tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime);
 
         var sessions = _tracker.CompletedSessions;
         SessionLabel = sessions > 0
@@ -303,7 +314,9 @@ public partial class StatusViewModel : ObservableObject
             _settings.ShortBreakTime,
             skipPrompt: true,
             soundService: _soundService,
-            fromWorkMode: IsWorkMode);
+            fromWorkMode: IsWorkMode,
+            awayBase: GetAwayBase(),
+                    todayBase: GetTodayBase());
         
         _tracker.IsPaused = false;
 

@@ -415,6 +415,30 @@
                                Margin="0,16,0,0"
                                FontFamily="Consolas"/>
 
+                    <Grid x:Name="TotalsGrid" HorizontalAlignment="Center" Margin="0,8,0,0" Visibility="Collapsed">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Всего вне компьютера:" Foreground="#BAC2DE" FontSize="16"
+                                   HorizontalAlignment="Right" Margin="0,2,6,2"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TotalAwayValue" Foreground="#F38BA8" FontSize="16"
+                                   FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Сегодня:" Foreground="#BAC2DE" FontSize="16"
+                                   HorizontalAlignment="Right" Margin="0,2,6,2"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TodayValue" Foreground="#A6E3A1" FontSize="16"
+                                   FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Общее время:" Foreground="#BAC2DE" FontSize="16"
+                                   HorizontalAlignment="Right" Margin="0,2,6,2"/>
+                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="GrandTotalValue" Foreground="#89B4FA" FontSize="16"
+                                   FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
+                    </Grid>
+
                     <TextBlock Text="Выберите режим работы:"
                                Foreground="#BAC2DE"
                                FontSize="16"

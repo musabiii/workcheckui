@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using WorkCheck.Helpers;
 using WorkCheck.Models;
 using WorkCheck.Services;
 using Screen = System.Windows.Forms.Screen;
@@ -35,6 +36,8 @@ private readonly TimeSpan _breakDuration;
     private TimeSpan _remaining;
     private TimeSpan _lateTime;
     private DateTime _modeSelectionStartTime;
+    private readonly TimeSpan? _awayBase;
+    private readonly TimeSpan? _todayBase;
     private TimeSpan _choiceRemaining;
 
 private readonly bool _skipPrompt;
@@ -47,8 +50,10 @@ private readonly bool _skipPrompt;
     public bool? ModeSelected { get; private set; }
     public Action? OnBreakStarted { get; set; }
 
-    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false, bool showChoice = false, SoundService? soundService = null, bool playSoundOnBreakEnd = false, bool fromWorkMode = false)
+    public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false, bool showChoice = false, SoundService? soundService = null, bool playSoundOnBreakEnd = false, bool fromWorkMode = false, TimeSpan? awayBase = null, TimeSpan? todayBase = null)
     {
+        _awayBase = awayBase;
+        _todayBase = todayBase;
         InitializeComponent();
 
         DataContext = this;
@@ -225,6 +230,14 @@ private void SwitchToModeSelection()
     {
         if (FindName("LateTimerBlock") is System.Windows.Controls.TextBlock lateTimerBlock)
             lateTimerBlock.Text = _lateTime.ToString(@"hh\:mm\:ss");
+
+        if (_awayBase.HasValue && _todayBase.HasValue)
+        {
+            TotalAwayValue.Text = TimeFormatter.FormatShort(_awayBase.Value + _lateTime);
+            TodayValue.Text = TimeFormatter.FormatShort(_todayBase.Value);
+            GrandTotalValue.Text = TimeFormatter.FormatShort(_todayBase.Value + _awayBase.Value + _lateTime);
+            TotalsGrid.Visibility = Visibility.Visible;
+        }
     }
 
     private void UpdateCountdownDisplay()
