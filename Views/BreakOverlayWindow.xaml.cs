@@ -44,6 +44,8 @@ private readonly bool _skipPrompt;
     private readonly bool _showChoice;
     private readonly SoundService? _soundService;
     private readonly bool _playSoundOnBreakEnd;
+    private bool _breakEndSoundPlayed;
+    private bool _breakEndSoundRepeated;
 
     public bool UserChoseBreak { get; private set; }
     public string SessionDescription { get; set; } = string.Empty;
@@ -196,7 +198,10 @@ public void ShowWithOverlays()
         {
             _countdownTimer?.Stop();
             if (_playSoundOnBreakEnd)
+            {
                 _soundService?.PlayBreakEnd();
+                _breakEndSoundPlayed = true;
+            }
             SwitchToModeSelection();
             return;
         }
@@ -223,6 +228,13 @@ private void SwitchToModeSelection()
     private void OnLateTimerTick(object? sender, EventArgs e)
     {
         _lateTime = DateTime.Now - _modeSelectionStartTime;
+
+        if (_breakEndSoundPlayed && !_breakEndSoundRepeated && _lateTime >= _breakDuration)
+        {
+            _breakEndSoundRepeated = true;
+            _soundService?.PlayBreakEnd();
+        }
+
         UpdateLateTimerDisplay();
     }
 
