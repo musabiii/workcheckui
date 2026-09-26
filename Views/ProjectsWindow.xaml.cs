@@ -29,8 +29,28 @@ public partial class ProjectsWindow : Window
             if (ProjectsList.SelectedItem is Project selected)
             {
                 _onSelectProject(selected);
+                Close();
             }
         };
+
+        ProjectsList.PreviewMouseLeftButtonUp += (s, e) =>
+        {
+            if (e.OriginalSource is not DependencyObject source) return;
+            if (System.Windows.Controls.ItemsControl.ContainerFromElement(ProjectsList, source) is not System.Windows.Controls.ListBoxItem item) return;
+            if (FindParent<System.Windows.Controls.Button>(source) != null) return;
+            if (item.DataContext is Project clicked && ReferenceEquals(clicked, ProjectsList.SelectedItem))
+            {
+                _onSelectProject(clicked);
+                Close();
+            }
+        };
+    }
+
+    private static T? FindParent<T>(DependencyObject child) where T : DependencyObject
+    {
+        for (var d = child; d != null; d = System.Windows.Media.VisualTreeHelper.GetParent(d))
+            if (d is T match) return match;
+        return null;
     }
 
     private void OnAddClick(object sender, RoutedEventArgs e)
@@ -38,10 +58,7 @@ public partial class ProjectsWindow : Window
         var name = NewProjectName.Text.Trim();
         if (string.IsNullOrEmpty(name)) return;
 
-        var rateText = NewProjectRate.Text.Trim();
-        var rate = decimal.TryParse(rateText, out var r) ? r : 0m;
-
-        var project = new Project { Name = name, Rate = rate };
+        var project = new Project { Name = name };
         var id = _dataService.AddProject(project);
 
         project.Id = id;
@@ -50,7 +67,6 @@ public partial class ProjectsWindow : Window
         ProjectsList.ItemsSource = _dataService.GetAllProjects();
 
         NewProjectName.Text = "";
-        NewProjectRate.Text = "";
     }
 
     private void OnDeleteClick(object sender, RoutedEventArgs e)

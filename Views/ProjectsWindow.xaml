@@ -40,11 +40,8 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <StackPanel>
-                            <TextBlock Text="{Binding Name}" FontSize="14" Foreground="#CDD6F4"/>
-                            <TextBlock Text="{Binding Rate, StringFormat='Ставка: {0:F0} ₽/мин'}" 
-                                       FontSize="11" Foreground="#6C7086"/>
-                        </StackPanel>
+                        <TextBlock Text="{Binding Name}" FontSize="14" Foreground="#CDD6F4"
+                                   VerticalAlignment="Center"/>
                         <Button Grid.Column="1" Content="✕"
                                 Click="OnDeleteClick" Tag="{Binding Id}"
                                 Background="Transparent" Foreground="#F38BA8"
@@ -63,22 +60,9 @@
                     FontSize="14" Padding="8,6"
                     Margin="0,0,0,8"
                     ToolTip="Название проекта"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <TextBox x:Name="NewProjectRate"
-                        Grid.Column="0"
-                        Foreground="#CDD6F4" Background="#313244"
-                        BorderBrush="#45475A" BorderThickness="1"
-                        FontSize="14" Padding="8,6"
-                        ToolTip="Ставка за минуту"
-                        Margin="0,0,8,0"/>
-                <Button Grid.Column="1" Content="Добавить" Click="OnAddClick"
-                        Background="#A6E3A1" Foreground="#1E1E2E"
-                        Padding="12,6"/>
-            </Grid>
+            <Button Content="Добавить" Click="OnAddClick"
+                    Background="#A6E3A1" Foreground="#1E1E2E"
+                    Padding="12,6"/>
         </StackPanel>
     </Grid>
 </Window>
