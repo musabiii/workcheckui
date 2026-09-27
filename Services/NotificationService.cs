@@ -13,7 +13,7 @@ public class NotificationService
     private const double WindowWidth = 400;
     private const double Margin = 2;
     private const double Gap = 4;
-    private const double StatusWindowHeight = 180;
+    private const double StatusWindowHeight = 146;
 
     public void Show(NotificationType type, string title, string message,
         string? secondary = null, string? quote = null)
