@@ -10,6 +10,8 @@ public class DataService : IDisposable
     private readonly string _connectionString;
     private SqliteConnection? _connection;
 
+    public string DbPath { get; }
+
     public DataService()
     {
         var appDataPath = Path.Combine(
@@ -18,10 +20,10 @@ public class DataService : IDisposable
 
         Directory.CreateDirectory(appDataPath);
 
-        var dbPath = Path.Combine(appDataPath, "statistics.db");
+        DbPath = Path.Combine(appDataPath, "statistics.db");
         _connectionString = new SqliteConnectionStringBuilder
         {
-            DataSource = dbPath,
+            DataSource = DbPath,
             Mode = SqliteOpenMode.ReadWriteCreate
         }.ToString();
 

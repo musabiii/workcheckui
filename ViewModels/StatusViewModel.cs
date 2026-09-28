@@ -424,6 +424,13 @@ public partial class StatusViewModel : ObservableObject
         Application.Current.MainWindow?.Hide();
     }
 
+    [RelayCommand]
+    private void OpenAbout()
+    {
+        var window = new AboutWindow(_dataService.DbPath);
+        window.ShowDialog();
+    }
+
     public void Cleanup()
     {
         _timer.Stop();

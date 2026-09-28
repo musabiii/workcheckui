@@ -68,6 +68,7 @@
                                 <MenuItem Header="⚙  Настройки" Command="{Binding OpenSettingsCommand}"/>
                                 <MenuItem Header="📊  Статистика" Command="{Binding OpenStatisticsCommand}"/>
                                 <MenuItem Header="↺  Обнулить" Command="{Binding ResetCommand}"/>
+                                <MenuItem Header="ℹ  О приложении" Command="{Binding OpenAboutCommand}"/>
                             </ContextMenu>
                         </Button.ContextMenu>
                     </Button>
