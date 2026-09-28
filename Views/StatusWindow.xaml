@@ -76,6 +76,7 @@
                             ToolTip="Проекты"/>
                     <Button Content="☕" Command="{Binding ManualBreakCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
+                            Foreground="#F9E2AF"
                             ToolTip="Ручной перерыв"/>
                     <Button Content="🖃" Click="OnMinimizeClick"
                             Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
