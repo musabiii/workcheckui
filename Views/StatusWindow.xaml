@@ -153,6 +153,9 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
 
+                <Separator Margin="0,2,0,2" Background="#33FFFFFF" Height="1"
+                           Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
                 <!-- Вне компьютера -->
                 <Grid Margin="0,0" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
