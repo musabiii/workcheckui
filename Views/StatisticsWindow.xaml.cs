@@ -1,5 +1,6 @@
 using System.Windows;
 using WorkCheck.Helpers;
+using WorkCheck.Models;
 using WorkCheck.Services;
 
 namespace WorkCheck.Views;
@@ -33,15 +34,34 @@ public partial class StatisticsWindow : Window
         TotalTimeText.Text = TimeFormatter.FormatShort(totalTime);
 
         var projectNames = _dataService.GetAllProjects().ToDictionary(p => p.Id, p => p.Name);
+        string ProjectName(Session s) =>
+            s.ProjectId is int id && projectNames.TryGetValue(id, out var name) ? name : "(удалён)";
 
         SessionsGrid.ItemsSource = sessions.Select(s => new
         {
             s.StartTime,
             s.EndTime,
             DurationText = TimeFormatter.FormatShort(s.Duration),
-            ProjectName = s.ProjectId is int id && projectNames.TryGetValue(id, out var name) ? name : "(удалён)",
+            ProjectName = ProjectName(s),
             s.Description
         }).ToList();
+
+        Gantt.Bars = sessions.Select(s =>
+        {
+            var tip = $"{ProjectName(s)}\n{s.StartTime:HH:mm}–{s.EndTime:HH:mm} · {TimeFormatter.FormatShort(s.Duration)}";
+            if (!string.IsNullOrWhiteSpace(s.Description))
+                tip += $"\n{s.Description}";
+            var colorKey = s.ProjectId is int id && projectNames.ContainsKey(id) ? id : -1;
+            return new GanttBar(ProjectName(s), colorKey, s.StartTime, s.EndTime, tip);
+        }).ToList();
+    }
+
+    private void OnViewChanged(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded) return;
+        var showList = ListViewRadio.IsChecked == true;
+        ListView.Visibility = showList ? Visibility.Visible : Visibility.Collapsed;
+        GanttView.Visibility = showList ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void OnFilterChanged(object sender, RoutedEventArgs e)
