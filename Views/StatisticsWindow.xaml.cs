@@ -9,10 +9,12 @@ using Binding = System.Windows.Data.Binding;
 
 namespace WorkCheck.Views;
 
-public record WeekRow(string Name, string[] Days, string Total, bool IsTotal = false);
+public record PeriodRow(string Name, string[] Cells, string Total, bool IsTotal = false);
 
 public partial class StatisticsWindow : Window
 {
+    private enum Period { Day, Week, Month }
+
     private static readonly TimeSpan FullSessionDuration = TimeSpan.FromMinutes(25);
     private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
 
@@ -27,10 +29,20 @@ public partial class StatisticsWindow : Window
         LoadStatistics();
     }
 
-    private bool IsWeek => DayPeriodRadio.IsChecked != true;
+    private Period CurrentPeriod =>
+        WeekPeriodRadio.IsChecked == true ? Period.Week
+        : MonthPeriodRadio.IsChecked == true ? Period.Month
+        : Period.Day;
 
     private static DateTime WeekStart(DateTime date) =>
         date.Date.AddDays(-(((int)date.DayOfWeek + 6) % 7));
+
+    private static (DateTime From, DateTime To) RangeOf(Period period, DateTime date) => period switch
+    {
+        Period.Week => (WeekStart(date), WeekStart(date).AddDays(7)),
+        Period.Month => (new DateTime(date.Year, date.Month, 1), new DateTime(date.Year, date.Month, 1).AddMonths(1)),
+        _ => (date.Date, date.Date.AddDays(1))
+    };
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
@@ -40,12 +52,15 @@ public partial class StatisticsWindow : Window
 
     private void LoadStatistics()
     {
-        var from = IsWeek ? WeekStart(_currentDate) : _currentDate.Date;
-        var to = from.AddDays(IsWeek ? 7 : 1);
+        var period = CurrentPeriod;
+        var (from, to) = RangeOf(period, _currentDate);
 
-        DateText.Text = IsWeek
-            ? $"{from:dd.MM} – {to.AddDays(-1):dd.MM.yyyy}"
-            : from.ToString("dd.MM.yyyy");
+        DateText.Text = period switch
+        {
+            Period.Week => $"{from:dd.MM} – {to.AddDays(-1):dd.MM.yyyy}",
+            Period.Month => Russian.TextInfo.ToTitleCase(Russian.DateTimeFormat.GetMonthName(from.Month)) + $" {from:yyyy}",
+            _ => from.ToString("dd.MM.yyyy")
+        };
 
         var minDuration = AllSessionsRadio.IsChecked == true ? TimeSpan.FromMinutes(1) : FullSessionDuration;
         var sessions = _dataService.GetSessionsInRange(from, to)
@@ -53,7 +68,7 @@ public partial class StatisticsWindow : Window
             .ToList();
 
         SessionCountText.Text = sessions.Count.ToString();
-        TotalTimeText.Text = TimeFormatter.FormatShort(TimeSpan.FromTicks(sessions.Sum(s => s.Duration.Ticks)));
+        TotalTimeText.Text = TimeFormatter.FormatShort(Total(sessions));
 
         var projectNames = _dataService.GetAllProjects().ToDictionary(p => p.Id, p => p.Name);
         string ProjectName(Session s) =>
@@ -61,13 +76,13 @@ public partial class StatisticsWindow : Window
         int ColorKey(Session s) =>
             s.ProjectId is int id && projectNames.ContainsKey(id) ? id : -1;
 
-        if (IsWeek)
-            LoadWeek(from, sessions, ProjectName, ColorKey);
-        else
+        if (period == Period.Day)
             LoadDay(sessions, ProjectName, ColorKey);
+        else
+            LoadPeriod(PeriodColumns(period, from, to), sessions, ProjectName, ColorKey);
 
-        SessionsGrid.Visibility = IsWeek ? Visibility.Collapsed : Visibility.Visible;
-        WeekGrid.Visibility = IsWeek ? Visibility.Visible : Visibility.Collapsed;
+        SessionsGrid.Visibility = period == Period.Day ? Visibility.Visible : Visibility.Collapsed;
+        PeriodGrid.Visibility = period == Period.Day ? Visibility.Collapsed : Visibility.Visible;
     }
 
     private void LoadDay(List<Session> sessions, Func<Session, string> projectName, Func<Session, int> colorKey)
@@ -81,96 +96,109 @@ public partial class StatisticsWindow : Window
             s.Description
         }).ToList();
 
-        Gantt.AxisStart = null;
-        Gantt.AxisEnd = null;
+        Gantt.Columns = [];
         Gantt.Bars = sessions.Select(s => new GanttBar(
             projectName(s), colorKey(s), s.StartTime, s.EndTime, s.Duration, SessionTip(s, projectName(s)))).ToList();
     }
 
-    private void LoadWeek(DateTime weekStart, List<Session> sessions,
+    // Week: one column per day. Month: one column per Monday–Sunday week, clipped to the month.
+    private static List<GanttColumn> PeriodColumns(Period period, DateTime from, DateTime to)
+    {
+        var columns = new List<GanttColumn>();
+        for (var start = from; start < to;)
+        {
+            var end = period == Period.Week ? start.AddDays(1) : Min(WeekStart(start).AddDays(7), to);
+            var label = period == Period.Week
+                ? $"{DayName(start)} {start:dd}"
+                : $"{start:dd}–{end.AddDays(-1):dd}";
+            columns.Add(new GanttColumn(start, end, label));
+            start = end;
+        }
+        return columns;
+    }
+
+    private void LoadPeriod(List<GanttColumn> columns, List<Session> sessions,
         Func<Session, string> projectName, Func<Session, int> colorKey)
     {
-        var days = Enumerable.Range(0, 7).Select(i => weekStart.AddDays(i)).ToList();
-        int DayIndex(Session s) => (s.StartTime.Date - weekStart).Days;
+        int ColumnIndex(Session s) => columns.FindIndex(c => s.StartTime >= c.Start && s.StartTime < c.End);
+        string[] Cells(IEnumerable<Session> group) =>
+            columns.Select((_, i) => FormatCell(group.Where(s => ColumnIndex(s) == i))).ToArray();
 
-        BuildWeekColumns(days);
+        BuildPeriodColumns(columns);
 
         var rows = sessions
             .GroupBy(projectName)
-            .Select(g => (Name: g.Key, Sessions: g.ToList(), Total: TimeSpan.FromTicks(g.Sum(s => s.Duration.Ticks))))
-            .OrderByDescending(p => p.Total)
-            .Select(p => new WeekRow(
-                p.Name,
-                days.Select((_, i) => FormatCell(p.Sessions.Where(s => DayIndex(s) == i))).ToArray(),
-                TimeFormatter.FormatClock(p.Total)))
+            .OrderByDescending(Total)
+            .Select(g => new PeriodRow(g.Key, Cells(g), TimeFormatter.FormatClock(Total(g))))
             .ToList();
 
         if (rows.Count > 0)
-        {
-            rows.Add(new WeekRow(
-                "Итого",
-                days.Select((_, i) => FormatCell(sessions.Where(s => DayIndex(s) == i))).ToArray(),
-                TimeFormatter.FormatClock(TimeSpan.FromTicks(sessions.Sum(s => s.Duration.Ticks))),
-                IsTotal: true));
-        }
+            rows.Add(new PeriodRow("Итого", Cells(sessions), TimeFormatter.FormatClock(Total(sessions)), IsTotal: true));
 
-        WeekGrid.ItemsSource = rows;
+        PeriodGrid.ItemsSource = rows;
 
-        // One row per project, one cell per day the project was worked on
-        Gantt.AxisStart = weekStart;
-        Gantt.AxisEnd = weekStart.AddDays(7);
+        // One row per project, one cell per column (day or week) the project was worked on
+        Gantt.Columns = columns;
         Gantt.Bars = sessions
-            .GroupBy(s => (Project: projectName(s), Day: DayIndex(s)))
+            .GroupBy(s => (Project: projectName(s), Column: ColumnIndex(s)))
             .Select(g =>
             {
-                var day = days[g.Key.Day];
-                var total = TimeSpan.FromTicks(g.Sum(s => s.Duration.Ticks));
-                var tip = $"{g.Key.Project}\n{DayLabel(day)} · {TimeFormatter.FormatShort(total)} · сессий: {g.Count()}";
-                return new GanttBar(g.Key.Project, colorKey(g.First()), day, day.AddDays(1), total, tip,
+                var column = columns[g.Key.Column];
+                var total = Total(g);
+                var tip = $"{g.Key.Project}\n{ColumnTitle(column)} · {TimeFormatter.FormatShort(total)} · сессий: {g.Count()}";
+                return new GanttBar(g.Key.Project, colorKey(g.First()), column.Start, column.End, total, tip,
                     TimeFormatter.FormatClock(total));
             })
             .ToList();
     }
 
-    private void BuildWeekColumns(List<DateTime> days)
+    private void BuildPeriodColumns(List<GanttColumn> columns)
     {
-        WeekGrid.Columns.Clear();
-        WeekGrid.Columns.Add(new DataGridTextColumn
+        PeriodGrid.Columns.Clear();
+        PeriodGrid.Columns.Add(new DataGridTextColumn
         {
             Header = "Проект",
-            Binding = new Binding(nameof(WeekRow.Name)),
+            Binding = new Binding(nameof(PeriodRow.Name)),
             Width = new DataGridLength(1, DataGridLengthUnitType.Star),
             MinWidth = 110,
             ElementStyle = (Style)FindResource("TrimmedCell")
         });
 
-        for (var i = 0; i < days.Count; i++)
+        for (var i = 0; i < columns.Count; i++)
         {
-            WeekGrid.Columns.Add(new DataGridTextColumn
+            PeriodGrid.Columns.Add(new DataGridTextColumn
             {
-                Header = $"{DayName(days[i])} {days[i]:dd}",
-                Binding = new Binding($"{nameof(WeekRow.Days)}[{i}]"),
-                Width = 62
+                Header = columns[i].Label,
+                Binding = new Binding($"{nameof(PeriodRow.Cells)}[{i}]"),
+                Width = 68
             });
         }
 
-        WeekGrid.Columns.Add(new DataGridTextColumn
+        PeriodGrid.Columns.Add(new DataGridTextColumn
         {
             Header = "Итого",
-            Binding = new Binding(nameof(WeekRow.Total)),
-            Width = 64
+            Binding = new Binding(nameof(PeriodRow.Total)),
+            Width = 68
         });
     }
 
+    private static TimeSpan Total(IEnumerable<Session> sessions) =>
+        TimeSpan.FromTicks(sessions.Sum(s => s.Duration.Ticks));
+
     private static string FormatCell(IEnumerable<Session> sessions)
     {
-        var total = TimeSpan.FromTicks(sessions.Sum(s => s.Duration.Ticks));
+        var total = Total(sessions);
         return total > TimeSpan.Zero ? TimeFormatter.FormatClock(total) : "";
     }
 
+    private static DateTime Min(DateTime a, DateTime b) => a < b ? a : b;
+
     private static string DayName(DateTime day) => Russian.DateTimeFormat.GetAbbreviatedDayName(day.DayOfWeek);
 
-    private static string DayLabel(DateTime day) => $"{DayName(day)} {day:dd.MM}";
+    private static string ColumnTitle(GanttColumn column) =>
+        column.End - column.Start == TimeSpan.FromDays(1)
+            ? $"{DayName(column.Start)} {column.Start:dd.MM}"
+            : $"{column.Start:dd.MM}–{column.End.AddDays(-1):dd.MM}";
 
     private static string SessionTip(Session s, string projectName)
     {
@@ -197,18 +225,25 @@ public partial class StatisticsWindow : Window
 
     private void OnPreviousClick(object sender, RoutedEventArgs e)
     {
-        _currentDate = _currentDate.AddDays(IsWeek ? -7 : -1);
+        _currentDate = Step(-1);
         LoadStatistics();
     }
 
     private void OnNextClick(object sender, RoutedEventArgs e)
     {
-        var next = _currentDate.AddDays(IsWeek ? 7 : 1);
-        if (IsWeek ? WeekStart(next) > DateTime.Today : next > DateTime.Today) return;
+        var next = Step(1);
+        if (RangeOf(CurrentPeriod, next).From > DateTime.Today) return;
 
-        _currentDate = next > DateTime.Today ? DateTime.Today : next;
+        _currentDate = Min(next, DateTime.Today);
         LoadStatistics();
     }
+
+    private DateTime Step(int direction) => CurrentPeriod switch
+    {
+        Period.Week => _currentDate.AddDays(7 * direction),
+        Period.Month => _currentDate.AddMonths(direction),
+        _ => _currentDate.AddDays(direction)
+    };
 
     private void OnCloseClick(object sender, RoutedEventArgs e)
     {

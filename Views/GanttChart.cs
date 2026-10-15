@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -15,20 +14,20 @@ namespace WorkCheck.Views;
 public record GanttBar(string Row, int ColorKey, DateTime Start, DateTime End, TimeSpan Duration, string ToolTip,
     string? Label = null);
 
+public record GanttColumn(DateTime Start, DateTime End, string Label);
+
 public class GanttChart : Canvas
 {
-    private const double LabelWidth = 190;
-    private const double TotalWidth = 72;
+    private const double LabelWidth = 205;
+    private const double TotalWidth = 88;
     private const double HeaderHeight = 20;
     private const double RowHeight = 26;
     private const double BarHeight = 14;
-    private const double DayBarHeight = 18;
-    private const double DayBarInset = 3;
+    private const double CellBarHeight = 18;
+    private const double CellBarInset = 3;
     private const double MinBarWidth = 2;
     private const double MinBarLabelWidth = 36;
     private const double MinHourLabelSpacing = 34;
-
-    private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
 
     private static readonly Brush GridBrush = Frozen(Color.FromArgb(0x22, 0xFF, 0xFF, 0xFF));
     private static readonly Brush StripeBrush = Frozen(Color.FromRgb(0x11, 0x11, 0x1A));
@@ -58,23 +57,15 @@ public class GanttChart : Canvas
         set => SetValue(BarsProperty, value);
     }
 
-    // Fixed axis range; when unset the axis fits the bars. A range longer than two days uses a day scale.
-    public static readonly DependencyProperty AxisStartProperty = DependencyProperty.Register(
-        nameof(AxisStart), typeof(DateTime?), typeof(GanttChart), new PropertyMetadata(null, OnChanged));
+    // When set, the axis is split into these labelled columns (e.g. days of a week) instead of an hour scale
+    public static readonly DependencyProperty ColumnsProperty = DependencyProperty.Register(
+        nameof(Columns), typeof(IReadOnlyList<GanttColumn>), typeof(GanttChart),
+        new PropertyMetadata(Array.Empty<GanttColumn>(), OnChanged));
 
-    public DateTime? AxisStart
+    public IReadOnlyList<GanttColumn> Columns
     {
-        get => (DateTime?)GetValue(AxisStartProperty);
-        set => SetValue(AxisStartProperty, value);
-    }
-
-    public static readonly DependencyProperty AxisEndProperty = DependencyProperty.Register(
-        nameof(AxisEnd), typeof(DateTime?), typeof(GanttChart), new PropertyMetadata(null, OnChanged));
-
-    public DateTime? AxisEnd
-    {
-        get => (DateTime?)GetValue(AxisEndProperty);
-        set => SetValue(AxisEndProperty, value);
+        get => (IReadOnlyList<GanttColumn>)GetValue(ColumnsProperty);
+        set => SetValue(ColumnsProperty, value);
     }
 
     public GanttChart()
@@ -109,7 +100,7 @@ public class GanttChart : Canvas
         if (rows.Count == 0 || ActualWidth <= LabelWidth) return;
 
         var (from, to) = AxisRange();
-        var dayScale = (to - from).TotalDays > 2;
+        var cellScale = Columns.Count > 0;
 
         var chartWidth = ActualWidth - LabelWidth;
         var totalHours = (to - from).TotalHours;
@@ -142,13 +133,13 @@ public class GanttChart : Canvas
             }, LabelWidth - TotalWidth - 8, top + 5);
         }
 
-        if (dayScale)
-            DrawDayScale(from, to, X);
+        if (cellScale)
+            DrawColumns(X);
         else
             DrawHourScale(from, to, X, chartWidth / totalHours);
 
-        var barHeight = dayScale ? DayBarHeight : BarHeight;
-        var inset = dayScale ? DayBarInset : 0;
+        var barHeight = cellScale ? CellBarHeight : BarHeight;
+        var inset = cellScale ? CellBarInset : 0;
 
         foreach (var bar in Bars)
         {
@@ -188,8 +179,8 @@ public class GanttChart : Canvas
 
     private (DateTime From, DateTime To) AxisRange()
     {
-        if (AxisStart is DateTime start && AxisEnd is DateTime end && end > start)
-            return (start, end);
+        if (Columns.Count > 0)
+            return (Columns[0].Start, Columns[^1].End);
 
         var first = Bars.Min(b => b.Start);
         var last = Bars.Max(b => b.End);
@@ -211,23 +202,22 @@ public class GanttChart : Canvas
         }
     }
 
-    private void DrawDayScale(DateTime from, DateTime to, Func<DateTime, double> x)
+    private void DrawColumns(Func<DateTime, double> x)
     {
-        for (var t = from; t <= to; t = t.AddDays(1))
+        foreach (var column in Columns)
         {
-            DrawGridLine(x(t));
-            if (t < to)
+            DrawGridLine(x(column.Start));
+            Add(new TextBlock
             {
-                Add(new TextBlock
-                {
-                    Text = t.ToString("ddd dd", Russian),
-                    Foreground = HourBrush,
-                    FontSize = 10,
-                    Width = x(t.AddDays(1)) - x(t),
-                    TextAlignment = TextAlignment.Center
-                }, x(t), 2);
-            }
+                Text = column.Label,
+                Foreground = HourBrush,
+                FontSize = 10,
+                Width = x(column.End) - x(column.Start),
+                TextAlignment = TextAlignment.Center,
+                TextTrimming = TextTrimming.CharacterEllipsis
+            }, x(column.Start), 2);
         }
+        DrawGridLine(x(Columns[^1].End));
     }
 
     private void DrawGridLine(double x) =>

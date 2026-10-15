@@ -106,7 +106,10 @@
                         <RadioButton x:Name="DayPeriodRadio" Content="День" GroupName="Period"
                                      Style="{StaticResource SegmentRadio}" IsChecked="True"
                                      Checked="OnFilterChanged"/>
-                        <RadioButton Content="Неделя" GroupName="Period"
+                        <RadioButton x:Name="WeekPeriodRadio" Content="Неделя" GroupName="Period"
+                                     Style="{StaticResource SegmentRadio}"
+                                     Checked="OnFilterChanged"/>
+                        <RadioButton x:Name="MonthPeriodRadio" Content="Месяц" GroupName="Period"
                                      Style="{StaticResource SegmentRadio}"
                                      Checked="OnFilterChanged"/>
                     </StackPanel>
@@ -189,7 +192,7 @@
                                 </DataGrid.Columns>
                             </DataGrid>
 
-                            <DataGrid x:Name="WeekGrid" Style="{StaticResource StatsGrid}" Visibility="Collapsed">
+                            <DataGrid x:Name="PeriodGrid" Style="{StaticResource StatsGrid}" Visibility="Collapsed">
                                 <DataGrid.RowStyle>
                                     <Style TargetType="DataGridRow">
                                         <Style.Triggers>
