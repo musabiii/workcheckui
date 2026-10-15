@@ -20,6 +20,7 @@
     <None Include="files\audio\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Resource Include="files\fonts\*.ttf" />
   </ItemGroup>
 
 </Project>

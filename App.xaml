@@ -5,6 +5,15 @@
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
+        <FontFamily x:Key="AppFont">Segoe UI</FontFamily>
+        <FontFamily x:Key="TimerFont">Consolas</FontFamily>
+        <Style TargetType="ContextMenu">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFont}"/>
+        </Style>
+        <Style TargetType="ToolTip">
+            <Setter Property="FontFamily" Value="{DynamicResource AppFont}"/>
+        </Style>
+
         <!-- ========== Header buttons (⚙) ========== -->
         <Style x:Key="HeaderButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>

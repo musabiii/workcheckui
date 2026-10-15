@@ -363,6 +363,7 @@ public partial class StatusViewModel : ObservableObject
             _tracker.ApplySettings(_settings);
             _telegram.Settings = _settings;
             _soundService.Enabled = _settings.SoundEnabled;
+            AppFonts.Apply(_settings.Font);
         }
     }
 

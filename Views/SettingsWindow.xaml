@@ -1,4 +1,5 @@
 <Window x:Class="WorkCheck.Views.SettingsWindow"
+        FontFamily="{DynamicResource AppFont}"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Настройки — WorkCheck"
@@ -36,7 +37,49 @@
                           HorizontalScrollBarVisibility="Disabled"
                           Padding="0,0,4,0">
             <StackPanel>
-                <TextBlock Text="Pomodoro (мин)" Foreground="#BAC2DE" FontSize="12" Margin="0,0,0,4"/>
+                <TextBlock Text="Шрифт" Foreground="#BAC2DE" FontSize="12" Margin="0,0,0,4"/>
+                <Border Background="#313244" CornerRadius="6" Padding="3">
+                    <Grid>
+                        <Grid.Resources>
+                            <Style TargetType="RadioButton">
+                                <Setter Property="GroupName" Value="Font"/>
+                                <Setter Property="Foreground" Value="#BAC2DE"/>
+                                <Setter Property="FontSize" Value="12"/>
+                                <Setter Property="Cursor" Value="Hand"/>
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="RadioButton">
+                                            <Border x:Name="Bg" Background="Transparent" CornerRadius="4" Padding="0,6">
+                                                <ContentPresenter HorizontalAlignment="Center"/>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger Property="IsMouseOver" Value="True">
+                                                    <Setter TargetName="Bg" Property="Background" Value="#1AFFFFFF"/>
+                                                </Trigger>
+                                                <Trigger Property="IsChecked" Value="True">
+                                                    <Setter TargetName="Bg" Property="Background" Value="#45475A"/>
+                                                    <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Grid.Resources>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <RadioButton Grid.Column="0" Content="Системный"
+                                     FontFamily="Segoe UI"
+                                     IsChecked="{Binding IsSystemFont}"/>
+                        <RadioButton Grid.Column="1" Content="JetBrains Mono"
+                                     FontFamily="pack://application:,,,/files/fonts/#JetBrains Mono"
+                                     IsChecked="{Binding IsJetBrainsMonoFont}"/>
+                    </Grid>
+                </Border>
+
+                <TextBlock Text="Pomodoro (мин)" Foreground="#BAC2DE" FontSize="12" Margin="0,10,0,4"/>
                 <TextBox Text="{Binding PomodoroMinutes, UpdateSourceTrigger=PropertyChanged}"
                          Style="{StaticResource DarkTextBox}"/>
 

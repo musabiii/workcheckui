@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using WorkCheck.Helpers;
 using WorkCheck.Models;
 using WorkCheck.Services;
 
@@ -21,6 +22,22 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _soundEnabled;
     [ObservableProperty] private string _testStatus = "";
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsSystemFont), nameof(IsJetBrainsMonoFont))]
+    private string _font = AppFonts.System;
+
+    public bool IsSystemFont
+    {
+        get => Font != AppFonts.JetBrainsMono;
+        set { if (value) Font = AppFonts.System; }
+    }
+
+    public bool IsJetBrainsMonoFont
+    {
+        get => Font == AppFonts.JetBrainsMono;
+        set { if (value) Font = AppFonts.JetBrainsMono; }
+    }
+
     public event Action<bool>? RequestClose;
 
     public SettingsViewModel(AppSettings current, SettingsService settingsService, TelegramService telegramService)
@@ -37,6 +54,7 @@ public partial class SettingsViewModel : ObservableObject
         ProxyUrl = current.ProxyUrl;
         TelegramEnabled = current.TelegramEnabled;
         SoundEnabled = current.SoundEnabled;
+        Font = current.Font;
     }
 
     [RelayCommand]
@@ -62,7 +80,8 @@ public partial class SettingsViewModel : ObservableObject
             TelegramChatId = TelegramChatId,
             ProxyUrl = ProxyUrl,
             TelegramEnabled = TelegramEnabled,
-            SoundEnabled = SoundEnabled
+            SoundEnabled = SoundEnabled,
+            Font = Font
         };
         _settingsService.Save(settings);
         RequestClose?.Invoke(true);

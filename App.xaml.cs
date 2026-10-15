@@ -23,6 +23,7 @@ public partial class App : Application
 
         var settingsService = new SettingsService();
         var settings = settingsService.Load();
+        AppFonts.Apply(settings.Font);
 
         var dataService = new DataService();
         var telegramService = new TelegramService(settings);
