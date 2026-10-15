@@ -29,11 +29,14 @@ public partial class StatisticsWindow : Window
         SessionCountText.Text = sessions.Count.ToString();
         TotalTimeText.Text = TimeFormatter.FormatShort(totalTime);
 
+        var projectNames = _dataService.GetAllProjects().ToDictionary(p => p.Id, p => p.Name);
+
         SessionsGrid.ItemsSource = sessions.Select(s => new
         {
             s.StartTime,
             s.EndTime,
             DurationText = TimeFormatter.FormatShort(s.Duration),
+            ProjectName = s.ProjectId is int id && projectNames.TryGetValue(id, out var name) ? name : "(удалён)",
             s.Description
         }).ToList();
     }
