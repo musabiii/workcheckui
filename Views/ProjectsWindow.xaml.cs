@@ -58,12 +58,7 @@ public partial class ProjectsWindow : Window
         var name = NewProjectName.Text.Trim();
         if (string.IsNullOrEmpty(name)) return;
 
-        var project = new Project { Name = name };
-        var id = _dataService.AddProject(project);
-
-        project.Id = id;
-        ((List<Project>)ProjectsList.ItemsSource).Add(project);
-        ProjectsList.ItemsSource = null;
+        _dataService.AddProject(new Project { Name = name });
         ProjectsList.ItemsSource = _dataService.GetAllProjects();
 
         NewProjectName.Text = "";

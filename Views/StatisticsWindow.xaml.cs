@@ -1,5 +1,5 @@
 using System.Windows;
-using WorkCheck.Models;
+using WorkCheck.Helpers;
 using WorkCheck.Services;
 
 namespace WorkCheck.Views;
@@ -27,13 +27,13 @@ public partial class StatisticsWindow : Window
         var totalTime = TimeSpan.FromTicks(sessions.Sum(s => s.Duration.Ticks));
 
         SessionCountText.Text = sessions.Count.ToString();
-        TotalTimeText.Text = FormatTime(totalTime);
+        TotalTimeText.Text = TimeFormatter.FormatShort(totalTime);
 
         SessionsGrid.ItemsSource = sessions.Select(s => new
         {
             s.StartTime,
             s.EndTime,
-            DurationText = FormatTime(s.Duration),
+            DurationText = TimeFormatter.FormatShort(s.Duration),
             s.Description
         }).ToList();
     }
@@ -51,15 +51,6 @@ public partial class StatisticsWindow : Window
             _currentDate = _currentDate.AddDays(1);
             LoadStatistics();
         }
-    }
-
-    private static string FormatTime(TimeSpan time)
-    {
-        if (time.TotalHours >= 1)
-            return $"{time.Hours} ч {time.Minutes} мин";
-        if (time.Minutes >= 1)
-            return $"{time.Minutes} мин";
-        return $"{time.Seconds} сек";
     }
 
     private void OnCloseClick(object sender, RoutedEventArgs e)

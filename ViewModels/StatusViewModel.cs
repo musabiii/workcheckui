@@ -162,23 +162,7 @@ public partial class StatusViewModel : ObservableObject
                 // Корректируем время: пока висел оверлей (ожидание + возможный перерыв),
                 // пользователь не работал — это не должно считаться рабочим временем
                 _tracker.AccountOverlayIdle(overlayShownAt, description, continueSession);
-
-                // Если выбран режим после перерыва, переключаем
-                if (modeSelected.HasValue)
-                {
-                    if (modeSelected.Value == false)
-                    {
-                        // Продолжить работать
-                        if (!IsWorkMode)
-                            ToggleMode();
-                    }
-                    else
-                    {
-                        // Дрейфовать
-                        if (IsWorkMode)
-                            ToggleMode();
-                    }
-                }
+                ApplyModeSelection(modeSelected);
             }
             else if (req.Type is NotificationType.ShortBreak && !_wasUserShortBreak)
             {
@@ -198,20 +182,7 @@ public partial class StatusViewModel : ObservableObject
                 _tracker.IsPaused = false;
 
                 _tracker.AccountOverlayIdle(overlayShownAt, "");
-
-                if (modeSelected.HasValue)
-                {
-                    if (modeSelected.Value == false)
-                    {
-                        if (!IsWorkMode)
-                            ToggleMode();
-                    }
-                    else
-                    {
-                        if (IsWorkMode)
-                            ToggleMode();
-                    }
-                }
+                ApplyModeSelection(modeSelected);
             }
             else if (IsWorkMode)
             {
@@ -221,6 +192,12 @@ public partial class StatusViewModel : ObservableObject
             if (IsWorkMode && req.SendTelegram && !string.IsNullOrEmpty(req.TelegramText))
                 _ = _telegram.SendAsync(req.TelegramText, req.SilentTelegram);
         }
+    }
+
+    private void ApplyModeSelection(bool? driftMode)
+    {
+        if (driftMode is bool drift && drift == IsWorkMode)
+            ToggleMode();
     }
 
     private TimeSpan? GetAwayBase() =>
@@ -312,25 +289,12 @@ public partial class StatusViewModel : ObservableObject
             soundService: _soundService,
             fromWorkMode: IsWorkMode,
             awayBase: GetAwayBase(),
-                    todayBase: GetTodayBase());
-        
+            todayBase: GetTodayBase());
+
         _tracker.IsPaused = false;
 
         _tracker.AccountOverlayIdle(overlayShownAt, description);
-
-        if (modeSelected.HasValue)
-        {
-            if (modeSelected.Value == false)
-            {
-                if (!IsWorkMode)
-                    ToggleMode();
-            }
-            else
-            {
-                if (IsWorkMode)
-                    ToggleMode();
-            }
-        }
+        ApplyModeSelection(modeSelected);
     }
 
     [RelayCommand]

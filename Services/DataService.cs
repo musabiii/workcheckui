@@ -48,9 +48,6 @@ public class DataService : IDisposable
                 )
                 """;
 
-            using var cmd = new SqliteCommand(createSessionsTable, connection);
-            cmd.ExecuteNonQuery();
-
             var createAwayTable = """
                 CREATE TABLE IF NOT EXISTS AwayPeriods (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -61,9 +58,6 @@ public class DataService : IDisposable
                 )
                 """;
 
-            using var cmd2 = new SqliteCommand(createAwayTable, connection);
-            cmd2.ExecuteNonQuery();
-
             var createProjectsTable = """
                 CREATE TABLE IF NOT EXISTS Projects (
                     Id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -72,40 +66,26 @@ public class DataService : IDisposable
                 )
                 """;
 
-            using var cmdProjects = new SqliteCommand(createProjectsTable, connection);
-            cmdProjects.ExecuteNonQuery();
+            foreach (var sql in new[] { createSessionsTable, createAwayTable, createProjectsTable })
+            {
+                using var cmd = new SqliteCommand(sql, connection);
+                cmd.ExecuteNonQuery();
+            }
 
-            var addProjectIdColumn = """
-                ALTER TABLE Sessions ADD COLUMN ProjectId INTEGER
-                """;
+            string[] addColumns =
+            [
+                "ALTER TABLE Sessions ADD COLUMN ProjectId INTEGER",
+                "ALTER TABLE Sessions ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1",
+                "ALTER TABLE Sessions ADD COLUMN Description TEXT",
+                "ALTER TABLE AwayPeriods ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1"
+            ];
 
-            using var cmdAddProjectId = new SqliteCommand(addProjectIdColumn, connection);
-            try { cmdAddProjectId.ExecuteNonQuery(); }
-            catch { /* Column already exists */ }
-
-            var addIsWorkModeColumn = """
-                ALTER TABLE Sessions ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1
-                """;
-
-            using var cmdIsWorkMode = new SqliteCommand(addIsWorkModeColumn, connection);
-            try { cmdIsWorkMode.ExecuteNonQuery(); }
-            catch { /* Column already exists */ }
-
-            var addDescriptionColumn = """
-                ALTER TABLE Sessions ADD COLUMN Description TEXT
-                """;
-
-            using var cmd5 = new SqliteCommand(addDescriptionColumn, connection);
-            try { cmd5.ExecuteNonQuery(); }
-            catch { /* Column already exists */ }
-
-            var addAwayColumn = """
-                ALTER TABLE AwayPeriods ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1
-                """;
-
-            using var cmd4 = new SqliteCommand(addAwayColumn, connection);
-            try { cmd4.ExecuteNonQuery(); }
-            catch { /* Column already exists */ }
+            foreach (var sql in addColumns)
+            {
+                using var cmd = new SqliteCommand(sql, connection);
+                try { cmd.ExecuteNonQuery(); }
+                catch (SqliteException) { /* Column already exists */ }
+            }
         }
         catch (Exception ex)
         {
@@ -178,18 +158,7 @@ public class DataService : IDisposable
 
             using var reader = cmd.ExecuteReader();
             while (reader.Read())
-            {
-                sessions.Add(new Session
-                {
-                    Id = reader.GetInt32(0),
-                    StartTime = DateTime.Parse(reader.GetString(1)),
-                    EndTime = DateTime.Parse(reader.GetString(2)),
-                    Duration = TimeSpan.FromMinutes(reader.GetInt32(3)),
-                    IsWorkMode = reader.GetInt32(4) == 1,
-                    Description = reader.IsDBNull(5) ? "" : reader.GetString(5),
-                    ProjectId = reader.IsDBNull(6) ? null : reader.GetInt32(6)
-                });
-            }
+                sessions.Add(ReadSession(reader));
         }
         catch (Exception ex)
         {
@@ -214,18 +183,7 @@ public class DataService : IDisposable
             using var cmd = new SqliteCommand(sql, connection);
             using var reader = cmd.ExecuteReader();
             if (reader.Read())
-            {
-                return new Session
-                {
-                    Id = reader.GetInt32(0),
-                    StartTime = DateTime.Parse(reader.GetString(1)),
-                    EndTime = DateTime.Parse(reader.GetString(2)),
-                    Duration = TimeSpan.FromMinutes(reader.GetInt32(3)),
-                    IsWorkMode = reader.GetInt32(4) == 1,
-                    Description = reader.IsDBNull(5) ? "" : reader.GetString(5),
-                    ProjectId = reader.IsDBNull(6) ? null : reader.GetInt32(6)
-                };
-            }
+                return ReadSession(reader);
         }
         catch (Exception ex)
         {
@@ -233,6 +191,17 @@ public class DataService : IDisposable
         }
         return null;
     }
+
+    private static Session ReadSession(SqliteDataReader reader) => new()
+    {
+        Id = reader.GetInt32(0),
+        StartTime = DateTime.Parse(reader.GetString(1)),
+        EndTime = DateTime.Parse(reader.GetString(2)),
+        Duration = TimeSpan.FromMinutes(reader.GetInt32(3)),
+        IsWorkMode = reader.GetInt32(4) == 1,
+        Description = reader.IsDBNull(5) ? "" : reader.GetString(5),
+        ProjectId = reader.IsDBNull(6) ? null : reader.GetInt32(6)
+    };
 
     public TimeSpan GetTotalWorkTimeByDate(DateTime date, bool isWorkMode, int? projectId = null)
     {

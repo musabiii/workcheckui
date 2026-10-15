@@ -174,14 +174,20 @@ public partial class BreakOverlayWindow : Window
         ModeSelectionPanel.Visibility = Visibility.Collapsed;
         Stripe.Background = new SolidColorBrush(BreakStripeColor);
 
-        _remaining = _breakDuration;
+        StartCountdown(_breakDuration);
+
+        OnBreakStarted?.Invoke();
+    }
+
+    private void StartCountdown(TimeSpan duration)
+    {
+        _countdownTimer?.Stop();
+        _remaining = duration;
         UpdateCountdownDisplay();
 
         _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _countdownTimer.Tick += OnCountdownTick;
         _countdownTimer.Start();
-
-        OnBreakStarted?.Invoke();
     }
 
     private void OnCountdownTick(object? sender, EventArgs e)
@@ -314,45 +320,13 @@ public partial class BreakOverlayWindow : Window
         SendMediaPause();
     }
 
-    private void OnSet5Min(object sender, RoutedEventArgs e)
-    {
-        _countdownTimer?.Stop();
-        _remaining = TimeSpan.FromMinutes(5);
-        UpdateCountdownDisplay();
-        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _countdownTimer.Tick += OnCountdownTick;
-        _countdownTimer.Start();
-    }
+    private void OnSet5Min(object sender, RoutedEventArgs e) => StartCountdown(TimeSpan.FromMinutes(5));
 
-    private void OnSet15Min(object sender, RoutedEventArgs e)
-    {
-        _countdownTimer?.Stop();
-        _remaining = TimeSpan.FromMinutes(15);
-        UpdateCountdownDisplay();
-        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _countdownTimer.Tick += OnCountdownTick;
-        _countdownTimer.Start();
-    }
+    private void OnSet15Min(object sender, RoutedEventArgs e) => StartCountdown(TimeSpan.FromMinutes(15));
 
-    private void OnSet30Min(object sender, RoutedEventArgs e)
-    {
-        _countdownTimer?.Stop();
-        _remaining = TimeSpan.FromMinutes(30);
-        UpdateCountdownDisplay();
-        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _countdownTimer.Tick += OnCountdownTick;
-        _countdownTimer.Start();
-    }
+    private void OnSet30Min(object sender, RoutedEventArgs e) => StartCountdown(TimeSpan.FromMinutes(30));
 
-    private void OnSet1Hour(object sender, RoutedEventArgs e)
-    {
-        _countdownTimer?.Stop();
-        _remaining = TimeSpan.FromHours(1);
-        UpdateCountdownDisplay();
-        _countdownTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-        _countdownTimer.Tick += OnCountdownTick;
-        _countdownTimer.Start();
-    }
+    private void OnSet1Hour(object sender, RoutedEventArgs e) => StartCountdown(TimeSpan.FromHours(1));
 
     private void OnAdd5Min(object sender, RoutedEventArgs e) => AddTime(TimeSpan.FromMinutes(5));
 

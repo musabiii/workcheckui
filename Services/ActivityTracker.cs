@@ -11,20 +11,9 @@ namespace WorkCheck.Services;
 public sealed class ActivityTracker : IDisposable
 {
     private readonly DataService _dataService;
-    private bool _isWorkMode;
-    private int? _currentProjectId;
 
-    public int? CurrentProjectId
-    {
-        get => _currentProjectId;
-        set => _currentProjectId = value;
-    }
-
-    public bool IsWorkMode
-    {
-        get => _isWorkMode;
-        set => _isWorkMode = value;
-    }
+    public int? CurrentProjectId { get; set; }
+    public bool IsWorkMode { get; set; }
 
     #region Win32 Hooks
 
@@ -109,9 +98,9 @@ public sealed class ActivityTracker : IDisposable
         {
             var sessionEnd = DateTime.Now;
             var sessionStart = sessionEnd - sessionWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, _currentProjectId, description);
+            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, IsWorkMode, CurrentProjectId, description);
             
-            Debug.WriteLine($"[ActivityTracker] Saved session: {sessionWork} in mode {_isWorkMode}");
+            Debug.WriteLine($"[ActivityTracker] Saved session: {sessionWork} in mode {IsWorkMode}");
         }
         
         _workedTime = TimeSpan.Zero;
@@ -124,9 +113,9 @@ public sealed class ActivityTracker : IDisposable
         {
             var sessionEnd = DateTime.Now;
             var sessionStart = sessionEnd - sessionAway;
-            _dataService.SaveAwayPeriod(sessionStart, sessionEnd, sessionAway, _isWorkMode);
+            _dataService.SaveAwayPeriod(sessionStart, sessionEnd, sessionAway, IsWorkMode);
             
-            Debug.WriteLine($"[ActivityTracker] Saved away period: {sessionAway} in mode {_isWorkMode}");
+            Debug.WriteLine($"[ActivityTracker] Saved away period: {sessionAway} in mode {IsWorkMode}");
         }
         
         _awayTime = TimeSpan.Zero;
@@ -158,7 +147,7 @@ public sealed class ActivityTracker : IDisposable
 
     public TimeSpan GetAwayTimeFromDatabase()
     {
-        return _dataService.GetTotalAwayTimeByDate(DateTime.Today, _isWorkMode);
+        return _dataService.GetTotalAwayTimeByDate(DateTime.Today, IsWorkMode);
     }
 
     public ActivityTracker(AppSettings settings, DataService dataService)
@@ -278,7 +267,7 @@ public sealed class ActivityTracker : IDisposable
             {
                 var awayEnd = now;
                 var awayStart = awayEnd - awayToAdd;
-                _dataService.SaveAwayPeriod(awayStart, awayEnd, awayToAdd, _isWorkMode);
+                _dataService.SaveAwayPeriod(awayStart, awayEnd, awayToAdd, IsWorkMode);
             }
 
             _pending.Enqueue(new NotificationRequest
@@ -357,7 +346,7 @@ public sealed class ActivityTracker : IDisposable
 
             var sessionEnd = _lastActivityTime;
             var sessionStart = sessionEnd - sessionWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, _currentProjectId);
+            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, IsWorkMode, CurrentProjectId);
 
             notifications.Add(new NotificationRequest
             {
@@ -438,7 +427,7 @@ public sealed class ActivityTracker : IDisposable
             // Сохраняем завершённую сессию в БД
             var sessionEnd = overlayShownAt;
             var sessionStart = sessionEnd - realWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, realWork, _isWorkMode, _currentProjectId, description);
+            _dataService.SaveSession(sessionStart, sessionEnd, realWork, IsWorkMode, CurrentProjectId, description);
         }
 
         // Время простоя пока висел оверлей — это away (минус время, выделенное на перерыв)
