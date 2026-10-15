@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
+using WorkCheck.Helpers;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
 using Rectangle = System.Windows.Shapes.Rectangle;
@@ -9,11 +10,12 @@ using Rectangle = System.Windows.Shapes.Rectangle;
 namespace WorkCheck.Views;
 
 // ColorKey picks a stable palette color (e.g. project id); a negative key draws the bar gray
-public record GanttBar(string Row, int ColorKey, DateTime Start, DateTime End, string ToolTip);
+public record GanttBar(string Row, int ColorKey, DateTime Start, DateTime End, TimeSpan Duration, string ToolTip);
 
 public class GanttChart : Canvas
 {
-    private const double LabelWidth = 110;
+    private const double LabelWidth = 190;
+    private const double TotalWidth = 72;
     private const double HeaderHeight = 20;
     private const double RowHeight = 26;
     private const double BarHeight = 14;
@@ -23,6 +25,7 @@ public class GanttChart : Canvas
     private static readonly Brush GridBrush = Frozen(Color.FromArgb(0x22, 0xFF, 0xFF, 0xFF));
     private static readonly Brush StripeBrush = Frozen(Color.FromRgb(0x11, 0x11, 0x1A));
     private static readonly Brush LabelBrush = Frozen(Color.FromRgb(0xBA, 0xC2, 0xDE));
+    private static readonly Brush TotalBrush = Frozen(Color.FromRgb(0xCD, 0xD6, 0xF4));
     private static readonly Brush HourBrush = Frozen(Color.FromRgb(0x6C, 0x70, 0x86));
 
     private static readonly Brush[] Palette =
@@ -68,8 +71,8 @@ public class GanttChart : Canvas
 
         var rows = Bars
             .GroupBy(b => b.Row)
-            .OrderByDescending(g => g.Sum(b => (b.End - b.Start).Ticks))
-            .Select(g => g.Key)
+            .Select(g => (Name: g.Key, Total: TimeSpan.FromTicks(g.Sum(b => b.Duration.Ticks))))
+            .OrderByDescending(r => r.Total)
             .ToList();
 
         Height = HeaderHeight + rows.Count * RowHeight;
@@ -94,13 +97,23 @@ public class GanttChart : Canvas
 
             Add(new TextBlock
             {
-                Text = rows[i],
+                Text = rows[i].Name,
                 Foreground = LabelBrush,
                 FontSize = 12,
-                Width = LabelWidth - 8,
+                Width = LabelWidth - TotalWidth - 12,
                 TextTrimming = TextTrimming.CharacterEllipsis,
-                ToolTip = rows[i]
+                ToolTip = rows[i].Name
             }, 0, top + 5);
+
+            Add(new TextBlock
+            {
+                Text = TimeFormatter.FormatShort(rows[i].Total),
+                Foreground = TotalBrush,
+                FontSize = 12,
+                FontWeight = FontWeights.SemiBold,
+                Width = TotalWidth,
+                TextAlignment = TextAlignment.Right
+            }, LabelWidth - TotalWidth - 8, top + 5);
         }
 
         var hourStep = Math.Max(1, (int)Math.Ceiling(MinHourLabelSpacing / (chartWidth / totalHours)));
@@ -115,7 +128,7 @@ public class GanttChart : Canvas
 
         foreach (var bar in Bars)
         {
-            var row = rows.IndexOf(bar.Row);
+            var row = rows.FindIndex(r => r.Name == bar.Row);
             var x = X(bar.Start);
             var width = Math.Max(MinBarWidth, X(bar.End) - x);
 

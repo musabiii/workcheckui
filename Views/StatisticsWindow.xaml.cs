@@ -59,7 +59,7 @@ public partial class StatisticsWindow : Window
             if (!string.IsNullOrWhiteSpace(s.Description))
                 tip += $"\n{s.Description}";
             var colorKey = s.ProjectId is int id && projectNames.ContainsKey(id) ? id : -1;
-            return new GanttBar(ProjectName(s), colorKey, s.StartTime, s.EndTime, tip);
+            return new GanttBar(ProjectName(s), colorKey, s.StartTime, s.EndTime, s.Duration, tip);
         }).ToList();
     }
 
