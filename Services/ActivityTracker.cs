@@ -93,16 +93,17 @@ public sealed class ActivityTracker : IDisposable
 
     public void SaveCurrentSession(string description = "")
     {
-        var sessionWork = DisplayWorkedTime;
-        if (sessionWork > TimeSpan.Zero)
+        // _workedTime holds stretches already saved by Tick() and AccountOverlayIdle(); only the open stretch is unsaved
+        if (_userActive && !_userShortBreak)
         {
-            var sessionEnd = DateTime.Now;
-            var sessionStart = sessionEnd - sessionWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, IsWorkMode, CurrentProjectId, description);
-            
-            Debug.WriteLine($"[ActivityTracker] Saved session: {sessionWork} in mode {IsWorkMode}");
+            var sessionWork = _lastActivityTime - _lastInactivityTime;
+            if (sessionWork > TimeSpan.Zero)
+            {
+                _dataService.SaveSession(_lastInactivityTime, _lastActivityTime, sessionWork, IsWorkMode, CurrentProjectId, description);
+                Debug.WriteLine($"[ActivityTracker] Saved session: {sessionWork} in mode {IsWorkMode}");
+            }
         }
-        
+
         _workedTime = TimeSpan.Zero;
     }
 
@@ -342,11 +343,10 @@ public sealed class ActivityTracker : IDisposable
 
             var sessionWork = _lastActivityTime - _lastInactivityTime;
             if (sessionWork > TimeSpan.Zero)
+            {
                 _workedTime += sessionWork;
-
-            var sessionEnd = _lastActivityTime;
-            var sessionStart = sessionEnd - sessionWork;
-            _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, IsWorkMode, CurrentProjectId);
+                _dataService.SaveSession(_lastInactivityTime, _lastActivityTime, sessionWork, IsWorkMode, CurrentProjectId);
+            }
 
             notifications.Add(new NotificationRequest
             {
@@ -417,8 +417,9 @@ public sealed class ActivityTracker : IDisposable
         }
 
         // Был перерыв - завершаем сессию и начинаем новую
-        // Фиксируем работу до момента показа оверлея
-        var realWork = overlayShownAt - _lastInactivityTime;
+        // Фиксируем работу до момента показа оверлея. Если Tick() уже начал короткий перерыв,
+        // отрезок до последней активности сохранён им, а после неё работы не было
+        var realWork = _userShortBreak ? TimeSpan.Zero : overlayShownAt - _lastInactivityTime;
         Debug.WriteLine($"[AccountOverlayIdle] realWork={realWork:mm\\:ss}");
         
         if (realWork > TimeSpan.Zero)
