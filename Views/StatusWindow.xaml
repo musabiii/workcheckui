@@ -9,7 +9,7 @@
         ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="True"
-        Width="300" Height="146">
+        Width="300" MinHeight="146" SizeToContent="Height">
 
     <Border Background="{Binding WindowBgBrush}" CornerRadius="12"
             BorderBrush="#33FFFFFF" BorderThickness="1">
@@ -106,8 +106,18 @@
 
                 <Separator Grid.Row="1" Margin="0,0,0,2" Background="#33FFFFFF" Height="1"/>
 
-                <!-- Сегодня -->
+                <!-- Сегодня (режим «Дрейфую») -->
                 <Grid Margin="0,0">
+                    <Grid.Style>
+                        <Style TargetType="Grid">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsWorkMode}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Grid.Style>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
@@ -116,6 +126,32 @@
                     <TextBlock Grid.Column="1" Text="{Binding TodayWorkedText}" Foreground="#CDD6F4"
                                FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
+
+                <!-- Проекты за сегодня (режим «В работе») -->
+                <ItemsControl ItemsSource="{Binding ProjectRows}"
+                              Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock x:Name="NameText" Grid.Column="0" Foreground="#BAC2DE" FontSize="12"
+                                           TextTrimming="CharacterEllipsis" Margin="0,0,8,0">
+                                    <Run Text="📁  "/><Run Text="{Binding Name, Mode=OneWay}"/>
+                                </TextBlock>
+                                <TextBlock Grid.Column="1" Text="{Binding TimeText}" Foreground="#CDD6F4"
+                                           FontSize="12" FontWeight="SemiBold"/>
+                            </Grid>
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                    <Setter TargetName="NameText" Property="Foreground" Value="#F9E2AF"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
 
                 <!-- Вне компьютера -->
                 <Grid Margin="0,0" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">

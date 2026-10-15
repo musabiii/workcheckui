@@ -13,14 +13,19 @@ public partial class StatusWindow : Window
     public StatusWindow()
     {
         InitializeComponent();
-        PositionBottomRight();
+        Left = SystemParameters.WorkArea.Right - Width - 12;
+        SizeChanged += OnSizeChanged;
     }
 
-    private void PositionBottomRight()
+    private void OnSizeChanged(object sender, SizeChangedEventArgs e)
     {
-        var workArea = SystemParameters.WorkArea;
-        Left = workArea.Right - Width - 12;
-        Top = workArea.Bottom - Height - 12;
+        if (!e.HeightChanged) return;
+
+        // Keep the bottom edge in place when project rows appear or disappear
+        if (e.PreviousSize.Height == 0)
+            Top = SystemParameters.WorkArea.Bottom - e.NewSize.Height - 12;
+        else
+            Top -= e.NewSize.Height - e.PreviousSize.Height;
     }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

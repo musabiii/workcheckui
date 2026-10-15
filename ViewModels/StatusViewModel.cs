@@ -27,12 +27,16 @@ public partial class StatusViewModel : ObservableObject
     private readonly DispatcherTimer _timer;
     private bool _wasUserShortBreak;
     private Project? _selectedProject;
+    private Dictionary<int, string> _projectNames = [];
+
+    private static readonly TimeSpan ProjectRowThreshold = TimeSpan.FromMinutes(15);
 
     [ObservableProperty] private bool _isWorkMode;
     [ObservableProperty] private string _currentSessionText = "0 мин";
     [ObservableProperty] private string _projectName = "";
     [ObservableProperty] private string _awayTimeText = "0 мин";
     [ObservableProperty] private string _todayWorkedText = "0 мин";
+    [ObservableProperty] private IReadOnlyList<ProjectTimeRow> _projectRows = [];
     [ObservableProperty] private string _statusText = "Дрейфую";
     [ObservableProperty] private Brush _statusBrush = DriftingGrayBrush;
     [ObservableProperty] private Brush _sessionBrush = NormalTextBrush;
@@ -85,18 +89,20 @@ public partial class StatusViewModel : ObservableObject
         _timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _timer.Tick += OnTick;
         _timer.Start();
-        
-        UpdateTodayWorkedText();
+
+        UpdateTodayTotals();
     }
 
     private void LoadProjects()
     {
         var projects = _dataService.GetAllProjects();
+        _projectNames = projects.ToDictionary(p => p.Id, p => p.Name);
 
         if (projects.Count == 0)
         {
             _selectedProject = new Project { Name = "По умолчанию" };
             _selectedProject.Id = _dataService.AddProject(_selectedProject);
+            _projectNames[_selectedProject.Id] = _selectedProject.Name;
         }
         else
         {
@@ -116,10 +122,11 @@ public partial class StatusViewModel : ObservableObject
     private void SelectProject(Project project)
     {
         _selectedProject = project;
+        _projectNames[project.Id] = project.Name;
         _tracker.CurrentProjectId = project.Id;
         ProjectName = project.Name;
-        
-        UpdateTodayWorkedText();
+
+        UpdateTodayTotals(_tracker.CurrentSession);
     }
 
     private void OnTick(object? sender, EventArgs e)
@@ -220,7 +227,7 @@ public partial class StatusViewModel : ObservableObject
             ? $"  Текущая сессия ({sessions}):"
             : "  Текущая сессия:";
 
-        UpdateTodayWorkedText(session);
+        UpdateTodayTotals(session);
 
         if (IsWorkMode)
         {
@@ -267,11 +274,33 @@ public partial class StatusViewModel : ObservableObject
         }
     }
 
-    private void UpdateTodayWorkedText(TimeSpan currentSession = default)
+    private void UpdateTodayTotals(TimeSpan currentSession = default)
     {
-        var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode, _tracker.CurrentProjectId);
-        var totalWithCurrent = todayTotal + currentSession;
-        TodayWorkedText = TimeFormatter.FormatShort(totalWithCurrent);
+        if (!IsWorkMode)
+        {
+            var todayTotal = _dataService.GetTotalWorkTimeByDate(DateTime.Today, IsWorkMode, _tracker.CurrentProjectId);
+            TodayWorkedText = TimeFormatter.FormatShort(todayTotal + currentSession);
+            return;
+        }
+
+        var totals = _dataService.GetSessionsByDate(DateTime.Today)
+            .Where(s => s.IsWorkMode && s.ProjectId.HasValue)
+            .GroupBy(s => s.ProjectId!.Value)
+            .ToDictionary(g => g.Key, g => TimeSpan.FromMinutes(g.Sum(s => s.Duration.TotalMinutes)));
+
+        var currentId = _selectedProject?.Id;
+        if (currentId is int id)
+            totals[id] = totals.GetValueOrDefault(id) + currentSession;
+
+        var rows = totals
+            .Where(t => _projectNames.ContainsKey(t.Key) && (t.Key == currentId || t.Value >= ProjectRowThreshold))
+            .OrderByDescending(t => t.Key == currentId)
+            .ThenByDescending(t => t.Value)
+            .Select(t => new ProjectTimeRow(_projectNames[t.Key], TimeFormatter.FormatShort(t.Value), t.Key == currentId))
+            .ToList();
+
+        if (!rows.SequenceEqual(ProjectRows))
+            ProjectRows = rows;
     }
 
     [RelayCommand]
@@ -303,7 +332,7 @@ public partial class StatusViewModel : ObservableObject
         _tracker.Reset();
         CurrentSessionText = "0 мин";
         AwayTimeText = "0 мин";
-        UpdateTodayWorkedText();
+        UpdateTodayTotals();
     }
 
     [RelayCommand]
@@ -348,6 +377,9 @@ public partial class StatusViewModel : ObservableObject
     {
         var window = new ProjectsWindow(_dataService, _selectedProject, SelectProject);
         window.ShowDialog();
+
+        _projectNames = _dataService.GetAllProjects().ToDictionary(p => p.Id, p => p.Name);
+        UpdateTodayTotals(_tracker.CurrentSession);
     }
 
     [RelayCommand]
