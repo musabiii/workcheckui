@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Input;
 using WorkCheck.Helpers;
 using WorkCheck.Models;
 using WorkCheck.Services;
@@ -18,6 +19,12 @@ public partial class StatisticsWindow : Window
         _dataService = dataService;
         _currentDate = DateTime.Today;
         LoadStatistics();
+    }
+
+    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+    {
+        base.OnMouseLeftButtonDown(e);
+        DragMove();
     }
 
     private void LoadStatistics()

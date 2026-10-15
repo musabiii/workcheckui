@@ -7,10 +7,11 @@
         WindowStyle="None"
         AllowsTransparency="True"
         Background="Transparent"
-        ResizeMode="NoResize"
+        ResizeMode="CanResizeWithGrip"
         ShowInTaskbar="False"
-        WindowStartupLocation="CenterOwner"
-        Width="620" Height="400">
+        WindowStartupLocation="CenterScreen"
+        Width="620" Height="400"
+        MinWidth="560" MinHeight="340">
 
     <Border Background="#1E1E2E" CornerRadius="12"
             BorderBrush="#33FFFFFF" BorderThickness="1">
@@ -65,8 +66,14 @@
 
             <!-- Summary -->
             <Border Grid.Row="1" Background="#181825" CornerRadius="8" Padding="16" Margin="0,0,0,12">
-                <StackPanel>
-                    <Grid Margin="0,0,0,12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Grid Grid.Row="0" Margin="0,0,0,12">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
@@ -85,7 +92,7 @@
                         </StackPanel>
                     </Grid>
 
-                    <Grid Margin="0,0,0,8">
+                    <Grid Grid.Row="1" Margin="0,0,0,8">
                         <TextBlock Text="Сессии:" Foreground="#6C7086" FontSize="12" VerticalAlignment="Center"/>
                         <Border Background="#313244" CornerRadius="6" Padding="2" HorizontalAlignment="Right">
                             <StackPanel Orientation="Horizontal">
@@ -99,12 +106,12 @@
                         </Border>
                     </Grid>
 
-                    <ScrollViewer x:Name="GanttView" MaxHeight="200" VerticalScrollBarVisibility="Auto"
+                    <ScrollViewer x:Name="GanttView" Grid.Row="2" VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
-                        <views:GanttChart x:Name="Gantt"/>
+                        <views:GanttChart x:Name="Gantt" VerticalAlignment="Top"/>
                     </ScrollViewer>
 
-                    <ScrollViewer x:Name="ListView" MaxHeight="200" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer x:Name="ListView" Grid.Row="2" VerticalScrollBarVisibility="Auto">
                         <DataGrid x:Name="SessionsGrid" AutoGenerateColumns="False" 
                                   Background="Transparent" BorderThickness="0"
                                   RowBackground="Transparent" AlternatingRowBackground="#11111A"
@@ -151,7 +158,7 @@
                             </DataGrid.Columns>
                         </DataGrid>
                     </ScrollViewer>
-                </StackPanel>
+                </Grid>
             </Border>
 
             <!-- Footer -->
