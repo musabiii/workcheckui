@@ -165,21 +165,21 @@
                                 <StackPanel Orientation="Horizontal">
                                     <RadioButton x:Name="ListViewRadio" Content="Список" GroupName="SessionView"
                                                  Style="{StaticResource SmallSegment}"
-                                                 IsChecked="True" Checked="OnViewChanged"/>
+                                                 Checked="OnViewChanged"/>
                                     <RadioButton Content="Диаграмма" GroupName="SessionView"
                                                  Style="{StaticResource SmallSegment}"
-                                                 Checked="OnViewChanged"/>
+                                                 IsChecked="True" Checked="OnViewChanged"/>
                                 </StackPanel>
                             </Border>
                         </StackPanel>
                     </Grid>
 
                     <ScrollViewer x:Name="GanttView" Grid.Row="2" VerticalScrollBarVisibility="Auto"
-                                  HorizontalScrollBarVisibility="Disabled" Visibility="Collapsed">
+                                  HorizontalScrollBarVisibility="Disabled">
                         <views:GanttChart x:Name="Gantt" VerticalAlignment="Top"/>
                     </ScrollViewer>
 
-                    <ScrollViewer x:Name="ListView" Grid.Row="2" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer x:Name="ListView" Grid.Row="2" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
                         <Grid>
                             <DataGrid x:Name="SessionsGrid" Style="{StaticResource StatsGrid}">
                                 <DataGrid.Columns>
