@@ -129,14 +129,15 @@ public class DataService : IDisposable
         }
     }
 
-    public List<Session> GetSessionsByDate(DateTime date, int? projectId = null)
+    public List<Session> GetSessionsByDate(DateTime date, int? projectId = null) =>
+        GetSessionsInRange(date.Date, date.Date.AddDays(1), projectId);
+
+    public List<Session> GetSessionsInRange(DateTime startDate, DateTime endDate, int? projectId = null)
     {
         var sessions = new List<Session>();
         try
         {
             var connection = GetConnection();
-            var startDate = date.Date;
-            var endDate = startDate.AddDays(1);
 
             var sql = """
                 SELECT Id, StartTime, EndTime, DurationMinutes, IsWorkMode, Description, ProjectId

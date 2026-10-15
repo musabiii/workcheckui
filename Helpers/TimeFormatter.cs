@@ -45,6 +45,12 @@ public static class TimeFormatter
         return result;
     }
 
+    public static string FormatClock(TimeSpan ts)
+    {
+        if (ts < TimeSpan.Zero) ts = TimeSpan.Zero;
+        return $"{(int)ts.TotalHours}:{ts.Minutes:00}";
+    }
+
     private static string Decline(int n, string one, string few, string many)
     {
         var abs = Math.Abs(n) % 100;

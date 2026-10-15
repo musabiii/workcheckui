@@ -10,8 +10,61 @@
         ResizeMode="CanResizeWithGrip"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterScreen"
-        Width="620" Height="400"
-        MinWidth="560" MinHeight="340">
+        Width="680" Height="440"
+        MinWidth="600" MinHeight="360">
+
+    <Window.Resources>
+        <Style x:Key="StatsGrid" TargetType="DataGrid">
+            <Setter Property="AutoGenerateColumns" Value="False"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="RowBackground" Value="Transparent"/>
+            <Setter Property="AlternatingRowBackground" Value="#11111A"/>
+            <Setter Property="HeadersVisibility" Value="Column"/>
+            <Setter Property="CanUserAddRows" Value="False"/>
+            <Setter Property="CanUserDeleteRows" Value="False"/>
+            <Setter Property="CanUserResizeRows" Value="False"/>
+            <Setter Property="CanUserReorderColumns" Value="False"/>
+            <Setter Property="IsReadOnly" Value="True"/>
+            <Setter Property="Foreground" Value="#CDD6F4"/>
+            <Setter Property="ColumnHeaderStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridColumnHeader">
+                        <Setter Property="Background" Value="#313244"/>
+                        <Setter Property="Foreground" Value="#A6ADC8"/>
+                        <Setter Property="Padding" Value="8,6"/>
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="CellStyle">
+                <Setter.Value>
+                    <Style TargetType="DataGridCell">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="8,6"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#45475A"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TrimmedCell" TargetType="TextBlock">
+            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+        </Style>
+
+        <Style x:Key="SmallSegment" TargetType="RadioButton" BasedOn="{StaticResource SegmentRadio}">
+            <Setter Property="Padding" Value="10,3"/>
+            <Setter Property="FontSize" Value="11"/>
+        </Style>
+    </Window.Resources>
 
     <Border Background="#1E1E2E" CornerRadius="12"
             BorderBrush="#33FFFFFF" BorderThickness="1">
@@ -35,14 +88,14 @@
                 </Grid.ColumnDefinitions>
 
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Button Content="◀" Click="OnPreviousDayClick" Cursor="Hand"
+                    <Button Content="◀" Click="OnPreviousClick" Cursor="Hand"
                             Padding="10,4" FontSize="14" FontWeight="Bold"
                             Style="{StaticResource CloseButton}"/>
                     <TextBlock x:Name="DateText" Text="05.03.2026" Foreground="#A6E3A1"
                                FontSize="18" FontWeight="Bold"
                                VerticalAlignment="Center"
                                Margin="12,0"/>
-                    <Button Content="▶" Click="OnNextDayClick" Cursor="Hand"
+                    <Button Content="▶" Click="OnNextClick" Cursor="Hand"
                             Padding="10,4" FontSize="14" FontWeight="Bold"
                             Style="{StaticResource CloseButton}"/>
                 </StackPanel>
@@ -50,10 +103,10 @@
                 <Border Grid.Column="1" Background="#313244" CornerRadius="6" Padding="3"
                         HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0">
                     <StackPanel Orientation="Horizontal">
-                        <RadioButton x:Name="AllSessionsRadio" Content="Все" GroupName="SessionFilter"
+                        <RadioButton x:Name="DayPeriodRadio" Content="День" GroupName="Period"
                                      Style="{StaticResource SegmentRadio}" IsChecked="True"
                                      Checked="OnFilterChanged"/>
-                        <RadioButton Content="Полные сессии" GroupName="SessionFilter"
+                        <RadioButton Content="Неделя" GroupName="Period"
                                      Style="{StaticResource SegmentRadio}"
                                      Checked="OnFilterChanged"/>
                     </StackPanel>
@@ -94,16 +147,28 @@
 
                     <Grid Grid.Row="1" Margin="0,0,0,8">
                         <TextBlock Text="Сессии:" Foreground="#6C7086" FontSize="12" VerticalAlignment="Center"/>
-                        <Border Background="#313244" CornerRadius="6" Padding="2" HorizontalAlignment="Right">
-                            <StackPanel Orientation="Horizontal">
-                                <RadioButton x:Name="ListViewRadio" Content="Список" GroupName="SessionView"
-                                             Style="{StaticResource SegmentRadio}" Padding="10,3" FontSize="11"
-                                             IsChecked="True" Checked="OnViewChanged"/>
-                                <RadioButton Content="Диаграмма" GroupName="SessionView"
-                                             Style="{StaticResource SegmentRadio}" Padding="10,3" FontSize="11"
-                                             Checked="OnViewChanged"/>
-                            </StackPanel>
-                        </Border>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Border Background="#313244" CornerRadius="6" Padding="2" Margin="0,0,8,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="AllSessionsRadio" Content="Все" GroupName="SessionFilter"
+                                                 Style="{StaticResource SmallSegment}" IsChecked="True"
+                                                 Checked="OnFilterChanged"/>
+                                    <RadioButton Content="Полные сессии" GroupName="SessionFilter"
+                                                 Style="{StaticResource SmallSegment}"
+                                                 Checked="OnFilterChanged"/>
+                                </StackPanel>
+                            </Border>
+                            <Border Background="#313244" CornerRadius="6" Padding="2">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="ListViewRadio" Content="Список" GroupName="SessionView"
+                                                 Style="{StaticResource SmallSegment}"
+                                                 IsChecked="True" Checked="OnViewChanged"/>
+                                    <RadioButton Content="Диаграмма" GroupName="SessionView"
+                                                 Style="{StaticResource SmallSegment}"
+                                                 Checked="OnViewChanged"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
                     </Grid>
 
                     <ScrollViewer x:Name="GanttView" Grid.Row="2" VerticalScrollBarVisibility="Auto"
@@ -112,51 +177,31 @@
                     </ScrollViewer>
 
                     <ScrollViewer x:Name="ListView" Grid.Row="2" VerticalScrollBarVisibility="Auto">
-                        <DataGrid x:Name="SessionsGrid" AutoGenerateColumns="False" 
-                                  Background="Transparent" BorderThickness="0"
-                                  RowBackground="Transparent" AlternatingRowBackground="#11111A"
-                                  HeadersVisibility="Column"
-                                  CanUserAddRows="False" CanUserDeleteRows="False"
-                                  CanUserResizeRows="False" CanUserReorderColumns="False"
-                                  IsReadOnly="True"
-                                  Foreground="#CDD6F4">
-                            <DataGrid.ColumnHeaderStyle>
-                                <Style TargetType="DataGridColumnHeader">
-                                    <Setter Property="Background" Value="#313244"/>
-                                    <Setter Property="Foreground" Value="#A6ADC8"/>
-                                    <Setter Property="Padding" Value="8,6"/>
-                                    <Setter Property="FontSize" Value="12"/>
-                                    <Setter Property="FontWeight" Value="SemiBold"/>
-                                </Style>
-                            </DataGrid.ColumnHeaderStyle>
-                            <DataGrid.CellStyle>
-                                <Style TargetType="DataGridCell">
-                                    <Setter Property="Background" Value="Transparent"/>
-                                    <Setter Property="BorderThickness" Value="0"/>
-                                    <Setter Property="Padding" Value="8,6"/>
-                                    <Setter Property="FontSize" Value="13"/>
-                                    <Setter Property="Foreground" Value="#CDD6F4"/>
-                                    <Style.Triggers>
-                                        <Trigger Property="IsSelected" Value="True">
-                                            <Setter Property="Background" Value="#45475A"/>
-                                        </Trigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </DataGrid.CellStyle>
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Header="Начало" Binding="{Binding StartTime, StringFormat={}{0:HH:mm}}" Width="70"/>
-                                <DataGridTextColumn Header="Конец" Binding="{Binding EndTime, StringFormat={}{0:HH:mm}}" Width="70"/>
-                                <DataGridTextColumn Header="Длительность" Binding="{Binding DurationText}" Width="110"/>
-                                <DataGridTextColumn Header="Проект" Binding="{Binding ProjectName}" Width="130">
-                                    <DataGridTextColumn.ElementStyle>
-                                        <Style TargetType="TextBlock">
-                                            <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
-                                        </Style>
-                                    </DataGridTextColumn.ElementStyle>
-                                </DataGridTextColumn>
-                                <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                        <Grid>
+                            <DataGrid x:Name="SessionsGrid" Style="{StaticResource StatsGrid}">
+                                <DataGrid.Columns>
+                                    <DataGridTextColumn Header="Начало" Binding="{Binding StartTime, StringFormat={}{0:HH:mm}}" Width="70"/>
+                                    <DataGridTextColumn Header="Конец" Binding="{Binding EndTime, StringFormat={}{0:HH:mm}}" Width="70"/>
+                                    <DataGridTextColumn Header="Длительность" Binding="{Binding DurationText}" Width="110"/>
+                                    <DataGridTextColumn Header="Проект" Binding="{Binding ProjectName}" Width="130"
+                                                        ElementStyle="{StaticResource TrimmedCell}"/>
+                                    <DataGridTextColumn Header="Описание" Binding="{Binding Description}" Width="*"/>
+                                </DataGrid.Columns>
+                            </DataGrid>
+
+                            <DataGrid x:Name="WeekGrid" Style="{StaticResource StatsGrid}" Visibility="Collapsed">
+                                <DataGrid.RowStyle>
+                                    <Style TargetType="DataGridRow">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsTotal}" Value="True">
+                                                <Setter Property="FontWeight" Value="Bold"/>
+                                                <Setter Property="Background" Value="#313244"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </DataGrid.RowStyle>
+                            </DataGrid>
+                        </Grid>
                     </ScrollViewer>
                 </Grid>
             </Border>

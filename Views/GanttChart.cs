@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -9,8 +10,10 @@ using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace WorkCheck.Views;
 
-// ColorKey picks a stable palette color (e.g. project id); a negative key draws the bar gray
-public record GanttBar(string Row, int ColorKey, DateTime Start, DateTime End, TimeSpan Duration, string ToolTip);
+// ColorKey picks a stable palette color (e.g. project id); a negative key draws the bar gray.
+// Label, when set, is drawn on the bar if it fits.
+public record GanttBar(string Row, int ColorKey, DateTime Start, DateTime End, TimeSpan Duration, string ToolTip,
+    string? Label = null);
 
 public class GanttChart : Canvas
 {
@@ -19,14 +22,20 @@ public class GanttChart : Canvas
     private const double HeaderHeight = 20;
     private const double RowHeight = 26;
     private const double BarHeight = 14;
+    private const double DayBarHeight = 18;
+    private const double DayBarInset = 3;
     private const double MinBarWidth = 2;
+    private const double MinBarLabelWidth = 36;
     private const double MinHourLabelSpacing = 34;
+
+    private static readonly CultureInfo Russian = CultureInfo.GetCultureInfo("ru-RU");
 
     private static readonly Brush GridBrush = Frozen(Color.FromArgb(0x22, 0xFF, 0xFF, 0xFF));
     private static readonly Brush StripeBrush = Frozen(Color.FromRgb(0x11, 0x11, 0x1A));
     private static readonly Brush LabelBrush = Frozen(Color.FromRgb(0xBA, 0xC2, 0xDE));
     private static readonly Brush TotalBrush = Frozen(Color.FromRgb(0xCD, 0xD6, 0xF4));
     private static readonly Brush HourBrush = Frozen(Color.FromRgb(0x6C, 0x70, 0x86));
+    private static readonly Brush BarTextBrush = Frozen(Color.FromRgb(0x1E, 0x1E, 0x2E));
 
     private static readonly Brush[] Palette =
     [
@@ -41,12 +50,31 @@ public class GanttChart : Canvas
 
     public static readonly DependencyProperty BarsProperty = DependencyProperty.Register(
         nameof(Bars), typeof(IReadOnlyList<GanttBar>), typeof(GanttChart),
-        new PropertyMetadata(Array.Empty<GanttBar>(), (d, _) => ((GanttChart)d).Rebuild()));
+        new PropertyMetadata(Array.Empty<GanttBar>(), OnChanged));
 
     public IReadOnlyList<GanttBar> Bars
     {
         get => (IReadOnlyList<GanttBar>)GetValue(BarsProperty);
         set => SetValue(BarsProperty, value);
+    }
+
+    // Fixed axis range; when unset the axis fits the bars. A range longer than two days uses a day scale.
+    public static readonly DependencyProperty AxisStartProperty = DependencyProperty.Register(
+        nameof(AxisStart), typeof(DateTime?), typeof(GanttChart), new PropertyMetadata(null, OnChanged));
+
+    public DateTime? AxisStart
+    {
+        get => (DateTime?)GetValue(AxisStartProperty);
+        set => SetValue(AxisStartProperty, value);
+    }
+
+    public static readonly DependencyProperty AxisEndProperty = DependencyProperty.Register(
+        nameof(AxisEnd), typeof(DateTime?), typeof(GanttChart), new PropertyMetadata(null, OnChanged));
+
+    public DateTime? AxisEnd
+    {
+        get => (DateTime?)GetValue(AxisEndProperty);
+        set => SetValue(AxisEndProperty, value);
     }
 
     public GanttChart()
@@ -57,6 +85,8 @@ public class GanttChart : Canvas
             if (e.WidthChanged) Rebuild();
         };
     }
+
+    private static void OnChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((GanttChart)d).Rebuild();
 
     private static Brush Frozen(Color color)
     {
@@ -78,12 +108,8 @@ public class GanttChart : Canvas
         Height = HeaderHeight + rows.Count * RowHeight;
         if (rows.Count == 0 || ActualWidth <= LabelWidth) return;
 
-        var first = Bars.Min(b => b.Start);
-        var last = Bars.Max(b => b.End);
-        var from = new DateTime(first.Year, first.Month, first.Day, first.Hour, 0, 0);
-        var to = new DateTime(last.Year, last.Month, last.Day, last.Hour, 0, 0);
-        if (to < last) to = to.AddHours(1);
-        if (to <= from) to = from.AddHours(1);
+        var (from, to) = AxisRange();
+        var dayScale = (to - from).TotalDays > 2;
 
         var chartWidth = ActualWidth - LabelWidth;
         var totalHours = (to - from).TotalHours;
@@ -116,26 +142,25 @@ public class GanttChart : Canvas
             }, LabelWidth - TotalWidth - 8, top + 5);
         }
 
-        var hourStep = Math.Max(1, (int)Math.Ceiling(MinHourLabelSpacing / (chartWidth / totalHours)));
-        for (var t = from; t <= to; t = t.AddHours(1))
-        {
-            var x = X(t);
-            Add(new Rectangle { Width = 1, Height = Height - HeaderHeight + 4, Fill = GridBrush }, x, HeaderHeight - 4);
+        if (dayScale)
+            DrawDayScale(from, to, X);
+        else
+            DrawHourScale(from, to, X, chartWidth / totalHours);
 
-            if ((t - from).TotalHours % hourStep == 0 && t < to)
-                Add(new TextBlock { Text = t.ToString("HH:mm"), Foreground = HourBrush, FontSize = 10 }, x + 3, 2);
-        }
+        var barHeight = dayScale ? DayBarHeight : BarHeight;
+        var inset = dayScale ? DayBarInset : 0;
 
         foreach (var bar in Bars)
         {
             var row = rows.FindIndex(r => r.Name == bar.Row);
-            var x = X(bar.Start);
-            var width = Math.Max(MinBarWidth, X(bar.End) - x);
+            var x = X(bar.Start) + inset;
+            var width = Math.Max(MinBarWidth, X(bar.End) - X(bar.Start) - 2 * inset);
+            var top = HeaderHeight + row * RowHeight + (RowHeight - barHeight) / 2;
 
             var rect = new Rectangle
             {
                 Width = width,
-                Height = BarHeight,
+                Height = barHeight,
                 RadiusX = 3,
                 RadiusY = 3,
                 Fill = bar.ColorKey < 0 ? HourBrush : Palette[bar.ColorKey % Palette.Length],
@@ -143,9 +168,70 @@ public class GanttChart : Canvas
                 Cursor = System.Windows.Input.Cursors.Hand
             };
             ToolTipService.SetInitialShowDelay(rect, 0);
-            Add(rect, x, HeaderHeight + row * RowHeight + (RowHeight - BarHeight) / 2);
+            Add(rect, x, top);
+
+            if (bar.Label != null && width >= MinBarLabelWidth)
+            {
+                Add(new TextBlock
+                {
+                    Text = bar.Label,
+                    Foreground = BarTextBrush,
+                    FontSize = 11,
+                    FontWeight = FontWeights.SemiBold,
+                    Width = width,
+                    TextAlignment = TextAlignment.Center,
+                    IsHitTestVisible = false
+                }, x, top + (barHeight - 15) / 2);
+            }
         }
     }
+
+    private (DateTime From, DateTime To) AxisRange()
+    {
+        if (AxisStart is DateTime start && AxisEnd is DateTime end && end > start)
+            return (start, end);
+
+        var first = Bars.Min(b => b.Start);
+        var last = Bars.Max(b => b.End);
+        var from = new DateTime(first.Year, first.Month, first.Day, first.Hour, 0, 0);
+        var to = new DateTime(last.Year, last.Month, last.Day, last.Hour, 0, 0);
+        if (to < last) to = to.AddHours(1);
+        if (to <= from) to = from.AddHours(1);
+        return (from, to);
+    }
+
+    private void DrawHourScale(DateTime from, DateTime to, Func<DateTime, double> x, double pixelsPerHour)
+    {
+        var hourStep = Math.Max(1, (int)Math.Ceiling(MinHourLabelSpacing / pixelsPerHour));
+        for (var t = from; t <= to; t = t.AddHours(1))
+        {
+            DrawGridLine(x(t));
+            if ((t - from).TotalHours % hourStep == 0 && t < to)
+                Add(new TextBlock { Text = t.ToString("HH:mm"), Foreground = HourBrush, FontSize = 10 }, x(t) + 3, 2);
+        }
+    }
+
+    private void DrawDayScale(DateTime from, DateTime to, Func<DateTime, double> x)
+    {
+        for (var t = from; t <= to; t = t.AddDays(1))
+        {
+            DrawGridLine(x(t));
+            if (t < to)
+            {
+                Add(new TextBlock
+                {
+                    Text = t.ToString("ddd dd", Russian),
+                    Foreground = HourBrush,
+                    FontSize = 10,
+                    Width = x(t.AddDays(1)) - x(t),
+                    TextAlignment = TextAlignment.Center
+                }, x(t), 2);
+            }
+        }
+    }
+
+    private void DrawGridLine(double x) =>
+        Add(new Rectangle { Width = 1, Height = Height - HeaderHeight + 4, Fill = GridBrush }, x, HeaderHeight - 4);
 
     private void Add(UIElement element, double left, double top)
     {
