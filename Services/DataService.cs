@@ -149,7 +149,7 @@ public class DataService : IDisposable
         }
     }
 
-public List<Session> GetSessionsByDate(DateTime date, int? projectId = null)
+    public List<Session> GetSessionsByDate(DateTime date, int? projectId = null)
     {
         var sessions = new List<Session>();
         try
@@ -297,35 +297,6 @@ public List<Session> GetSessionsByDate(DateTime date, int? projectId = null)
         }
     }
 
-    public int GetSessionCountByDate(DateTime date, bool isWorkMode)
-    {
-        try
-        {
-            var connection = GetConnection();
-            var startDate = date.Date;
-            var endDate = startDate.AddDays(1);
-
-            var count = """
-                SELECT COUNT(*)
-                FROM Sessions
-                WHERE StartTime >= @StartDate AND StartTime < @EndDate
-                AND IsWorkMode = @IsWorkMode
-                """;
-
-            using var cmd = new SqliteCommand(count, connection);
-            cmd.Parameters.AddWithValue("@StartDate", startDate.ToString("O"));
-            cmd.Parameters.AddWithValue("@EndDate", endDate.ToString("O"));
-            cmd.Parameters.AddWithValue("@IsWorkMode", isWorkMode ? 1 : 0);
-
-            return Convert.ToInt32(cmd.ExecuteScalar());
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[DataService] Ошибка подсчёта сессий: {ex.Message}");
-            return 0;
-        }
-    }
-
     public List<Project> GetAllProjects()
     {
         var projects = new List<Project>();
@@ -375,28 +346,6 @@ public List<Session> GetSessionsByDate(DateTime date, int? projectId = null)
         {
             Debug.WriteLine($"[DataService] Ошибка добавления проекта: {ex.Message}");
             return 0;
-        }
-    }
-
-    public void UpdateProject(Project project)
-    {
-        try
-        {
-            var connection = GetConnection();
-            var update = """
-                UPDATE Projects SET Name = @Name, Rate = @Rate
-                WHERE Id = @Id
-                """;
-
-            using var cmd = new SqliteCommand(update, connection);
-            cmd.Parameters.AddWithValue("@Id", project.Id);
-            cmd.Parameters.AddWithValue("@Name", project.Name);
-            cmd.Parameters.AddWithValue("@Rate", (double)project.Rate);
-            cmd.ExecuteNonQuery();
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"[DataService] Ошибка обновления проекта: {ex.Message}");
         }
     }
 

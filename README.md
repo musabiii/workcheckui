@@ -6,8 +6,13 @@
 
 - **Отслеживание активности** — глобальные хуки клавиатуры и мыши
 - **Pomodoro-таймеры** — двухуровневые напоминания об отдыхе (25 и 40 минут)
+- **Режимы «В работе» / «Дрейфую»** — уведомления и Telegram только в рабочем режиме
+- **Полноэкранный оверлей перерыва** — таймер отдыха на всех мониторах, звук по окончании
+- **Проекты** — время сессий учитывается по выбранному проекту
+- **Статистика** — история сессий по дням (SQLite)
+- **Иконка в трее** — показывает минуты текущей сессии и её цвет
 - **Кастомные уведомления** — собственные всплывающие окна с анимацией
-- **Telegram-интеграция** — отправка уведомлений в чат
+- **Telegram-интеграция** — отправка уведомлений в чат, поддержка SOCKS5-прокси
 - **Тёмная тема** — современный минималистичный интерфейс
 
 ## Требования
@@ -47,7 +52,9 @@ dotnet run -- --long       # Длинный режим
 
 ## Настройки
 
-Настройки хранятся в `settings.json` в папке приложения. Можно редактировать через окно настроек (кнопка ⚙ в главном окне).
+Настройки хранятся в `settings.json` в папке приложения. Можно редактировать через окно настроек (меню ☰ → «Настройки»).
+
+История сессий хранится в SQLite-базе `%LocalAppData%\WorkCheck\statistics.db`. Точные пути показаны в окне «О приложении».
 
 ### Telegram
 
@@ -59,21 +66,32 @@ dotnet run -- --long       # Длинный режим
 ## Структура проекта
 
 ```
-├── Models/                 # Модели данных
-│   ├── AppSettings.cs      # Настройки приложения
-│   └── NotificationRequest.cs
-├── Services/               # Сервисы
-│   ├── ActivityTracker.cs  # Хуки и логика состояний
-│   ├── NotificationService.cs
-│   ├── SettingsService.cs
-│   └── TelegramService.cs
-├── ViewModels/             # MVVM ViewModels
+├── Models/                       # Модели данных
+│   ├── AppSettings.cs            # Настройки приложения
+│   ├── NotificationRequest.cs
+│   ├── Project.cs
+│   └── Session.cs
+├── Services/                     # Сервисы
+│   ├── ActivityTracker.cs        # Хуки и логика состояний
+│   ├── DataService.cs            # SQLite: сессии, периоды отсутствия, проекты
+│   ├── NotificationService.cs    # Всплывающие уведомления и оверлей перерыва
+│   ├── SettingsService.cs        # settings.json
+│   ├── SoundService.cs           # Звук окончания перерыва
+│   ├── TelegramService.cs        # Telegram Bot API (+ SOCKS5)
+│   └── TrayIconService.cs        # Иконка в трее
+├── ViewModels/                   # MVVM ViewModels
 │   ├── StatusViewModel.cs
 │   └── SettingsViewModel.cs
-├── Views/                  # WPF окна
-│   ├── StatusWindow.xaml   # Главное окно статуса
-│   ├── SettingsWindow.xaml # Окно настроек
-│   └── NotificationWindow.xaml
+├── Views/                        # WPF окна
+│   ├── StatusWindow.xaml         # Главное окно статуса
+│   ├── CompactStatusWindow.xaml  # Свёрнутый вид
+│   ├── BreakOverlayWindow.xaml   # Полноэкранный оверлей перерыва
+│   ├── NotificationWindow.xaml
+│   ├── SettingsWindow.xaml
+│   ├── ProjectsWindow.xaml
+│   ├── StatisticsWindow.xaml
+│   └── AboutWindow.xaml
+├── files/audio/                  # Звук окончания перерыва
 ├── Helpers/
 │   ├── TimeFormatter.cs    # Форматирование времени
 │   └── Quotes.cs           # Мотивационные цитаты

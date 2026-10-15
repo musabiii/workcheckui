@@ -29,7 +29,7 @@ public partial class BreakOverlayWindow : Window
     private static readonly Color BreakStripeColor = Color.FromRgb(0x89, 0xB4, 0xFA);
 
     private readonly List<Window> _secondaryOverlays = [];
-private readonly TimeSpan _breakDuration;
+    private readonly TimeSpan _breakDuration;
     private DispatcherTimer? _countdownTimer;
     private DispatcherTimer? _lateTimer;
     private DispatcherTimer? _choiceTimer;
@@ -40,7 +40,7 @@ private readonly TimeSpan _breakDuration;
     private readonly TimeSpan? _todayBase;
     private TimeSpan _choiceRemaining;
 
-private readonly bool _skipPrompt;
+    private readonly bool _skipPrompt;
     private readonly bool _showChoice;
     private readonly SoundService? _soundService;
     private readonly bool _playSoundOnBreakEnd;
@@ -59,11 +59,11 @@ private readonly bool _skipPrompt;
         InitializeComponent();
 
         DataContext = this;
-_breakDuration = breakDuration;
-_skipPrompt = skipPrompt;
+        _breakDuration = breakDuration;
+        _skipPrompt = skipPrompt;
         _showChoice = showChoice;
         _soundService = soundService;
-_playSoundOnBreakEnd = playSoundOnBreakEnd;
+        _playSoundOnBreakEnd = playSoundOnBreakEnd;
         if (fromWorkMode)
             _playSoundOnBreakEnd = true;
 
@@ -120,12 +120,6 @@ _playSoundOnBreakEnd = playSoundOnBreakEnd;
         ChoiceCountdownBlock.Text = $"Перерыв через {_choiceRemaining.Seconds}...";
     }
 
-    public void ExtendChoiceTimer()
-    {
-        _choiceRemaining = TimeSpan.FromSeconds(10);
-        UpdateChoiceCountdownDisplay();
-    }
-
     private void CreateSecondaryOverlays()
     {
         foreach (var screen in Screen.AllScreens)
@@ -150,7 +144,7 @@ _playSoundOnBreakEnd = playSoundOnBreakEnd;
         }
     }
 
-public void ShowWithOverlays()
+    public void ShowWithOverlays()
     {
         foreach (var overlay in _secondaryOverlays)
             overlay.Show();
@@ -209,7 +203,7 @@ public void ShowWithOverlays()
         UpdateCountdownDisplay();
     }
 
-private void SwitchToModeSelection()
+    private void SwitchToModeSelection()
     {
         PromptPanel.Visibility = Visibility.Collapsed;
         TimerPanel.Visibility = Visibility.Collapsed;
@@ -288,7 +282,7 @@ private void SwitchToModeSelection()
         _secondaryOverlays.Clear();
     }
 
-private void OnBreakClick(object sender, RoutedEventArgs e)
+    private void OnBreakClick(object sender, RoutedEventArgs e)
     {
         _choiceTimer?.Stop();
         SwitchToTimerMode();

@@ -10,8 +10,8 @@ namespace WorkCheck.Services;
 
 public sealed class ActivityTracker : IDisposable
 {
-private readonly DataService _dataService;
-    private bool _isWorkMode = false;
+    private readonly DataService _dataService;
+    private bool _isWorkMode;
     private int? _currentProjectId;
 
     public int? CurrentProjectId
@@ -318,12 +318,6 @@ private readonly DataService _dataService;
         Debug.WriteLine($"[Tick] sinceLast={sinceLast:mm\\:ss}, sinceInactivity={sinceInactivity:mm\\:ss}, " +
                        $"userShortBreak={_userShortBreak}, pomodoroNotified={_pomodoroNotified}, IsPaused={IsPaused}");
 
-        Debug.WriteLine($"[Tick] sinceLast={sinceLast:mm\\:ss}, sinceInactivity={sinceInactivity:mm\\:ss}, " +
-                       $"userShortBreak={_userShortBreak}, pomodoroNotified={_pomodoroNotified}, IsPaused={IsPaused}");
-
-        Debug.WriteLine($"[Tick] sinceLast={sinceLast:mm\\:ss}, sinceInactivity={sinceInactivity:mm\\:ss}, " +
-                       $"userShortBreak={_userShortBreak}, pomodoroNotified={_pomodoroNotified}, IsPaused={IsPaused}");
-
         if (!_userShortBreak)
         {
             if (sinceInactivity > _pomodoroTime && !_pomodoroNotified)
@@ -361,7 +355,6 @@ private readonly DataService _dataService;
             if (sessionWork > TimeSpan.Zero)
                 _workedTime += sessionWork;
 
-// Сохраняем завершённую сессию в БД
             var sessionEnd = _lastActivityTime;
             var sessionStart = sessionEnd - sessionWork;
             _dataService.SaveSession(sessionStart, sessionEnd, sessionWork, _isWorkMode, _currentProjectId);
@@ -467,18 +460,8 @@ private readonly DataService _dataService;
         Debug.WriteLine($"[AccountOverlayIdle] AFTER - _lastInactivityTime={_lastInactivityTime:HH:mm:ss}, flags reset (pomodoro={_pomodoroNotified}, pomodoro2={_pomodoro2Notified}, userShortBreak={_userShortBreak})");
     }
 
-    public void ResetSessionTimer()
-    {
-        var now = DateTime.Now;
-        _lastActivityTime = now;
-        _lastInactivityTime = now;
-        _activeSessionStart = now;
-    }
-
     public void Reset()
     {
-        //SaveCurrentSession();
-
         var now = DateTime.Now;
         _lastActivityTime = now;
         _lastInactivityTime = now;

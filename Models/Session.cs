@@ -6,18 +6,7 @@ public class Session
     public DateTime StartTime { get; set; }
     public DateTime EndTime { get; set; }
     public TimeSpan Duration { get; set; }
-    public DateTime Date => StartTime.Date;
     public bool IsWorkMode { get; set; }
     public string Description { get; set; } = string.Empty;
     public int? ProjectId { get; set; }
-}
-
-public class AwayPeriod
-{
-    public int Id { get; set; }
-    public DateTime StartTime { get; set; }
-    public DateTime EndTime { get; set; }
-    public TimeSpan Duration { get; set; }
-    public DateTime Date => StartTime.Date;
-    public bool IsWorkMode { get; set; }
 }

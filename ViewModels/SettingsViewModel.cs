@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WorkCheck.Models;
@@ -21,7 +20,6 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _telegramEnabled;
     [ObservableProperty] private bool _soundEnabled;
     [ObservableProperty] private string _testStatus = "";
-    [ObservableProperty] private bool _isTesting;
 
     public event Action<bool>? RequestClose;
 
@@ -44,13 +42,11 @@ public partial class SettingsViewModel : ObservableObject
     [RelayCommand]
     private async Task TestTelegram()
     {
-        IsTesting = true;
         TestStatus = "Отправка...";
 
         var (success, error) = await _telegramService.SendTestAsync(TelegramBotToken, TelegramChatId, ProxyUrl);
 
         TestStatus = success ? "✅ Сообщение отправлено" : $"❌ Ошибка: {error}";
-        IsTesting = false;
     }
 
     [RelayCommand]

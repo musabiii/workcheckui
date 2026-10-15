@@ -26,7 +26,6 @@ public partial class StatusViewModel : ObservableObject
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
     private bool _wasUserShortBreak;
-    private List<Project> _projects;
     private Project? _selectedProject;
 
     [ObservableProperty] private bool _isWorkMode;
@@ -92,19 +91,19 @@ public partial class StatusViewModel : ObservableObject
 
     private void LoadProjects()
     {
-        _projects = _dataService.GetAllProjects();
-        
-        if (_projects.Count == 0)
+        var projects = _dataService.GetAllProjects();
+
+        if (projects.Count == 0)
         {
-            _selectedProject = new Project { Id = _dataService.AddProject(new Project { Name = "По умолчанию", Rate = 0 }) };
-            _projects.Add(_selectedProject);
+            _selectedProject = new Project { Name = "По умолчанию" };
+            _selectedProject.Id = _dataService.AddProject(_selectedProject);
         }
         else
         {
             var lastSession = _dataService.GetLastSession();
-            _selectedProject = lastSession?.ProjectId != null 
-                ? _projects.FirstOrDefault(p => p.Id == lastSession.ProjectId) 
-                : _projects.LastOrDefault();
+            _selectedProject = lastSession?.ProjectId != null
+                ? projects.FirstOrDefault(p => p.Id == lastSession.ProjectId)
+                : projects.LastOrDefault();
         }
 
         if (_selectedProject != null)
@@ -114,11 +113,8 @@ public partial class StatusViewModel : ObservableObject
         }
     }
 
-    [RelayCommand]
-    private void SelectProject(Project? project)
+    private void SelectProject(Project project)
     {
-        if (project == null) return;
-        
         _selectedProject = project;
         _tracker.CurrentProjectId = project.Id;
         ProjectName = project.Name;
@@ -340,8 +336,6 @@ public partial class StatusViewModel : ObservableObject
     [RelayCommand]
     private void Reset()
     {
-        var session = _tracker.CurrentSession;
-        
         _tracker.Reset();
         CurrentSessionText = "0 мин";
         AwayTimeText = "0 мин";
@@ -388,17 +382,7 @@ public partial class StatusViewModel : ObservableObject
     [RelayCommand]
     private void OpenProjects()
     {
-        var projects = _dataService.GetAllProjects();
-        var current = _selectedProject;
-        
-        var window = new ProjectsWindow(_dataService, current, project =>
-        {
-            _selectedProject = project;
-            _tracker.CurrentProjectId = project.Id;
-            ProjectName = project.Name;
-            UpdateTodayWorkedText();
-        });
-        
+        var window = new ProjectsWindow(_dataService, _selectedProject, SelectProject);
         window.ShowDialog();
     }
 

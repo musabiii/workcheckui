@@ -5,12 +5,6 @@
     <Application.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
-        <!-- ========== Colors ========== -->
-        <SolidColorBrush x:Key="BgBrush" Color="#1E1E2E"/>
-        <SolidColorBrush x:Key="SurfaceBrush" Color="#313244"/>
-        <SolidColorBrush x:Key="TextBrush" Color="#CDD6F4"/>
-        <SolidColorBrush x:Key="SubtleBrush" Color="#A6ADC8"/>
-
         <!-- ========== Header buttons (⚙) ========== -->
         <Style x:Key="HeaderButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
