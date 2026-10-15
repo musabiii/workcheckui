@@ -6,6 +6,8 @@ namespace WorkCheck.Views;
 
 public partial class StatisticsWindow : Window
 {
+    private static readonly TimeSpan FullSessionDuration = TimeSpan.FromMinutes(25);
+
     private readonly DataService _dataService;
     private DateTime _currentDate;
 
@@ -21,8 +23,9 @@ public partial class StatisticsWindow : Window
     {
         DateText.Text = _currentDate.ToString("dd.MM.yyyy");
         
+        var minDuration = AllSessionsRadio.IsChecked == true ? TimeSpan.FromMinutes(1) : FullSessionDuration;
         var sessions = _dataService.GetSessionsByDate(_currentDate)
-            .Where(s => s.IsWorkMode && s.Duration >= TimeSpan.FromMinutes(25))
+            .Where(s => s.IsWorkMode && s.Duration >= minDuration)
             .ToList();
         var totalTime = TimeSpan.FromTicks(sessions.Sum(s => s.Duration.Ticks));
 
@@ -39,6 +42,13 @@ public partial class StatisticsWindow : Window
             ProjectName = s.ProjectId is int id && projectNames.TryGetValue(id, out var name) ? name : "(удалён)",
             s.Description
         }).ToList();
+    }
+
+    private void OnFilterChanged(object sender, RoutedEventArgs e)
+    {
+        // Checked fires while InitializeComponent sets the default; the constructor loads the data itself
+        if (!IsLoaded) return;
+        LoadStatistics();
     }
 
     private void OnPreviousDayClick(object sender, RoutedEventArgs e)
