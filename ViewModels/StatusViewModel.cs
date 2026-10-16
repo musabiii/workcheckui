@@ -172,6 +172,11 @@ public partial class StatusViewModel : ObservableObject
 
         foreach (var req in requests)
         {
+            // Sent before any overlay: the overlays are modal, and "come back" or "take a rest" is useless
+            // once the user is already back; the mode is checked before the overlay lets the user change it
+            if (req.SendTelegram && !string.IsNullOrEmpty(req.TelegramText))
+                SendRemote(req.TelegramText, req.SilentTelegram);
+
             if (req.Type is NotificationType.Pomodoro or NotificationType.Pomodoro2)
             {
                 var overlayShownAt = DateTime.Now;
@@ -183,7 +188,10 @@ public partial class StatusViewModel : ObservableObject
                     soundService: _soundService,
                     playSoundOnBreakEnd: true,
                     awayBase: GetAwayBase(),
-                    todayBase: GetTodayBase());
+                    todayBase: GetTodayBase(),
+                    onBreakEnded: OnBreakCountdownEnded,
+                    onStillAway: OnStillAwayAfterBreak,
+                    stillAwayAfter: _settings.InactivityTime);
                 _tracker.IsPaused = false;
 
                 // Если пользователь нажал "Продолжить работать" сразу (не пошел на перерыв)
@@ -219,14 +227,25 @@ public partial class StatusViewModel : ObservableObject
             {
                 _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
             }
-
-            // TelegramText is the remote-notification text; ntfy gets the same messages as Telegram
-            if (IsWorkMode && req.SendTelegram && !string.IsNullOrEmpty(req.TelegramText))
-            {
-                _ = _telegram.SendAsync(req.TelegramText, req.SilentTelegram);
-                _ = _ntfy.SendAsync(req.TelegramText, req.SilentTelegram);
-            }
         }
+    }
+
+    // The tracker is paused during a break countdown, so these come from the overlay instead of Tick
+    private void OnBreakCountdownEnded() => SendRemote("☕ Перерыв окончен, пора возвращаться!");
+
+    private void OnStillAwayAfterBreak()
+    {
+        if (DateTime.Now.Hour is not (>= 9 and < 18)) return;
+        var after = TimeFormatter.FormatHuman(_settings.InactivityTime);
+        SendRemote($"❗ Слышь, работать! Перерыв кончился {after} назад\n{Quotes.GetRandom()}");
+    }
+
+    // Telegram and ntfy each check their own "enabled" setting
+    private void SendRemote(string text, bool silent = false)
+    {
+        if (!IsWorkMode) return;
+        _ = _telegram.SendAsync(text, silent);
+        _ = _ntfy.SendAsync(text, silent);
     }
 
     private void ApplyModeSelection(bool? driftMode)
@@ -348,7 +367,10 @@ public partial class StatusViewModel : ObservableObject
             soundService: _soundService,
             fromWorkMode: IsWorkMode,
             awayBase: GetAwayBase(),
-            todayBase: GetTodayBase());
+            todayBase: GetTodayBase(),
+            onBreakEnded: OnBreakCountdownEnded,
+            onStillAway: OnStillAwayAfterBreak,
+            stillAwayAfter: _settings.InactivityTime);
 
         _tracker.IsPaused = false;
 

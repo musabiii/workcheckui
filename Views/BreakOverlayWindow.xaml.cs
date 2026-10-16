@@ -45,11 +45,20 @@ public partial class BreakOverlayWindow : Window
     private readonly bool _playSoundOnBreakEnd;
     private bool _breakEndSoundPlayed;
     private bool _breakEndSoundRepeated;
+    private bool _countdownFinished;
+    private bool _stillAwayReported;
 
     public bool UserChoseBreak { get; private set; }
     public string SessionDescription { get; set; } = string.Empty;
     public bool? ModeSelected { get; private set; }
     public Action? OnBreakStarted { get; set; }
+
+    // Raised when the break countdown runs out
+    public Action? OnBreakEnded { get; set; }
+
+    // Raised once if the user is still away StillAwayAfter after the countdown ran out
+    public Action? OnStillAway { get; set; }
+    public TimeSpan StillAwayAfter { get; set; } = TimeSpan.MaxValue;
 
     public BreakOverlayWindow(NotificationType type, string title, string message, TimeSpan breakDuration, bool skipPrompt = false, bool showChoice = false, SoundService? soundService = null, bool playSoundOnBreakEnd = false, bool fromWorkMode = false, TimeSpan? awayBase = null, TimeSpan? todayBase = null)
     {
@@ -195,6 +204,8 @@ public partial class BreakOverlayWindow : Window
         if (_remaining <= TimeSpan.Zero)
         {
             _countdownTimer?.Stop();
+            _countdownFinished = true;
+            OnBreakEnded?.Invoke();
             if (_playSoundOnBreakEnd)
             {
                 _soundService?.PlayBreakEnd();
@@ -231,6 +242,12 @@ public partial class BreakOverlayWindow : Window
         {
             _breakEndSoundRepeated = true;
             _soundService?.PlayBreakEnd();
+        }
+
+        if (_countdownFinished && !_stillAwayReported && _lateTime >= StillAwayAfter)
+        {
+            _stillAwayReported = true;
+            OnStillAway?.Invoke();
         }
 
         UpdateLateTimerDisplay();
