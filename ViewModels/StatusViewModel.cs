@@ -365,11 +365,15 @@ public partial class StatusViewModel : ObservableObject
     [RelayCommand]
     private void OpenProjects()
     {
+        // Not modal: the list closes as soon as it loses focus, including a click on the status window
         var window = new ProjectsWindow(_dataService, _selectedProject, SelectProject);
-        window.ShowDialog();
-
-        _projectNames = _dataService.GetAllProjects().ToDictionary(p => p.Id, p => p.Name);
-        UpdateTodayTotals(_tracker.CurrentSession);
+        window.Closed += (_, _) =>
+        {
+            _projectNames = _dataService.GetAllProjects().ToDictionary(p => p.Id, p => p.Name);
+            UpdateTodayTotals(_tracker.CurrentSession);
+        };
+        window.Show();
+        window.Activate();
     }
 
     [RelayCommand]

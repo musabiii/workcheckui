@@ -10,6 +10,8 @@ public partial class ProjectsWindow : Window
     private readonly DataService _dataService;
     private readonly Action<Project> _onSelectProject;
     private readonly int? _currentProjectId;
+    private bool _closing;
+    private bool _inDialog;
 
     public ProjectsWindow(DataService dataService, Project? currentProject, Action<Project> onSelectProject)
     {
@@ -18,6 +20,13 @@ public partial class ProjectsWindow : Window
         _dataService = dataService;
         _onSelectProject = onSelectProject;
         _currentProjectId = currentProject?.Id;
+
+        // Clicking anywhere outside closes the list; the delete dialogs keep it open
+        Deactivated += (_, _) =>
+        {
+            if (!_closing && !_inDialog) Close();
+        };
+        Closing += (_, _) => _closing = true;
 
         var projects = dataService.GetAllProjects();
         ProjectsList.ItemsSource = projects;
@@ -74,8 +83,8 @@ public partial class ProjectsWindow : Window
         // The tracker keeps saving the running session to the current project, so it must stay
         if (project.Id == _currentProjectId)
         {
-            ConfirmWindow.Inform(this, "Нельзя удалить текущий проект",
-                $"Сейчас время записывается на «{project.Name}». Сначала выберите другой проект, потом удаляйте этот.");
+            InDialog(() => ConfirmWindow.Inform(this, "Нельзя удалить текущий проект",
+                $"Сейчас время записывается на «{project.Name}». Сначала выберите другой проект, потом удаляйте этот."));
             return;
         }
 
@@ -85,10 +94,21 @@ public partial class ProjectsWindow : Window
             : $"У проекта {count} {SessionsWord(count)} на {TimeFormatter.FormatShort(total)}. " +
               "Они останутся в статистике под именем «(удалён)», и вернуть их к проекту из приложения будет нельзя.";
 
-        if (!ConfirmWindow.Ask(this, $"Удалить «{project.Name}»?", message, "Удалить")) return;
+        var confirmed = false;
+        InDialog(() => confirmed = ConfirmWindow.Ask(this, $"Удалить «{project.Name}»?", message, "Удалить"));
+        if (!confirmed) return;
 
         _dataService.DeleteProject(project.Id);
         ProjectsList.ItemsSource = _dataService.GetAllProjects();
+    }
+
+    // Focus may not come back to this window when a dialog closes, so take it back explicitly
+    private void InDialog(Action show)
+    {
+        _inDialog = true;
+        try { show(); }
+        finally { _inDialog = false; }
+        Activate();
     }
 
     private static string SessionsWord(int n)
