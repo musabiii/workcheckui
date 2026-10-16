@@ -1,6 +1,25 @@
 <UserControl x:Class="WorkCheck.Views.ProjectsPanel"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="RowAction" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Padding" Value="8,3"/>
+            <Setter Property="Foreground" Value="{DynamicResource Subtext0Brush}"/>
+        </Style>
+
+        <Style x:Key="ProjectRow" TargetType="Border">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Padding" Value="10,2,2,2"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource Surface0Brush}"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -19,33 +38,59 @@
                     Click="OnAddClick" Margin="8,0,0,0"/>
         </Grid>
 
-        <!-- Projects List -->
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                       Padding="0,0,4,0">
-            <ItemsControl x:Name="ProjectsList">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Border x:Name="Row" Background="Transparent" CornerRadius="4" Padding="10,2,2,2">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{DynamicResource TextBrush}"
-                                           VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                <Button Grid.Column="1" Content="✕" Click="OnDeleteClick"
-                                        Style="{StaticResource HeaderButton}" FontSize="12"
-                                        Foreground="{DynamicResource RedBrush}" ToolTip="Удалить проект"/>
-                            </Grid>
-                        </Border>
-                        <DataTemplate.Triggers>
-                            <Trigger SourceName="Row" Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Row" Property="Background" Value="{DynamicResource Surface0Brush}"/>
-                            </Trigger>
-                        </DataTemplate.Triggers>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <StackPanel>
+                <!-- Active projects -->
+                <ItemsControl x:Name="ActiveList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border Style="{StaticResource ProjectRow}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{DynamicResource TextBrush}"
+                                               VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                    <Button Grid.Column="1" Content="В архив" Click="OnArchiveClick"
+                                            Style="{StaticResource RowAction}"
+                                            ToolTip="Скрыть из выбора; статистика проекта сохранится"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <!-- Archived projects -->
+                <StackPanel x:Name="ArchiveSection" Margin="0,14,0,0">
+                    <TextBlock Text="Архив" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"
+                               Margin="0,0,0,4"/>
+                    <ItemsControl x:Name="ArchivedList">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Style="{StaticResource ProjectRow}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{DynamicResource Overlay1Brush}"
+                                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                        <Button Grid.Column="1" Content="Восстановить" Click="OnRestoreClick"
+                                                Style="{StaticResource RowAction}"/>
+                                        <Button Grid.Column="2" Content="Удалить" Click="OnDeleteClick"
+                                                Style="{StaticResource RowAction}"
+                                                Foreground="{DynamicResource RedBrush}"
+                                                ToolTip="Удалить окончательно"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </StackPanel>
         </ScrollViewer>
     </Grid>
 </UserControl>

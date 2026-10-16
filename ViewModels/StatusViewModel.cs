@@ -85,8 +85,9 @@ public partial class StatusViewModel : ObservableObject
     {
         var projects = _dataService.GetAllProjects();
         _projectNames = projects.ToDictionary(p => p.Id, p => p.Name);
+        var active = projects.Where(p => !p.IsArchived).ToList();
 
-        if (projects.Count == 0)
+        if (active.Count == 0)
         {
             _selectedProject = new Project { Name = "По умолчанию" };
             _selectedProject.Id = _dataService.AddProject(_selectedProject);
@@ -95,9 +96,8 @@ public partial class StatusViewModel : ObservableObject
         else
         {
             var lastSession = _dataService.GetLastSession();
-            _selectedProject = lastSession?.ProjectId != null
-                ? projects.FirstOrDefault(p => p.Id == lastSession.ProjectId)
-                : projects.LastOrDefault();
+            _selectedProject = active.FirstOrDefault(p => p.Id == lastSession?.ProjectId)
+                               ?? active.LastOrDefault();
         }
 
         if (_selectedProject != null)
@@ -362,7 +362,7 @@ public partial class StatusViewModel : ObservableObject
         window.ShowDialog();
     }
 
-    public IReadOnlyList<Project> GetProjects() => _dataService.GetAllProjects();
+    public IReadOnlyList<Project> GetProjects() => _dataService.GetAllProjects().Where(p => !p.IsArchived).ToList();
 
     public int? CurrentProjectId => _selectedProject?.Id;
 

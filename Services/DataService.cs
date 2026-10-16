@@ -14,9 +14,10 @@ public class DataService : IDisposable
 
     public DataService()
     {
-        var appDataPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "WorkCheck");
+        // WORKCHECK_DATA_DIR points a test run at a copy of the database instead of the real one
+        var appDataPath = Environment.GetEnvironmentVariable("WORKCHECK_DATA_DIR") is { Length: > 0 } dataDir
+            ? dataDir
+            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WorkCheck");
 
         Directory.CreateDirectory(appDataPath);
 
@@ -77,7 +78,8 @@ public class DataService : IDisposable
                 "ALTER TABLE Sessions ADD COLUMN ProjectId INTEGER",
                 "ALTER TABLE Sessions ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1",
                 "ALTER TABLE Sessions ADD COLUMN Description TEXT",
-                "ALTER TABLE AwayPeriods ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1"
+                "ALTER TABLE AwayPeriods ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1",
+                "ALTER TABLE Projects ADD COLUMN IsArchived INTEGER NOT NULL DEFAULT 0"
             ];
 
             foreach (var sql in addColumns)
@@ -267,13 +269,14 @@ public class DataService : IDisposable
         }
     }
 
+    // Includes archived projects, so statistics keep showing their names
     public List<Project> GetAllProjects()
     {
         var projects = new List<Project>();
         try
         {
             var connection = GetConnection();
-            var select = "SELECT Id, Name, Rate FROM Projects ORDER BY Name";
+            var select = "SELECT Id, Name, Rate, IsArchived FROM Projects ORDER BY Name";
 
             using var cmd = new SqliteCommand(select, connection);
             using var reader = cmd.ExecuteReader();
@@ -283,7 +286,8 @@ public class DataService : IDisposable
                 {
                     Id = reader.GetInt32(0),
                     Name = reader.GetString(1),
-                    Rate = (decimal)reader.GetDouble(2)
+                    Rate = (decimal)reader.GetDouble(2),
+                    IsArchived = reader.GetInt64(3) != 0
                 });
             }
         }
@@ -337,6 +341,22 @@ public class DataService : IDisposable
             Debug.WriteLine($"[DataService] Ошибка подсчёта сессий проекта: {ex.Message}");
         }
         return (0, TimeSpan.Zero);
+    }
+
+    public void SetProjectArchived(int id, bool archived)
+    {
+        try
+        {
+            var connection = GetConnection();
+            using var cmd = new SqliteCommand("UPDATE Projects SET IsArchived = @IsArchived WHERE Id = @Id", connection);
+            cmd.Parameters.AddWithValue("@IsArchived", archived ? 1 : 0);
+            cmd.Parameters.AddWithValue("@Id", id);
+            cmd.ExecuteNonQuery();
+        }
+        catch (SqliteException ex)
+        {
+            Debug.WriteLine($"[DataService] Ошибка архивации проекта: {ex.Message}");
+        }
     }
 
     public void DeleteProject(int id)
