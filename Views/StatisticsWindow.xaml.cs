@@ -74,8 +74,8 @@ public partial class StatisticsWindow : Window
         var stored = _dataService.GetAwayPeriodsInRange(from, to, isWorkMode: true);
         var extras = new List<ExtraRow>
         {
-            new("Перерыв", "Teal", CleanAway(stored, AwayKind.Break, allSessions, from, to)),
-            new("Не у компа", "Red", CleanAway(stored, AwayKind.Away, allSessions, from, to)),
+            new("Перерыв", "Teal", CleanAway(stored, AwayKind.Break, allSessions, from, to), ByProject: true),
+            new("Не у компа", "Red", CleanAway(stored, AwayKind.Away, allSessions, from, to), ByProject: true),
             new("Дрейф", "Overlay1", allSessions.Where(s => !s.IsWorkMode && s.Duration >= minDuration).ToList())
         };
 
@@ -109,17 +109,48 @@ public partial class StatisticsWindow : Window
             s.Description
         }).ToList();
 
+        var owners = OwnerOrder(sessions, projectName);
+        var projectFirst = ProjectGroupingRadio.IsChecked == true;
+        var summaryGroup = projectFirst ? owners.Count : 1;
+
         Gantt.Columns = [];
         Gantt.Bars = sessions
-            .Select(s => new GanttBar(projectName(s), colorKey(s), s.StartTime, s.EndTime, s.Duration, SessionTip(s, projectName(s))))
-            .Concat(extras.SelectMany((row, i) => row.Items.Select(s => new GanttBar(row.Name, -1, s.StartTime, s.EndTime,
-                s.EndTime - s.StartTime, $"{row.Name} · {OwnerName(s, projectName)}\n{RangeText(s)}",
-                ColorRole: row.Role, Group: i + 1))))
+            .Select(s => new GanttBar(projectName(s), colorKey(s), s.StartTime, s.EndTime, s.Duration, SessionTip(s, projectName(s)),
+                Group: projectFirst ? owners.IndexOf(OwnerName(s, projectName)) : 0))
+            .Concat(extras.SelectMany((row, i) => ExtraBars(row, i)))
             .ToList();
+
+        // By type: the row, then one indented child row per project.
+        // By project: the row as a plain total at the bottom, and an indented child row under each project.
+        IEnumerable<GanttBar> ExtraBars(ExtraRow row, int index)
+        {
+            foreach (var s in row.Items)
+            {
+                var owner = OwnerName(s, projectName);
+                var tip = $"{row.Name} · {owner}\n{RangeText(s)}";
+                yield return new GanttBar(row.Name, -1, s.StartTime, s.EndTime, s.EndTime - s.StartTime, tip,
+                    ColorRole: row.Role, Group: summaryGroup + index);
+                if (!row.ByProject || (projectFirst && !owners.Contains(owner))) continue;
+
+                yield return projectFirst
+                    ? new GanttBar(row.Name, -1, s.StartTime, s.EndTime, s.EndTime - s.StartTime, tip,
+                        ColorRole: row.Role, Group: owners.IndexOf(owner), Indent: 1, Order: index)
+                    : new GanttBar(owner, -1, s.StartTime, s.EndTime, s.EndTime - s.StartTime, tip,
+                        ColorRole: row.Role, Group: summaryGroup + index, Indent: 1);
+            }
+        }
     }
 
+    // Projects with work in the period, by work time. Breaks and time away of other projects only count
+    // in the totals at the bottom: under a project row they would have no parent to hang from.
+    private static List<string> OwnerOrder(List<Session> sessions, Func<Session, string> projectName) =>
+        sessions.GroupBy(s => OwnerName(s, projectName)).OrderByDescending(Total).Select(g => g.Key).ToList();
+
     // A row under the projects: breaks, time away or drift; Items carry the project they belong to
-    private record ExtraRow(string Name, string Role, List<Session> Items);
+    private record ExtraRow(string Name, string Role, List<Session> Items, bool ByProject = false);
+
+    // Child rows in the period table: the grid has no tree, so the indent is leading spaces
+    private const string ChildIndent = "    ";
 
     private static string OwnerName(Session s, Func<Session, string> projectName) =>
         s.ProjectId == null ? "без проекта" : projectName(s);
@@ -173,16 +204,46 @@ public partial class StatisticsWindow : Window
 
         BuildPeriodColumns(columns);
 
-        var rows = sessions
-            .GroupBy(projectName)
-            .OrderByDescending(Total)
-            .Select(g => new PeriodRow(g.Key, Cells(g), TimeFormatter.FormatClock(Total(g))))
-            .ToList();
+        var owners = OwnerOrder(sessions, projectName);
+        var projectFirst = ProjectGroupingRadio.IsChecked == true;
+        var summaryGroup = projectFirst ? owners.Count : 1;
+        List<Session> Of(IEnumerable<Session> items, string owner) =>
+            items.Where(s => OwnerName(s, projectName) == owner).ToList();
 
-        if (rows.Count > 0)
+        var rows = new List<PeriodRow>();
+        if (projectFirst)
+        {
+            // Each project, then its breaks and time away indented under it
+            foreach (var owner in owners)
+            {
+                var work = Of(sessions, owner);
+                rows.Add(new PeriodRow(owner, Cells(work), TimeFormatter.FormatClock(Total(work))));
+                foreach (var extra in extras.Where(e => e.ByProject))
+                {
+                    var items = Of(extra.Items, owner);
+                    if (items.Count > 0)
+                        rows.Add(new PeriodRow(ChildIndent + extra.Name, Cells(items), TimeFormatter.FormatClock(Total(items))));
+                }
+            }
+        }
+        else
+        {
+            rows.AddRange(sessions
+                .GroupBy(projectName)
+                .OrderByDescending(Total)
+                .Select(g => new PeriodRow(g.Key, Cells(g), TimeFormatter.FormatClock(Total(g)))));
+        }
+
+        if (sessions.Count > 0)
             rows.Add(new PeriodRow("Итого", Cells(sessions), TimeFormatter.FormatClock(Total(sessions)), IsTotal: true));
         foreach (var extra in extras.Where(e => e.Items.Count > 0))
+        {
             rows.Add(new PeriodRow(extra.Name, Cells(extra.Items), TimeFormatter.FormatClock(Total(extra.Items))));
+            if (!extra.ByProject || projectFirst) continue;
+
+            foreach (var owner in extra.Items.GroupBy(s => OwnerName(s, projectName)).OrderByDescending(Total))
+                rows.Add(new PeriodRow(ChildIndent + owner.Key, Cells(owner), TimeFormatter.FormatClock(Total(owner))));
+        }
 
         PeriodGrid.ItemsSource = rows;
 
@@ -196,23 +257,37 @@ public partial class StatisticsWindow : Window
                 var total = Total(g);
                 var tip = $"{g.Key.Project}\n{ColumnTitle(column)} · {TimeFormatter.FormatShort(total)} · сессий: {g.Count()}";
                 return new GanttBar(g.Key.Project, colorKey(g.First()), column.Start, column.End, total, tip,
-                    TimeFormatter.FormatClock(total));
+                    TimeFormatter.FormatClock(total), Group: projectFirst ? owners.IndexOf(OwnerName(g.First(), projectName)) : 0);
             })
-            .Concat(extras.SelectMany((extra, i) => ExtraCells(extra, i + 1)))
+            .Concat(extras.SelectMany((extra, i) => ExtraCells(extra, i)))
             .ToList();
 
-        // Drift and away get one cell per column like a project, in their own row under the projects
-        IEnumerable<GanttBar> ExtraCells(ExtraRow extra, int group) => extra.Items
-            .GroupBy(ColumnIndex)
-            .Where(g => g.Key >= 0)
-            .Select(g =>
-            {
-                var column = columns[g.Key];
-                var total = Total(g);
-                return new GanttBar(extra.Name, -1, column.Start, column.End, total,
-                    $"{extra.Name}\n{ColumnTitle(column)} · {TimeFormatter.FormatShort(total)}", TimeFormatter.FormatClock(total),
-                    extra.Role, group);
-            });
+        // Breaks, away and drift get one cell per column like a project: a total row at the bottom, plus
+        // indented per-project rows under that total (by type) or under each project (by project)
+        IEnumerable<GanttBar> ExtraCells(ExtraRow extra, int index)
+        {
+            var cells = CellsOf(extra.Items, extra.Name, extra.Name, summaryGroup + index, 0);
+            if (!extra.ByProject) return cells;
+
+            return cells.Concat(extra.Items
+                .GroupBy(s => OwnerName(s, projectName))
+                .Where(owner => !projectFirst || owners.Contains(owner.Key))
+                .SelectMany(owner => projectFirst
+                    ? CellsOf(owner, extra.Name, $"{owner.Key} · {extra.Name}", owners.IndexOf(owner.Key), 1)
+                    : CellsOf(owner, owner.Key, $"{extra.Name} · {owner.Key}", summaryGroup + index, 1)));
+
+            IEnumerable<GanttBar> CellsOf(IEnumerable<Session> items, string row, string title, int group, int indent) => items
+                .GroupBy(ColumnIndex)
+                .Where(g => g.Key >= 0)
+                .Select(g =>
+                {
+                    var column = columns[g.Key];
+                    var total = Total(g);
+                    return new GanttBar(row, -1, column.Start, column.End, total,
+                        $"{title}\n{ColumnTitle(column)} · {TimeFormatter.FormatShort(total)}", TimeFormatter.FormatClock(total),
+                        extra.Role, group, indent, index);
+                });
+        }
     }
 
     private void BuildPeriodColumns(List<GanttColumn> columns)

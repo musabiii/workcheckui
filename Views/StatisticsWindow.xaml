@@ -164,6 +164,17 @@
                                                  Checked="OnFilterChanged"/>
                                 </StackPanel>
                             </Border>
+                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="6" Padding="2" Margin="0,0,8,0"
+                                    ToolTip="Как показывать перерывы и время не у компа">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Content="По типу" GroupName="Grouping"
+                                                 Style="{StaticResource SmallSegment}" IsChecked="True"
+                                                 Checked="OnFilterChanged"/>
+                                    <RadioButton x:Name="ProjectGroupingRadio" Content="По проектам" GroupName="Grouping"
+                                                 Style="{StaticResource SmallSegment}"
+                                                 Checked="OnFilterChanged"/>
+                                </StackPanel>
+                            </Border>
                             <Border Background="{DynamicResource Surface0Brush}" CornerRadius="6" Padding="2">
                                 <StackPanel Orientation="Horizontal">
                                     <RadioButton x:Name="ListViewRadio" Content="Список" GroupName="SessionView"

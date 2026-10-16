@@ -12,8 +12,10 @@ namespace WorkCheck.Views;
 // ColorKey picks a stable palette color (e.g. project id); a negative key draws the bar gray.
 // ColorRole, when set, overrides it with a theme role. Label, when set, is drawn on the bar if it fits.
 // Rows with a higher Group go below the others (e.g. drift and away under the projects), after a divider.
+// Inside a group, rows with Indent 0 come first and Indent 1 rows follow as their indented children,
+// by Order and then by total; a row is identified by its Group and Row, so a name can repeat across groups.
 public record GanttBar(string Row, int ColorKey, DateTime Start, DateTime End, TimeSpan Duration, string ToolTip,
-    string? Label = null, string? ColorRole = null, int Group = 0);
+    string? Label = null, string? ColorRole = null, int Group = 0, int Indent = 0, int Order = 0);
 
 public record GanttColumn(DateTime Start, DateTime End, string Label);
 
@@ -29,6 +31,7 @@ public class GanttChart : Canvas
     private const double MinBarWidth = 2;
     private const double MinBarLabelWidth = 36;
     private const double MinHourLabelSpacing = 34;
+    private const double IndentWidth = 16;
 
     private static readonly Brush GridBrush = Frozen(Color.FromArgb(0x22, 0xFF, 0xFF, 0xFF));
     private static Brush StripeBrush => AppThemes.Brush("Crust");
@@ -37,6 +40,7 @@ public class GanttChart : Canvas
     private static Brush HourBrush => AppThemes.Brush("Overlay0");
     private static Brush BarTextBrush => AppThemes.Brush("OnAccent");
     private static Brush DividerBrush => AppThemes.Brush("Surface2");
+    private static Brush ChildLabelBrush => AppThemes.Brush("Overlay1");
 
     private static readonly string[] PaletteRoles = ["Blue", "Green", "Yellow", "Mauve", "Peach", "Teal", "Red"];
 
@@ -84,9 +88,12 @@ public class GanttChart : Canvas
         Children.Clear();
 
         var rows = Bars
-            .GroupBy(b => b.Row)
-            .Select(g => (Name: g.Key, Total: TimeSpan.FromTicks(g.Sum(b => b.Duration.Ticks)), Group: g.Max(b => b.Group)))
+            .GroupBy(b => (b.Group, b.Row))
+            .Select(g => (Name: g.Key.Row, g.Key.Group, Indent: g.Max(b => b.Indent), Order: g.Min(b => b.Order),
+                Total: TimeSpan.FromTicks(g.Sum(b => b.Duration.Ticks))))
             .OrderBy(r => r.Group)
+            .ThenBy(r => r.Indent)
+            .ThenBy(r => r.Order)
             .ThenByDescending(r => r.Total)
             .ToList();
 
@@ -109,15 +116,16 @@ public class GanttChart : Canvas
             if (i > 0 && rows[i].Group != rows[i - 1].Group)
                 Add(new Rectangle { Width = ActualWidth, Height = 1, Fill = DividerBrush }, 0, top);
 
+            var indent = rows[i].Indent * IndentWidth;
             Add(new TextBlock
             {
                 Text = rows[i].Name,
-                Foreground = LabelBrush,
+                Foreground = rows[i].Indent > 0 ? ChildLabelBrush : LabelBrush,
                 FontSize = 12,
-                Width = LabelWidth - TotalWidth - 12,
+                Width = LabelWidth - TotalWidth - 12 - indent,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 ToolTip = rows[i].Name
-            }, 0, top + 5);
+            }, indent, top + 5);
 
             Add(new TextBlock
             {
@@ -140,7 +148,7 @@ public class GanttChart : Canvas
 
         foreach (var bar in Bars)
         {
-            var row = rows.FindIndex(r => r.Name == bar.Row);
+            var row = rows.FindIndex(r => r.Name == bar.Row && r.Group == bar.Group);
             var x = X(bar.Start) + inset;
             var width = Math.Max(MinBarWidth, X(bar.End) - X(bar.Start) - 2 * inset);
             var top = HeaderHeight + row * RowHeight + (RowHeight - barHeight) / 2;
