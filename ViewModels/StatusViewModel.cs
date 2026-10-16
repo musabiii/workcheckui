@@ -22,6 +22,7 @@ public partial class StatusViewModel : ObservableObject
     private readonly SettingsService _settingsService;
     private readonly DataService _dataService;
     private readonly SoundService _soundService;
+    private readonly AmbientSoundService _ambient;
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
     private bool _wasUserShortBreak;
@@ -37,6 +38,18 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _todayWorkedText = "0 мин";
     [ObservableProperty] private IReadOnlyList<ProjectTimeRow> _projectRows = [];
     [ObservableProperty] private string _statusText = "Дрейфую";
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsAmbientPlaying), nameof(IsWhitePlaying), nameof(IsPinkPlaying), nameof(IsBrownPlaying))]
+    private AmbientSound? _playingSound;
+
+    public bool IsAmbientPlaying => PlayingSound != null;
+    public bool IsWhitePlaying => PlayingSound == AmbientSound.White;
+    public bool IsPinkPlaying => PlayingSound == AmbientSound.Pink;
+    public bool IsBrownPlaying => PlayingSound == AmbientSound.Brown;
+
+    // 0–100 for the slider
+    [ObservableProperty] private double _ambientVolume;
     [ObservableProperty] private Brush _statusBrush = DriftingGrayBrush;
     [ObservableProperty] private Brush _sessionBrush = NormalTextBrush;
     [ObservableProperty] private Brush _windowBgBrush = DriftingBgBrush;
@@ -61,7 +74,8 @@ public partial class StatusViewModel : ObservableObject
         DataService dataService,
         AppSettings settings,
         TrayIconService trayIcon,
-        SoundService soundService)
+        SoundService soundService,
+        AmbientSoundService ambient)
     {
         _tracker = tracker;
         _notifications = notifications;
@@ -70,7 +84,11 @@ public partial class StatusViewModel : ObservableObject
         _settingsService = settingsService;
         _dataService = dataService;
         _soundService = soundService;
+        _ambient = ambient;
         _settings = settings;
+
+        _ambient.Volume = (float)settings.AmbientVolume;
+        _ambientVolume = settings.AmbientVolume * 100;
 
         LoadProjects();
 
@@ -411,8 +429,36 @@ public partial class StatusViewModel : ObservableObject
         window.ShowDialog();
     }
 
+    [RelayCommand]
+    private void PlayAmbient(AmbientSound sound)
+    {
+        _ambient.Play(sound);
+        PlayingSound = _ambient.Current;
+        if (PlayingSound == null) return;
+
+        _settings.AmbientSound = sound.ToString();
+        _settingsService.Save(_settings);
+    }
+
+    [RelayCommand]
+    private void StopAmbient()
+    {
+        _ambient.Stop();
+        PlayingSound = null;
+    }
+
+    partial void OnAmbientVolumeChanged(double value)
+    {
+        _ambient.Volume = (float)(value / 100);
+        _settings.AmbientVolume = value / 100;
+    }
+
+    // The slider moves in small steps, so the volume is written to disk once the popup closes
+    public void SaveAmbientVolume() => _settingsService.Save(_settings);
+
     public void Cleanup()
     {
+        _ambient.Stop();
         _timer.Stop();
         _tracker.StopHooks();
         _notifications.CloseAll();

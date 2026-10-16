@@ -94,6 +94,22 @@ public partial class StatusWindow : Window
         menu.IsOpen = true;
     }
 
+    private DateTime _soundPopupClosedAt;
+
+    private void OnSoundClick(object sender, RoutedEventArgs e)
+    {
+        // A click on the button first closes the open popup; don't reopen it right away
+        if ((DateTime.Now - _soundPopupClosedAt).TotalMilliseconds < 300) return;
+        SoundPopup.IsOpen = true;
+    }
+
+    private void OnSoundPopupClosed(object? sender, EventArgs e)
+    {
+        _soundPopupClosedAt = DateTime.Now;
+        if (DataContext is StatusViewModel vm)
+            vm.SaveAmbientVolume();
+    }
+
     private void OnMinimizeClick(object sender, RoutedEventArgs e)
     {
         OnMinimize?.Invoke();

@@ -30,6 +30,7 @@ public partial class App : Application
         var telegramService = new TelegramService(settings);
         var notificationService = new NotificationService();
         var soundService = new SoundService { Enabled = settings.SoundEnabled };
+        var ambientSound = new AmbientSoundService();
         _tracker = new ActivityTracker(settings, dataService);
 
         ApplyCommandLineArgs(e.Args, _tracker);
@@ -55,12 +56,13 @@ public partial class App : Application
             onExit: () =>
             {
                 statusWindow?.Shutdown();
+                ambientSound.Dispose();
                 dataService.Dispose();
                 Shutdown();
             },
             onToggleWindow: ShowNormal);
 
-        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, dataService, settings, trayIcon, soundService);
+        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, dataService, settings, trayIcon, soundService, ambientSound);
         statusWindow = new StatusWindow { DataContext = statusVm };
         statusWindow.OnMinimize = ShowCompact;
 

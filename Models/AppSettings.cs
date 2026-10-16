@@ -13,6 +13,8 @@ public class AppSettings
     public bool SoundEnabled { get; set; } = true;
     public string Font { get; set; } = "Theme";
     public string Theme { get; set; } = "Catppuccin Mocha";
+    public string AmbientSound { get; set; } = "Brown";
+    public double AmbientVolume { get; set; } = 0.5;
 
     public TimeSpan PomodoroTime => TimeSpan.FromMinutes(PomodoroMinutes);
     public TimeSpan Pomodoro2Time => TimeSpan.FromMinutes(Pomodoro2Minutes);

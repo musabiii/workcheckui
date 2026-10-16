@@ -10,6 +10,7 @@ public partial class SettingsViewModel : ObservableObject
 {
     private readonly SettingsService _settingsService;
     private readonly TelegramService _telegramService;
+    private readonly AppSettings _current;
 
     [ObservableProperty] private int _pomodoroMinutes;
     [ObservableProperty] private int _pomodoro2Minutes;
@@ -78,6 +79,7 @@ public partial class SettingsViewModel : ObservableObject
     {
         _settingsService = settingsService;
         _telegramService = telegramService;
+        _current = current;
 
         PomodoroMinutes = current.PomodoroMinutes;
         Pomodoro2Minutes = current.Pomodoro2Minutes;
@@ -117,7 +119,9 @@ public partial class SettingsViewModel : ObservableObject
             TelegramEnabled = TelegramEnabled,
             SoundEnabled = SoundEnabled,
             Font = Font,
-            Theme = Theme
+            Theme = Theme,
+            AmbientSound = _current.AmbientSound,
+            AmbientVolume = _current.AmbientVolume
         };
         _settingsService.Save(settings);
         RequestClose?.Invoke(true);
