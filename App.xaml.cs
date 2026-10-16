@@ -53,6 +53,14 @@ public partial class App : Application
             compactWindow?.Activate();
         };
 
+        // Windows logoff or shutdown takes the same path as Exit in the tray, so the open session is saved
+        SessionEnding += (_, _) =>
+        {
+            statusWindow?.Shutdown();
+            ambientSound.Dispose();
+            dataService.Dispose();
+        };
+
         var trayIcon = new TrayIconService(
             onExit: () =>
             {

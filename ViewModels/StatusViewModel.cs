@@ -220,7 +220,7 @@ public partial class StatusViewModel : ObservableObject
                     todayBase: GetTodayBase());
                 _tracker.IsPaused = false;
 
-                _tracker.AccountOverlayIdle(overlayShownAt, "");
+                _tracker.AccountOverlayIdle(overlayShownAt, "", countIdleAsAway: false);
                 ApplyModeSelection(modeSelected);
             }
             else if (IsWorkMode)
@@ -507,6 +507,10 @@ public partial class StatusViewModel : ObservableObject
 
     public void Cleanup()
     {
+        // Otherwise the stretch since the last break or mode switch is lost on exit
+        _tracker.SaveCurrentSession();
+        _tracker.SaveCurrentAwayPeriod();
+
         _ambient.Stop();
         _timer.Stop();
         _tracker.StopHooks();
