@@ -40,13 +40,19 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _statusText = "Дрейфую";
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsAmbientPlaying), nameof(IsWhitePlaying), nameof(IsPinkPlaying), nameof(IsBrownPlaying))]
+    [NotifyPropertyChangedFor(nameof(IsAmbientPlaying))]
     private AmbientSound? _playingSound;
 
     public bool IsAmbientPlaying => PlayingSound != null;
-    public bool IsWhitePlaying => PlayingSound == AmbientSound.White;
-    public bool IsPinkPlaying => PlayingSound == AmbientSound.Pink;
-    public bool IsBrownPlaying => PlayingSound == AmbientSound.Brown;
+
+    // The sound the on/off button plays; highlighted in the picker even while off
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsWhiteSelected), nameof(IsPinkSelected), nameof(IsBrownSelected))]
+    private AmbientSound _selectedSound;
+
+    public bool IsWhiteSelected => SelectedSound == AmbientSound.White;
+    public bool IsPinkSelected => SelectedSound == AmbientSound.Pink;
+    public bool IsBrownSelected => SelectedSound == AmbientSound.Brown;
 
     // 0–100 for the slider
     [ObservableProperty] private double _ambientVolume;
@@ -89,6 +95,7 @@ public partial class StatusViewModel : ObservableObject
 
         _ambient.Volume = (float)settings.AmbientVolume;
         _ambientVolume = settings.AmbientVolume * 100;
+        _selectedSound = Enum.TryParse<AmbientSound>(settings.AmbientSound, out var sound) ? sound : AmbientSound.Brown;
 
         LoadProjects();
 
@@ -430,21 +437,25 @@ public partial class StatusViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void PlayAmbient(AmbientSound sound)
+    private void ToggleAmbient()
     {
+        if (PlayingSound != null)
+            _ambient.Stop();
+        else
+            _ambient.Play(SelectedSound);
+        PlayingSound = _ambient.Current;
+    }
+
+    // Picking a sound also turns it on: that is almost always why the picker was opened
+    [RelayCommand]
+    private void SelectAmbient(AmbientSound sound)
+    {
+        SelectedSound = sound;
         _ambient.Play(sound);
         PlayingSound = _ambient.Current;
-        if (PlayingSound == null) return;
 
         _settings.AmbientSound = sound.ToString();
         _settingsService.Save(_settings);
-    }
-
-    [RelayCommand]
-    private void StopAmbient()
-    {
-        _ambient.Stop();
-        PlayingSound = null;
     }
 
     partial void OnAmbientVolumeChanged(double value)

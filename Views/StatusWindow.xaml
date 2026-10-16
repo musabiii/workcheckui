@@ -172,34 +172,43 @@
                 <TextBlock Grid.Column="1" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}"
                            FontSize="12" VerticalAlignment="Center"/>
 
-                <Button x:Name="SoundButton" Grid.Column="2" Content="&#xE7F6;" Click="OnSoundClick"
-                        FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13"
-                        Margin="6,0,0,0" ToolTip="Фоновый звук">
-                    <Button.Style>
-                        <Style TargetType="Button" BasedOn="{StaticResource HeaderButton}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsAmbientPlaying}" Value="True">
-                                    <Setter Property="Foreground" Value="{DynamicResource GreenBrush}"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="6,0,0,0">
+                    <Button x:Name="SoundPickerButton" Content="&#xE8D6;" Click="OnSoundPickerClick"
+                            Style="{StaticResource HeaderButton}"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13"
+                            Margin="0,0,2,0" ToolTip="Выбрать фоновый звук"/>
+                    <Button Command="{Binding ToggleAmbientCommand}"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="12"
+                            ToolTip="Фоновый звук: вкл/выкл">
+                        <Button.Style>
+                            <Style TargetType="Button" BasedOn="{StaticResource HeaderButton}">
+                                <!-- Play while off, pause while playing -->
+                                <Setter Property="Content" Value="&#xE768;"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAmbientPlaying}" Value="True">
+                                        <Setter Property="Content" Value="&#xE769;"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource GreenBrush}"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
 
-                <Popup x:Name="SoundPopup" PlacementTarget="{Binding ElementName=SoundButton}"
-                       Placement="Top" HorizontalOffset="-176" VerticalOffset="-4"
+                <Popup x:Name="SoundPopup" PlacementTarget="{Binding ElementName=SoundPickerButton}"
+                       Placement="Top" HorizontalOffset="-150" VerticalOffset="-4"
                        StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade"
                        Closed="OnSoundPopupClosed">
                     <Border Width="200" Background="{DynamicResource BaseBrush}" BorderBrush="#33FFFFFF"
                             BorderThickness="1" CornerRadius="6" Padding="4"
                             TextElement.FontFamily="{DynamicResource AppFont}">
                         <StackPanel>
-                            <Button Content="Белый шум" Style="{StaticResource PopupItem}" Tag="{Binding IsWhitePlaying}"
-                                    Command="{Binding PlayAmbientCommand}" CommandParameter="{x:Static services:AmbientSound.White}"/>
-                            <Button Content="Розовый шум" Style="{StaticResource PopupItem}" Tag="{Binding IsPinkPlaying}"
-                                    Command="{Binding PlayAmbientCommand}" CommandParameter="{x:Static services:AmbientSound.Pink}"/>
-                            <Button Content="Коричневый шум" Style="{StaticResource PopupItem}" Tag="{Binding IsBrownPlaying}"
-                                    Command="{Binding PlayAmbientCommand}" CommandParameter="{x:Static services:AmbientSound.Brown}"/>
+                            <Button Content="Белый шум" Style="{StaticResource PopupItem}" Tag="{Binding IsWhiteSelected}"
+                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.White}"/>
+                            <Button Content="Розовый шум" Style="{StaticResource PopupItem}" Tag="{Binding IsPinkSelected}"
+                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.Pink}"/>
+                            <Button Content="Коричневый шум" Style="{StaticResource PopupItem}" Tag="{Binding IsBrownSelected}"
+                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.Brown}"/>
 
                             <Border Height="1" Margin="8,4" Background="{DynamicResource Surface1Brush}"/>
 
@@ -215,9 +224,6 @@
                                         Minimum="0" Maximum="100" Value="{Binding AmbientVolume}"/>
                             </Grid>
 
-                            <Button Content="Выключить" Style="{StaticResource PopupItem}"
-                                    Command="{Binding StopAmbientCommand}"
-                                    Visibility="{Binding IsAmbientPlaying, Converter={StaticResource BoolToVisibilityConverter}}"/>
                         </StackPanel>
                     </Border>
                 </Popup>

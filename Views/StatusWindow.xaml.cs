@@ -96,12 +96,14 @@ public partial class StatusWindow : Window
 
     private DateTime _soundPopupClosedAt;
 
-    private void OnSoundClick(object sender, RoutedEventArgs e)
+    private void OnSoundPickerClick(object sender, RoutedEventArgs e)
     {
         // A click on the button first closes the open popup; don't reopen it right away
         if ((DateTime.Now - _soundPopupClosedAt).TotalMilliseconds < 300) return;
         SoundPopup.IsOpen = true;
     }
+
+    private void OnSoundChosen(object sender, RoutedEventArgs e) => SoundPopup.IsOpen = false;
 
     private void OnSoundPopupClosed(object? sender, EventArgs e)
     {
