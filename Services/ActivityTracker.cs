@@ -112,16 +112,7 @@ public sealed class ActivityTracker : IDisposable
     public void SaveCurrentAwayPeriod()
     {
         if (!_userActive || _userShortBreak)
-        {
-            var now = DateTime.Now;
-            var interval = now - _lastActivityTime;
-            var away = _userShortBreak ? interval - _shortBreakTime : interval;
-            if (away > TimeSpan.Zero)
-            {
-                _dataService.SaveAwayPeriod(now - away, now, away, IsWorkMode);
-                Debug.WriteLine($"[ActivityTracker] Saved away period: {away} in mode {IsWorkMode}");
-            }
-        }
+            SaveBreakAndAway(_lastActivityTime, DateTime.Now, _userShortBreak ? _shortBreakTime : TimeSpan.Zero);
         
         _awayTime = TimeSpan.Zero;
     }
@@ -253,27 +244,8 @@ public sealed class ActivityTracker : IDisposable
         {
             var awayInterval = now - _lastActivityTime;
 
-            TimeSpan awayToAdd;
-            if (_userShortBreak)
-            {
-                // Время перерыва не зачитывается как "вне компьютера" — только время сверх перерыва
-                var breakExcess = awayInterval - _shortBreakTime;
-                awayToAdd = breakExcess > TimeSpan.Zero ? breakExcess : TimeSpan.Zero;
-            }
-            else
-            {
-                awayToAdd = awayInterval;
-            }
-
-            _awayTime += awayToAdd;
-
-            // Сохраняем период неактивности в БД
-            if (awayToAdd > TimeSpan.Zero)
-            {
-                var awayEnd = now;
-                var awayStart = awayEnd - awayToAdd;
-                _dataService.SaveAwayPeriod(awayStart, awayEnd, awayToAdd, IsWorkMode);
-            }
+            // Время перерыва не зачитывается как "вне компьютера" — только время сверх перерыва
+            _awayTime += SaveBreakAndAway(_lastActivityTime, now, _userShortBreak ? _shortBreakTime : TimeSpan.Zero);
 
             _pending.Enqueue(new NotificationRequest
             {
@@ -395,10 +367,30 @@ public sealed class ActivityTracker : IDisposable
     /// Вызывается когда пользователь закрыл оверлей помодоро (нажал "Продолжить" или завершил перерыв).
     /// Всё время от момента показа оверлея до сейчас считается перерывом, а не работой.
     /// </summary>
+    // Splits [start, end] into a break (up to breakLength, first) and time away after it, saves both with the
+    // current project and returns the away part
+    private TimeSpan SaveBreakAndAway(DateTime start, DateTime end, TimeSpan breakLength)
+    {
+        var total = end - start;
+        if (total <= TimeSpan.Zero) return TimeSpan.Zero;
+
+        var breakPart = total < breakLength ? total : breakLength;
+        if (breakPart > TimeSpan.Zero)
+            _dataService.SaveAwayPeriod(start, start + breakPart, breakPart, IsWorkMode, CurrentProjectId, AwayKind.Break);
+
+        var away = total - breakPart;
+        if (away > TimeSpan.Zero)
+            _dataService.SaveAwayPeriod(start + breakPart, end, away, IsWorkMode, CurrentProjectId, AwayKind.Away);
+
+        Debug.WriteLine($"[ActivityTracker] Saved break {breakPart} and away {away} in mode {IsWorkMode}");
+        return away;
+    }
+
     // countIdleAsAway is false for the short-break overlay: there the tracker keeps running, so
-    // OnActivity() already records the time away when the user comes back
+    // OnActivity() already records the break and the time away when the user comes back.
+    // breakLength is the break the user picked in the overlay; without one the short break applies.
     public void AccountOverlayIdle(DateTime overlayShownAt, string description = "", bool continueSession = false,
-        bool countIdleAsAway = true)
+        bool countIdleAsAway = true, TimeSpan? breakLength = null)
     {
         var now = DateTime.Now;
         var idleDuration = now - overlayShownAt;
@@ -438,13 +430,9 @@ public sealed class ActivityTracker : IDisposable
             _dataService.SaveSession(sessionStart, sessionEnd, realWork, IsWorkMode, CurrentProjectId, description);
         }
 
-        // Время простоя пока висел оверлей — это away (минус время, выделенное на перерыв)
-        var excessIdle = idleDuration - _shortBreakTime;
-        if (countIdleAsAway && excessIdle > TimeSpan.Zero)
-        {
-            _awayTime += excessIdle;
-            _dataService.SaveAwayPeriod(now - excessIdle, now, excessIdle, IsWorkMode);
-        }
+        // Время простоя пока висел оверлей: сначала перерыв, сверх него — away
+        if (countIdleAsAway)
+            _awayTime += SaveBreakAndAway(overlayShownAt, now, breakLength ?? _shortBreakTime);
 
         // Начинаем новую сессию с текущего момента
         _lastActivityTime = now;

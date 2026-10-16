@@ -181,7 +181,7 @@ public partial class StatusViewModel : ObservableObject
             {
                 var overlayShownAt = DateTime.Now;
 
-                var (choseBreak, description, modeSelected) = _notifications.ShowBreakOverlay(
+                var (choseBreak, description, modeSelected, breakLength) = _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
                     _settings.ShortBreakTime,
                     onBreakStarted: () => _tracker.IsPaused = true,
@@ -200,7 +200,7 @@ public partial class StatusViewModel : ObservableObject
                 
                 // Корректируем время: пока висел оверлей (ожидание + возможный перерыв),
                 // пользователь не работал — это не должно считаться рабочим временем
-                _tracker.AccountOverlayIdle(overlayShownAt, description, continueSession);
+                _tracker.AccountOverlayIdle(overlayShownAt, description, continueSession, breakLength: breakLength);
                 ApplyModeSelection(modeSelected);
             }
             else if (req.Type is NotificationType.ShortBreak && !_wasUserShortBreak)
@@ -208,7 +208,7 @@ public partial class StatusViewModel : ObservableObject
                 _wasUserShortBreak = true;
                 var overlayShownAt = DateTime.Now;
 
-                var (_, _, modeSelected) = _notifications.ShowBreakOverlay(
+                var (_, _, modeSelected, _) = _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
                     _settings.ShortBreakTime,
                     onBreakStarted: () => _tracker.IsPaused = true,
@@ -358,7 +358,7 @@ public partial class StatusViewModel : ObservableObject
         _tracker.IsPaused = true;
         var overlayShownAt = DateTime.Now;
 
-        var (_, description, modeSelected) = _notifications.ShowBreakOverlay(
+        var (_, description, modeSelected, breakLength) = _notifications.ShowBreakOverlay(
             NotificationType.Pomodoro,
             "☕  Ручной перерыв",
             $"Поработали {TimeFormatter.FormatShort(_tracker.CurrentSession)}",
@@ -374,7 +374,7 @@ public partial class StatusViewModel : ObservableObject
 
         _tracker.IsPaused = false;
 
-        _tracker.AccountOverlayIdle(overlayShownAt, description);
+        _tracker.AccountOverlayIdle(overlayShownAt, description, breakLength: breakLength);
         ApplyModeSelection(modeSelected);
     }
 

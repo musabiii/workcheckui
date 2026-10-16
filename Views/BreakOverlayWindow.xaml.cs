@@ -53,6 +53,9 @@ public partial class BreakOverlayWindow : Window
     public bool? ModeSelected { get; private set; }
     public Action? OnBreakStarted { get; set; }
 
+    // The last break countdown started (the default or a 5/15/30/60 minute pick); zero if none
+    public TimeSpan BreakLength { get; private set; }
+
     // Raised when the break countdown runs out
     public Action? OnBreakEnded { get; set; }
 
@@ -189,6 +192,7 @@ public partial class BreakOverlayWindow : Window
     private void StartCountdown(TimeSpan duration)
     {
         _countdownTimer?.Stop();
+        BreakLength = duration;
         _remaining = duration;
         UpdateCountdownDisplay();
 

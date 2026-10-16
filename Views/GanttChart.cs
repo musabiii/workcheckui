@@ -10,9 +10,10 @@ using Rectangle = System.Windows.Shapes.Rectangle;
 namespace WorkCheck.Views;
 
 // ColorKey picks a stable palette color (e.g. project id); a negative key draws the bar gray.
-// Label, when set, is drawn on the bar if it fits.
+// ColorRole, when set, overrides it with a theme role. Label, when set, is drawn on the bar if it fits.
+// Rows with a higher Group go below the others (e.g. drift and away under the projects), after a divider.
 public record GanttBar(string Row, int ColorKey, DateTime Start, DateTime End, TimeSpan Duration, string ToolTip,
-    string? Label = null);
+    string? Label = null, string? ColorRole = null, int Group = 0);
 
 public record GanttColumn(DateTime Start, DateTime End, string Label);
 
@@ -35,6 +36,7 @@ public class GanttChart : Canvas
     private static Brush TotalBrush => AppThemes.Brush("Text");
     private static Brush HourBrush => AppThemes.Brush("Overlay0");
     private static Brush BarTextBrush => AppThemes.Brush("OnAccent");
+    private static Brush DividerBrush => AppThemes.Brush("Surface2");
 
     private static readonly string[] PaletteRoles = ["Blue", "Green", "Yellow", "Mauve", "Peach", "Teal", "Red"];
 
@@ -83,8 +85,9 @@ public class GanttChart : Canvas
 
         var rows = Bars
             .GroupBy(b => b.Row)
-            .Select(g => (Name: g.Key, Total: TimeSpan.FromTicks(g.Sum(b => b.Duration.Ticks))))
-            .OrderByDescending(r => r.Total)
+            .Select(g => (Name: g.Key, Total: TimeSpan.FromTicks(g.Sum(b => b.Duration.Ticks)), Group: g.Max(b => b.Group)))
+            .OrderBy(r => r.Group)
+            .ThenByDescending(r => r.Total)
             .ToList();
 
         Height = HeaderHeight + rows.Count * RowHeight;
@@ -102,6 +105,9 @@ public class GanttChart : Canvas
             var top = HeaderHeight + i * RowHeight;
             if (i % 2 == 1)
                 Add(new Rectangle { Width = ActualWidth, Height = RowHeight, Fill = StripeBrush }, 0, top);
+
+            if (i > 0 && rows[i].Group != rows[i - 1].Group)
+                Add(new Rectangle { Width = ActualWidth, Height = 1, Fill = DividerBrush }, 0, top);
 
             Add(new TextBlock
             {
@@ -145,7 +151,9 @@ public class GanttChart : Canvas
                 Height = barHeight,
                 RadiusX = 3,
                 RadiusY = 3,
-                Fill = bar.ColorKey < 0 ? HourBrush : AppThemes.Brush(PaletteRoles[bar.ColorKey % PaletteRoles.Length]),
+                Fill = bar.ColorRole != null ? AppThemes.Brush(bar.ColorRole)
+                    : bar.ColorKey < 0 ? HourBrush
+                    : AppThemes.Brush(PaletteRoles[bar.ColorKey % PaletteRoles.Length]),
                 ToolTip = bar.ToolTip,
                 Cursor = System.Windows.Input.Cursors.Hand
             };

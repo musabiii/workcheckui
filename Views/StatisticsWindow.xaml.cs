@@ -67,9 +67,17 @@ public partial class StatisticsWindow : Window
         TodayButton.Opacity = showsToday ? 0.4 : 1;
 
         var minDuration = AllSessionsRadio.IsChecked == true ? TimeSpan.FromMinutes(1) : FullSessionDuration;
-        var sessions = _dataService.GetSessionsInRange(from, to)
-            .Where(s => s.IsWorkMode && s.Duration >= minDuration)
-            .ToList();
+        var allSessions = _dataService.GetSessionsInRange(from, to);
+        var sessions = allSessions.Where(s => s.IsWorkMode && s.Duration >= minDuration).ToList();
+
+        // Shown as their own rows under the projects; the totals above stay work-only
+        var stored = _dataService.GetAwayPeriodsInRange(from, to, isWorkMode: true);
+        var extras = new List<ExtraRow>
+        {
+            new("Перерыв", "Teal", CleanAway(stored, AwayKind.Break, allSessions, from, to)),
+            new("Не у компа", "Red", CleanAway(stored, AwayKind.Away, allSessions, from, to)),
+            new("Дрейф", "Overlay1", allSessions.Where(s => !s.IsWorkMode && s.Duration >= minDuration).ToList())
+        };
 
         SessionCountText.Text = sessions.Count.ToString();
         TotalTimeText.Text = TimeFormatter.FormatShort(Total(sessions));
@@ -81,15 +89,16 @@ public partial class StatisticsWindow : Window
             s.ProjectId is int id && projectNames.ContainsKey(id) ? id : -1;
 
         if (period == Period.Day)
-            LoadDay(sessions, ProjectName, ColorKey);
+            LoadDay(sessions, extras, ProjectName, ColorKey);
         else
-            LoadPeriod(PeriodColumns(period, from, to), sessions, ProjectName, ColorKey);
+            LoadPeriod(PeriodColumns(period, from, to), sessions, extras, ProjectName, ColorKey);
 
         SessionsGrid.Visibility = period == Period.Day ? Visibility.Visible : Visibility.Collapsed;
         PeriodGrid.Visibility = period == Period.Day ? Visibility.Collapsed : Visibility.Visible;
     }
 
-    private void LoadDay(List<Session> sessions, Func<Session, string> projectName, Func<Session, int> colorKey)
+    private void LoadDay(List<Session> sessions, List<ExtraRow> extras,
+        Func<Session, string> projectName, Func<Session, int> colorKey)
     {
         SessionsGrid.ItemsSource = sessions.Select(s => new
         {
@@ -101,9 +110,43 @@ public partial class StatisticsWindow : Window
         }).ToList();
 
         Gantt.Columns = [];
-        Gantt.Bars = sessions.Select(s => new GanttBar(
-            projectName(s), colorKey(s), s.StartTime, s.EndTime, s.Duration, SessionTip(s, projectName(s)))).ToList();
+        Gantt.Bars = sessions
+            .Select(s => new GanttBar(projectName(s), colorKey(s), s.StartTime, s.EndTime, s.Duration, SessionTip(s, projectName(s))))
+            .Concat(extras.SelectMany((row, i) => row.Items.Select(s => new GanttBar(row.Name, -1, s.StartTime, s.EndTime,
+                s.EndTime - s.StartTime, $"{row.Name} · {OwnerName(s, projectName)}\n{RangeText(s)}",
+                ColorRole: row.Role, Group: i + 1))))
+            .ToList();
     }
+
+    // A row under the projects: breaks, time away or drift; Items carry the project they belong to
+    private record ExtraRow(string Name, string Role, List<Session> Items);
+
+    private static string OwnerName(Session s, Func<Session, string> projectName) =>
+        s.ProjectId == null ? "без проекта" : projectName(s);
+
+    // Cleaned periods of one kind, each tagged with its project: the stored one, or for older rows
+    // (which have none) the project of the last session before it, since the project can't change while away
+    private static List<Session> CleanAway(List<AwayPeriod> stored, AwayKind kind, List<Session> sessions,
+        DateTime from, DateTime to)
+    {
+        var ofKind = stored.Where(p => p.Kind == kind).ToList();
+        return TimeRanges.CleanAway(ofKind.Select(p => new TimeRange(p.Start, p.End)), sessions, from, to,
+                TimeSpan.FromMinutes(1))
+            .Select(r =>
+            {
+                var middle = r.Start + r.Duration / 2;
+                var projectId = ofKind.FirstOrDefault(p => p.ProjectId != null && p.Start <= middle && p.End >= middle)?.ProjectId
+                    ?? sessions.Where(s => s.EndTime <= r.Start.AddSeconds(1)).MaxBy(s => s.EndTime)?.ProjectId;
+                return new Session
+                {
+                    StartTime = r.Start, EndTime = r.End, Duration = r.Duration, IsWorkMode = true, ProjectId = projectId
+                };
+            })
+            .ToList();
+    }
+
+    private static string RangeText(Session s) =>
+        $"{s.StartTime:HH:mm}–{s.EndTime:HH:mm} · {TimeFormatter.FormatShort(s.EndTime - s.StartTime)}";
 
     // Week: one column per day. Month: one column per Monday–Sunday week, clipped to the month.
     private static List<GanttColumn> PeriodColumns(Period period, DateTime from, DateTime to)
@@ -121,7 +164,7 @@ public partial class StatisticsWindow : Window
         return columns;
     }
 
-    private void LoadPeriod(List<GanttColumn> columns, List<Session> sessions,
+    private void LoadPeriod(List<GanttColumn> columns, List<Session> sessions, List<ExtraRow> extras,
         Func<Session, string> projectName, Func<Session, int> colorKey)
     {
         int ColumnIndex(Session s) => columns.FindIndex(c => s.StartTime >= c.Start && s.StartTime < c.End);
@@ -138,6 +181,8 @@ public partial class StatisticsWindow : Window
 
         if (rows.Count > 0)
             rows.Add(new PeriodRow("Итого", Cells(sessions), TimeFormatter.FormatClock(Total(sessions)), IsTotal: true));
+        foreach (var extra in extras.Where(e => e.Items.Count > 0))
+            rows.Add(new PeriodRow(extra.Name, Cells(extra.Items), TimeFormatter.FormatClock(Total(extra.Items))));
 
         PeriodGrid.ItemsSource = rows;
 
@@ -153,7 +198,21 @@ public partial class StatisticsWindow : Window
                 return new GanttBar(g.Key.Project, colorKey(g.First()), column.Start, column.End, total, tip,
                     TimeFormatter.FormatClock(total));
             })
+            .Concat(extras.SelectMany((extra, i) => ExtraCells(extra, i + 1)))
             .ToList();
+
+        // Drift and away get one cell per column like a project, in their own row under the projects
+        IEnumerable<GanttBar> ExtraCells(ExtraRow extra, int group) => extra.Items
+            .GroupBy(ColumnIndex)
+            .Where(g => g.Key >= 0)
+            .Select(g =>
+            {
+                var column = columns[g.Key];
+                var total = Total(g);
+                return new GanttBar(extra.Name, -1, column.Start, column.End, total,
+                    $"{extra.Name}\n{ColumnTitle(column)} · {TimeFormatter.FormatShort(total)}", TimeFormatter.FormatClock(total),
+                    extra.Role, group);
+            });
     }
 
     private void BuildPeriodColumns(List<GanttColumn> columns)

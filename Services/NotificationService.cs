@@ -90,7 +90,7 @@ public class NotificationService
         }
     }
 
-    public (bool choseBreak, string description, bool? modeSelected) ShowBreakOverlay(NotificationType type, string title, string message,
+    public (bool choseBreak, string description, bool? modeSelected, TimeSpan breakLength) ShowBreakOverlay(NotificationType type, string title, string message,
         TimeSpan breakDuration, Action? onBreakStarted = null, bool skipPrompt = false, bool showChoice = false,
         SoundService? soundService = null, bool playSoundOnBreakEnd = false, bool fromWorkMode = false, TimeSpan? awayBase = null, TimeSpan? todayBase = null,
         Action? onBreakEnded = null, Action? onStillAway = null, TimeSpan? stillAwayAfter = null)
@@ -105,12 +105,12 @@ public class NotificationService
                 overlay.StillAwayAfter = stillAwayAfter.Value;
             overlay.Loaded += (_, _) => overlay.PlayFadeIn();
             overlay.ShowWithOverlays();
-            return (overlay.UserChoseBreak, overlay.SessionDescription, overlay.ModeSelected);
+            return (overlay.UserChoseBreak, overlay.SessionDescription, overlay.ModeSelected, overlay.BreakLength);
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[Notification] Ошибка показа оверлея: {ex.Message}");
-            return (false, string.Empty, null);
+            return (false, string.Empty, null, TimeSpan.Zero);
         }
     }
 

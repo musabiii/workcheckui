@@ -75,6 +75,8 @@ public class DataService : IDisposable
                 "ALTER TABLE Sessions ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1",
                 "ALTER TABLE Sessions ADD COLUMN Description TEXT",
                 "ALTER TABLE AwayPeriods ADD COLUMN IsWorkMode INTEGER NOT NULL DEFAULT 1",
+                "ALTER TABLE AwayPeriods ADD COLUMN ProjectId INTEGER",
+                "ALTER TABLE AwayPeriods ADD COLUMN Kind INTEGER NOT NULL DEFAULT 0",
                 "ALTER TABLE Projects ADD COLUMN IsArchived INTEGER NOT NULL DEFAULT 0"
             ];
 
@@ -208,14 +210,15 @@ public class DataService : IDisposable
         return TimeSpan.FromMinutes(sessions.Where(s => s.IsWorkMode == isWorkMode).Sum(s => s.Duration.TotalMinutes));
     }
 
-    public void SaveAwayPeriod(DateTime startTime, DateTime endTime, TimeSpan duration, bool isWorkMode)
+    public void SaveAwayPeriod(DateTime startTime, DateTime endTime, TimeSpan duration, bool isWorkMode,
+        int? projectId = null, AwayKind kind = AwayKind.Away)
     {
         try
         {
             var connection = GetConnection();
             var insert = """
-                INSERT INTO AwayPeriods (StartTime, EndTime, DurationMinutes, IsWorkMode)
-                VALUES (@StartTime, @EndTime, @DurationMinutes, @IsWorkMode)
+                INSERT INTO AwayPeriods (StartTime, EndTime, DurationMinutes, IsWorkMode, ProjectId, Kind)
+                VALUES (@StartTime, @EndTime, @DurationMinutes, @IsWorkMode, @ProjectId, @Kind)
                 """;
 
             using var cmd = new SqliteCommand(insert, connection);
@@ -223,6 +226,8 @@ public class DataService : IDisposable
             cmd.Parameters.AddWithValue("@EndTime", endTime.ToString("O"));
             cmd.Parameters.AddWithValue("@DurationMinutes", (int)duration.TotalMinutes);
             cmd.Parameters.AddWithValue("@IsWorkMode", isWorkMode ? 1 : 0);
+            cmd.Parameters.AddWithValue("@ProjectId", projectId.HasValue ? projectId.Value : DBNull.Value);
+            cmd.Parameters.AddWithValue("@Kind", (int)kind);
 
             cmd.ExecuteNonQuery();
         }
@@ -230,6 +235,40 @@ public class DataService : IDisposable
         {
             Debug.WriteLine($"[DataService] Ошибка сохранения периода неактивности: {ex.Message}");
         }
+    }
+
+    // Away periods and breaks that overlap [from, to); stored ones may overlap each other, see TimeRanges.CleanAway
+    public List<AwayPeriod> GetAwayPeriodsInRange(DateTime from, DateTime to, bool isWorkMode)
+    {
+        var periods = new List<AwayPeriod>();
+        try
+        {
+            var connection = GetConnection();
+            var select = """
+                SELECT StartTime, EndTime, ProjectId, Kind
+                FROM AwayPeriods
+                WHERE StartTime < @EndDate AND EndTime > @StartDate AND IsWorkMode = @IsWorkMode
+                """;
+
+            using var cmd = new SqliteCommand(select, connection);
+            cmd.Parameters.AddWithValue("@StartDate", from.ToString("O"));
+            cmd.Parameters.AddWithValue("@EndDate", to.ToString("O"));
+            cmd.Parameters.AddWithValue("@IsWorkMode", isWorkMode ? 1 : 0);
+
+            using var reader = cmd.ExecuteReader();
+            while (reader.Read())
+                periods.Add(new AwayPeriod(
+                    DateTime.Parse(reader.GetString(0)),
+                    DateTime.Parse(reader.GetString(1)),
+                    isWorkMode,
+                    reader.IsDBNull(2) ? null : reader.GetInt32(2),
+                    (AwayKind)reader.GetInt32(3)));
+        }
+        catch (SqliteException ex)
+        {
+            Debug.WriteLine($"[DataService] Ошибка получения периодов вне компьютера: {ex.Message}");
+        }
+        return periods;
     }
 
     public TimeSpan GetTotalAwayTimeByDate(DateTime date, bool isWorkMode)
@@ -244,7 +283,7 @@ public class DataService : IDisposable
                 SELECT SUM(DurationMinutes)
                 FROM AwayPeriods
                 WHERE StartTime >= @StartDate AND StartTime < @EndDate
-                AND IsWorkMode = @IsWorkMode
+                AND IsWorkMode = @IsWorkMode AND Kind = 0
                 """;
 
             using var cmd = new SqliteCommand(select, connection);
