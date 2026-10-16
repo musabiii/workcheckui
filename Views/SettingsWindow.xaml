@@ -65,13 +65,17 @@
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <RadioButton Grid.Column="0" Content="Catppuccin Mocha" GroupName="Theme"
+                        <RadioButton Grid.Column="0" Content="Catppuccin" GroupName="Theme"
                                      Style="{StaticResource SegmentRadio}" Padding="0,6"
                                      IsChecked="{Binding IsMochaTheme}"/>
                         <RadioButton Grid.Column="1" Content="GitHub Dark" GroupName="Theme"
                                      Style="{StaticResource SegmentRadio}" Padding="0,6"
                                      IsChecked="{Binding IsGitHubDarkTheme}"/>
+                        <RadioButton Grid.Column="2" Content="Darcula" GroupName="Theme"
+                                     Style="{StaticResource SegmentRadio}" Padding="0,6"
+                                     IsChecked="{Binding IsDarculaTheme}"/>
                     </Grid>
                 </Border>
 
