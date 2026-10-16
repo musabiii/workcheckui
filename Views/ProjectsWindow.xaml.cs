@@ -1,4 +1,5 @@
 using System.Windows;
+using WorkCheck.Helpers;
 using WorkCheck.Models;
 using WorkCheck.Services;
 
@@ -8,6 +9,7 @@ public partial class ProjectsWindow : Window
 {
     private readonly DataService _dataService;
     private readonly Action<Project> _onSelectProject;
+    private readonly int? _currentProjectId;
 
     public ProjectsWindow(DataService dataService, Project? currentProject, Action<Project> onSelectProject)
     {
@@ -15,6 +17,7 @@ public partial class ProjectsWindow : Window
 
         _dataService = dataService;
         _onSelectProject = onSelectProject;
+        _currentProjectId = currentProject?.Id;
 
         var projects = dataService.GetAllProjects();
         ProjectsList.ItemsSource = projects;
@@ -66,11 +69,38 @@ public partial class ProjectsWindow : Window
 
     private void OnDeleteClick(object sender, RoutedEventArgs e)
     {
-        if (sender is System.Windows.Controls.Button btn && btn.Tag is int id)
+        if (sender is not System.Windows.Controls.Button { DataContext: Project project }) return;
+
+        // The tracker keeps saving the running session to the current project, so it must stay
+        if (project.Id == _currentProjectId)
         {
-            _dataService.DeleteProject(id);
-            ProjectsList.ItemsSource = _dataService.GetAllProjects();
+            ConfirmWindow.Inform(this, "Нельзя удалить текущий проект",
+                $"Сейчас время записывается на «{project.Name}». Сначала выберите другой проект, потом удаляйте этот.");
+            return;
         }
+
+        var (count, total) = _dataService.GetProjectSessionStats(project.Id);
+        var message = count == 0
+            ? "У проекта нет сессий."
+            : $"У проекта {count} {SessionsWord(count)} на {TimeFormatter.FormatShort(total)}. " +
+              "Они останутся в статистике под именем «(удалён)», и вернуть их к проекту из приложения будет нельзя.";
+
+        if (!ConfirmWindow.Ask(this, $"Удалить «{project.Name}»?", message, "Удалить")) return;
+
+        _dataService.DeleteProject(project.Id);
+        ProjectsList.ItemsSource = _dataService.GetAllProjects();
+    }
+
+    private static string SessionsWord(int n)
+    {
+        var mod100 = n % 100;
+        if (mod100 is >= 11 and <= 19) return "сессий";
+        return (n % 10) switch
+        {
+            1 => "сессия",
+            >= 2 and <= 4 => "сессии",
+            _ => "сессий"
+        };
     }
 
     private void OnCloseClick(object sender, RoutedEventArgs e)

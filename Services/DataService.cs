@@ -319,6 +319,26 @@ public class DataService : IDisposable
         }
     }
 
+    public (int Count, TimeSpan Total) GetProjectSessionStats(int projectId)
+    {
+        try
+        {
+            var connection = GetConnection();
+            var select = "SELECT COUNT(*), COALESCE(SUM(DurationMinutes), 0) FROM Sessions WHERE ProjectId = @ProjectId";
+
+            using var cmd = new SqliteCommand(select, connection);
+            cmd.Parameters.AddWithValue("@ProjectId", projectId);
+            using var reader = cmd.ExecuteReader();
+            if (reader.Read())
+                return (reader.GetInt32(0), TimeSpan.FromMinutes(reader.GetInt64(1)));
+        }
+        catch (SqliteException ex)
+        {
+            Debug.WriteLine($"[DataService] Ошибка подсчёта сессий проекта: {ex.Message}");
+        }
+        return (0, TimeSpan.Zero);
+    }
+
     public void DeleteProject(int id)
     {
         try

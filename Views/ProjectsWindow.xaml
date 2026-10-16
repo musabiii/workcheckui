@@ -44,7 +44,7 @@
                         <TextBlock Text="{Binding Name}" FontSize="14" Foreground="#CDD6F4"
                                    VerticalAlignment="Center"/>
                         <Button Grid.Column="1" Content="✕"
-                                Click="OnDeleteClick" Tag="{Binding Id}"
+                                Click="OnDeleteClick"
                                 Background="Transparent" Foreground="#F38BA8"
                                 BorderThickness="0" FontSize="12" Cursor="Hand"
                                 Padding="8,4"/>
