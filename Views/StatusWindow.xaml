@@ -9,7 +9,7 @@
         ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="True"
-        Width="300" MinHeight="146" SizeToContent="Height">
+        Width="324" MinHeight="146" SizeToContent="Height">
 
     <Border Background="{Binding WindowBgBrush}" CornerRadius="12"
             BorderBrush="#33FFFFFF" BorderThickness="1">
@@ -26,39 +26,48 @@
 
             <!-- Header -->
             <Grid Grid.Row="0" Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <Button Click="OnProjectsClick" Style="{StaticResource HeaderButton}"
                         Foreground="{DynamicResource YellowBrush}" FontSize="12" FontWeight="SemiBold"
                         Padding="6,2" Margin="-6,0,0,0"
                         VerticalAlignment="Center" HorizontalAlignment="Left"
                         ToolTip="Выбрать проект">
-                    <StackPanel Orientation="Horizontal">
+                    <DockPanel>
+                        <TextBlock DockPanel.Dock="Right" Text="▾" Margin="4,0,0,0" Opacity="0.7"/>
                         <TextBlock Text="{Binding ProjectName}" MaxWidth="120" TextTrimming="CharacterEllipsis"/>
-                        <TextBlock Text="▾" Margin="4,0,0,0" Opacity="0.7"/>
-                    </StackPanel>
+                    </DockPanel>
                     <Button.ContextMenu>
                         <ContextMenu Style="{StaticResource PopupMenu}"/>
                     </Button.ContextMenu>
                 </Button>
 
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4,0,0,0">
                     <Button Content="☰" Click="OnMenuClick"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
                             ToolTip="Меню">
                         <Button.ContextMenu>
                             <ContextMenu Style="{StaticResource PopupMenu}">
-                                <MenuItem Header="⚙  Настройки" Command="{Binding OpenSettingsCommand}"/>
-                                <MenuItem Header="📊  Статистика" Command="{Binding OpenStatisticsCommand}"/>
                                 <MenuItem Header="↺  Обнулить" Command="{Binding ResetCommand}"/>
                                 <MenuItem Header="ℹ  О приложении" Command="{Binding OpenAboutCommand}"/>
                             </ContextMenu>
                         </Button.ContextMenu>
                     </Button>
+                    <Button Content="📊" Command="{Binding OpenStatisticsCommand}"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                            ToolTip="Статистика"/>
+                    <Button Content="&#xE713;" Command="{Binding OpenSettingsCommand}"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="14"
+                            ToolTip="Настройки"/>
                     <Button Content="☕" Command="{Binding ManualBreakCommand}"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
                             Foreground="{DynamicResource YellowBrush}"
                             ToolTip="Ручной перерыв"/>
                     <Button Content="🖃" Click="OnMinimizeClick"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
                             ToolTip="Свернуть"/>
                     <Button Content="✕" Command="{Binding CloseAppCommand}"
                             Style="{StaticResource CloseButton}"/>
