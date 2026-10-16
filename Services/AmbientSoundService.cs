@@ -1,16 +1,22 @@
 using System.Diagnostics;
+using System.IO;
 using NAudio;
+using NAudio.Vorbis;
 using NAudio.Wave;
 
 namespace WorkCheck.Services;
 
-public enum AmbientSound { White, Pink, Brown }
+public enum AmbientSound { White, Pink, Brown, ServerRoom, Office }
 
-// Background noise for focus. The noise is generated on the fly, so it has no loop seam and needs no files.
+// Background sound for focus. Noises are generated on the fly; recordings from files/audio/ambient
+// are looped with a crossfade, so neither has an audible seam.
 public sealed class AmbientSoundService : IDisposable
 {
+    private static readonly string RecordingsDir = Path.Combine(AppContext.BaseDirectory, "files", "audio", "ambient");
+
     private WaveOutEvent? _output;
-    private NoiseProvider? _noise;
+    private GainProvider? _gain;
+    private IDisposable? _source;
     private float _volume = 0.5f;
 
     public AmbientSound? Current { get; private set; }
@@ -21,7 +27,7 @@ public sealed class AmbientSoundService : IDisposable
         set
         {
             _volume = Math.Clamp(value, 0f, 1f);
-            if (_noise != null) _noise.Volume = _volume;
+            if (_gain != null) _gain.Volume = _volume;
         }
     }
 
@@ -32,54 +38,80 @@ public sealed class AmbientSoundService : IDisposable
 
         try
         {
-            _noise = new NoiseProvider(sound) { Volume = _volume };
+            ISampleProvider source = sound switch
+            {
+                // Levels bring the recordings close to the noises' loudness without clipping their peaks
+                AmbientSound.ServerRoom => Recording("server-room.ogg", 3f),
+                AmbientSound.Office => Recording("office.ogg", 5f),
+                _ => new NoiseProvider(sound)
+            };
+            _source = source as IDisposable;
+            _gain = new GainProvider(source) { Volume = _volume };
             _output = new WaveOutEvent { DesiredLatency = 200 };
-            _output.Init(_noise);
+            _output.Init(_gain);
             _output.Play();
             Current = sound;
         }
-        catch (MmException ex)
+        catch (Exception ex) when (ex is MmException or IOException or InvalidDataException)
         {
-            Debug.WriteLine($"[AmbientSound] Не удалось включить звук: {ex.Message}");
+            Debug.WriteLine($"[AmbientSound] Не удалось включить {sound}: {ex.Message}");
             Stop();
         }
     }
+
+    private static CrossfadeLoopProvider Recording(string file, float level) => new(Path.Combine(RecordingsDir, file), level);
 
     public void Stop()
     {
         _output?.Stop();
         _output?.Dispose();
         _output = null;
-        _noise = null;
+        _source?.Dispose();
+        _source = null;
+        _gain = null;
         Current = null;
     }
 
     public void Dispose() => Stop();
 }
 
-internal sealed class NoiseProvider(AmbientSound sound) : ISampleProvider
+// Glides to the target volume so starts and slider moves never click
+internal sealed class GainProvider(ISampleProvider source) : ISampleProvider
 {
-    private readonly Random _random = new();
     private float _gain;
-    private double _b0, _b1, _b2, _b3, _b4, _b5, _b6;
-    private double _brown;
 
-    public WaveFormat WaveFormat { get; } = WaveFormat.CreateIeeeFloatWaveFormat(44100, 1);
+    public WaveFormat WaveFormat => source.WaveFormat;
 
     // Written from the UI thread, read on the audio thread; a torn read is impossible for a float
     public float Volume { get; set; }
 
     public int Read(float[] buffer, int offset, int count)
     {
+        var read = source.Read(buffer, offset, count);
+
         // Squared so the slider feels even across its range
         var target = Volume * Volume;
-
-        for (var i = 0; i < count; i++)
+        for (var i = 0; i < read; i++)
         {
-            // Glide to the target gain so start and volume changes never click
             _gain += (target - _gain) * 0.0005f;
-            buffer[offset + i] = (float)(NextSample() * _gain);
+            buffer[offset + i] *= _gain;
         }
+        return read;
+    }
+}
+
+internal sealed class NoiseProvider(AmbientSound sound) : ISampleProvider
+{
+    private readonly Random _random = new();
+    private double _b0, _b1, _b2, _b3, _b4, _b5, _b6;
+    private double _brown;
+
+    public WaveFormat WaveFormat { get; } = WaveFormat.CreateIeeeFloatWaveFormat(44100, 1);
+
+    public int Read(float[] buffer, int offset, int count)
+    {
+        for (var i = 0; i < count; i++)
+            buffer[offset + i] = (float)NextSample();
         return count;
     }
 
@@ -109,5 +141,104 @@ internal sealed class NoiseProvider(AmbientSound sound) : ISampleProvider
             default:
                 return white * 0.3;
         }
+    }
+}
+
+// Plays a recording endlessly. The last seconds fade out while a second reader fades in from the start,
+// so the loop point is a smooth blend instead of a cut.
+internal sealed class CrossfadeLoopProvider : ISampleProvider, IDisposable
+{
+    private const double FadeSeconds = 3;
+
+    private readonly string _path;
+    private readonly float _level;
+    private readonly long _total;
+    private readonly long _fade;
+    private VorbisWaveReader _current;
+    private VorbisWaveReader? _next;
+    private long _played;
+    private float[] _mix = [];
+
+    public CrossfadeLoopProvider(string path, float level = 1f)
+    {
+        _path = path;
+        _level = level;
+        _current = new VorbisWaveReader(path);
+        WaveFormat = _current.WaveFormat;
+
+        // Positions are counted in interleaved samples
+        var channels = WaveFormat.Channels;
+        var frames = (long)(_current.TotalTime.TotalSeconds * WaveFormat.SampleRate);
+        _total = frames * channels;
+        _fade = Math.Min((long)(FadeSeconds * WaveFormat.SampleRate), frames / 4) * channels;
+    }
+
+    public WaveFormat WaveFormat { get; }
+
+    public int Read(float[] buffer, int offset, int count)
+    {
+        FillLoop(buffer, offset, count);
+        for (var i = 0; i < count; i++)
+            buffer[offset + i] *= _level;
+        return count;
+    }
+
+    private void FillLoop(float[] buffer, int offset, int count)
+    {
+        var written = 0;
+        while (written < count)
+        {
+            var fadeStart = _total - _fade;
+
+            if (_played < fadeStart)
+            {
+                var wanted = (int)Math.Min(count - written, fadeStart - _played);
+                var read = _current.Read(buffer, offset + written, wanted);
+                if (read == 0)
+                {
+                    // The file ended earlier than its header said: restart without a blend
+                    _current.Position = 0;
+                    _played = 0;
+                    continue;
+                }
+                _played += read;
+                written += read;
+                continue;
+            }
+
+            var left = (int)Math.Min(count - written, _total - _played);
+            if (left <= 0)
+            {
+                // The fade is over: the second reader, already past its fade-in, becomes the main one
+                _current.Dispose();
+                _current = _next ?? new VorbisWaveReader(_path);
+                _next = null;
+                _played = _fade;
+                continue;
+            }
+
+            _next ??= new VorbisWaveReader(_path);
+            if (_mix.Length < left) _mix = new float[left];
+
+            var a = _current.Read(buffer, offset + written, left);
+            Array.Clear(buffer, offset + written + a, left - a);
+            var b = _next.Read(_mix, 0, left);
+            Array.Clear(_mix, b, left - b);
+
+            for (var i = 0; i < left; i++)
+            {
+                // Equal-power curves keep the loudness steady for uncorrelated ambience
+                var t = (_played - fadeStart + i) / (double)_fade * (Math.PI / 2);
+                buffer[offset + written + i] = (float)(buffer[offset + written + i] * Math.Cos(t) + _mix[i] * Math.Sin(t));
+            }
+            _played += left;
+            written += left;
+        }
+    }
+
+    public void Dispose()
+    {
+        _current.Dispose();
+        _next?.Dispose();
     }
 }

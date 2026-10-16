@@ -47,12 +47,15 @@ public partial class StatusViewModel : ObservableObject
 
     // The sound the on/off button plays; highlighted in the picker even while off
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsWhiteSelected), nameof(IsPinkSelected), nameof(IsBrownSelected))]
+    [NotifyPropertyChangedFor(nameof(IsWhiteSelected), nameof(IsPinkSelected), nameof(IsBrownSelected),
+        nameof(IsServerRoomSelected), nameof(IsOfficeSelected))]
     private AmbientSound _selectedSound;
 
     public bool IsWhiteSelected => SelectedSound == AmbientSound.White;
     public bool IsPinkSelected => SelectedSound == AmbientSound.Pink;
     public bool IsBrownSelected => SelectedSound == AmbientSound.Brown;
+    public bool IsServerRoomSelected => SelectedSound == AmbientSound.ServerRoom;
+    public bool IsOfficeSelected => SelectedSound == AmbientSound.Office;
 
     // 0–100 for the slider
     [ObservableProperty] private double _ambientVolume;

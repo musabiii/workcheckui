@@ -1,0 +1,7 @@
+Background recordings from Freesound, released under CC0 1.0 (public domain).
+Files are the HQ OGG previews of the originals.
+
+server-room.ogg  "AMBTech_Server Room Noise 01_KVV_FREE" by KVV_Audio
+                 https://freesound.org/people/KVV_Audio/sounds/715475/
+office.ogg       "Office Ambience 01 OWI.wav" by DavidFrbr
+                 https://freesound.org/people/DavidFrbr/sounds/327497/

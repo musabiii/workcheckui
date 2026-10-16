@@ -212,6 +212,13 @@
 
                             <Border Height="1" Margin="8,4" Background="{DynamicResource Surface1Brush}"/>
 
+                            <Button Content="Серверная" Style="{StaticResource PopupItem}" Tag="{Binding IsServerRoomSelected}"
+                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.ServerRoom}"/>
+                            <Button Content="Офис" Style="{StaticResource PopupItem}" Tag="{Binding IsOfficeSelected}"
+                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.Office}"/>
+
+                            <Border Height="1" Margin="8,4" Background="{DynamicResource Surface1Brush}"/>
+
                             <Grid Margin="12,4,12,6">
                                 <Grid.RowDefinitions>
                                     <RowDefinition Height="Auto"/>
