@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Windows;
+using WorkCheck.Helpers;
 using Clipboard = System.Windows.Clipboard;
 
 namespace WorkCheck.Views;
@@ -21,11 +22,12 @@ public partial class AboutWindow : Window
 
         AppPathBox.Text = _appPath;
         DbPathBox.Text = _dbPath;
+        SettingsPathBox.Text = AppPaths.Settings;
     }
 
     private void OnCopyClick(object sender, RoutedEventArgs e)
     {
-        Clipboard.SetText($"Программа: {_appPath}\nБаза данных: {_dbPath}");
+        Clipboard.SetText($"Программа: {_appPath}\nБаза данных: {_dbPath}\nНастройки: {AppPaths.Settings}");
     }
 
     private void OnCloseClick(object sender, RoutedEventArgs e)

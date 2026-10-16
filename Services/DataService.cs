@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using Microsoft.Data.Sqlite;
+using WorkCheck.Helpers;
 using WorkCheck.Models;
 
 namespace WorkCheck.Services;
@@ -14,14 +15,9 @@ public class DataService : IDisposable
 
     public DataService()
     {
-        // WORKCHECK_DATA_DIR points a test run at a copy of the database instead of the real one
-        var appDataPath = Environment.GetEnvironmentVariable("WORKCHECK_DATA_DIR") is { Length: > 0 } dataDir
-            ? dataDir
-            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WorkCheck");
+        Directory.CreateDirectory(AppPaths.DataDir);
 
-        Directory.CreateDirectory(appDataPath);
-
-        DbPath = Path.Combine(appDataPath, "statistics.db");
+        DbPath = AppPaths.Database;
         _connectionString = new SqliteConnectionStringBuilder
         {
             DataSource = DbPath,
