@@ -7,7 +7,6 @@ using WorkCheck.Helpers;
 using WorkCheck.Models;
 using WorkCheck.Services;
 using Screen = System.Windows.Forms.Screen;
-using Color = System.Windows.Media.Color;
 
 namespace WorkCheck.Views;
 
@@ -20,13 +19,13 @@ public partial class BreakOverlayWindow : Window
     private const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
     private const uint KEYEVENTF_KEYUP = 0x0002;
 
-    private static readonly Dictionary<NotificationType, Color> StripeColors = new()
+    private static readonly Dictionary<NotificationType, string> StripeRoles = new()
     {
-        [NotificationType.Pomodoro] = Color.FromRgb(0xF9, 0xE2, 0xAF),
-        [NotificationType.Pomodoro2] = Color.FromRgb(0xF3, 0x8B, 0xA8)
+        [NotificationType.Pomodoro] = "Yellow",
+        [NotificationType.Pomodoro2] = "Red"
     };
 
-    private static readonly Color BreakStripeColor = Color.FromRgb(0x89, 0xB4, 0xFA);
+    private const string BreakStripeRole = "Blue";
 
     private readonly List<Window> _secondaryOverlays = [];
     private readonly TimeSpan _breakDuration;
@@ -70,8 +69,7 @@ public partial class BreakOverlayWindow : Window
         TitleBlock.Text = title;
         MessageBlock.Text = message;
 
-        var color = StripeColors.GetValueOrDefault(type, Color.FromRgb(0xF9, 0xE2, 0xAF));
-        Stripe.Background = new SolidColorBrush(color);
+        Stripe.Background = AppThemes.Brush(StripeRoles.GetValueOrDefault(type, "Yellow"));
 
         CreateSecondaryOverlays();
 
@@ -130,7 +128,7 @@ public partial class BreakOverlayWindow : Window
             {
                 WindowStyle = WindowStyle.None,
                 AllowsTransparency = true,
-                Background = new SolidColorBrush(Color.FromArgb(0xDD, 0x1E, 0x1E, 0x2E)),
+                Background = AppThemes.Brush("BaseTranslucent"),
                 ResizeMode = ResizeMode.NoResize,
                 Topmost = true,
                 ShowInTaskbar = false,
@@ -172,7 +170,7 @@ public partial class BreakOverlayWindow : Window
         PromptPanel.Visibility = Visibility.Collapsed;
         TimerPanel.Visibility = Visibility.Visible;
         ModeSelectionPanel.Visibility = Visibility.Collapsed;
-        Stripe.Background = new SolidColorBrush(BreakStripeColor);
+        Stripe.Background = AppThemes.Brush(BreakStripeRole);
 
         StartCountdown(_breakDuration);
 
@@ -214,7 +212,7 @@ public partial class BreakOverlayWindow : Window
         PromptPanel.Visibility = Visibility.Collapsed;
         TimerPanel.Visibility = Visibility.Collapsed;
         ModeSelectionPanel.Visibility = Visibility.Visible;
-        Stripe.Background = new SolidColorBrush(BreakStripeColor);
+        Stripe.Background = AppThemes.Brush(BreakStripeRole);
 
         _modeSelectionStartTime = DateTime.Now;
         _lateTime = TimeSpan.Zero;

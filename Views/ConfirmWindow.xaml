@@ -13,7 +13,7 @@
 
     <Window.Resources>
         <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
-            <Setter Property="Background" Value="#F38BA8"/>
+            <Setter Property="Background" Value="{DynamicResource RedBrush}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
@@ -23,10 +23,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#F5A3B9"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource RedHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#E8708F"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource RedPressedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -35,16 +35,16 @@
         </Style>
     </Window.Resources>
 
-    <Border Background="#1E1E2E" CornerRadius="12" Margin="12"
+    <Border Background="{DynamicResource BaseBrush}" CornerRadius="12" Margin="12"
             BorderBrush="#33FFFFFF" BorderThickness="1">
         <Border.Effect>
             <DropShadowEffect Color="Black" BlurRadius="16" Opacity="0.5" ShadowDepth="2"/>
         </Border.Effect>
 
         <StackPanel Margin="20,16,20,16">
-            <TextBlock x:Name="TitleBlock" Foreground="#CDD6F4" FontSize="15" FontWeight="Bold"
+            <TextBlock x:Name="TitleBlock" Foreground="{DynamicResource TextBrush}" FontSize="15" FontWeight="Bold"
                        TextWrapping="Wrap" Margin="0,0,0,10"/>
-            <TextBlock x:Name="MessageBlock" Foreground="#BAC2DE" FontSize="12"
+            <TextBlock x:Name="MessageBlock" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"
                        TextWrapping="Wrap" LineHeight="18"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">

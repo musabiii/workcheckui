@@ -30,22 +30,13 @@ public class GanttChart : Canvas
     private const double MinHourLabelSpacing = 34;
 
     private static readonly Brush GridBrush = Frozen(Color.FromArgb(0x22, 0xFF, 0xFF, 0xFF));
-    private static readonly Brush StripeBrush = Frozen(Color.FromRgb(0x11, 0x11, 0x1A));
-    private static readonly Brush LabelBrush = Frozen(Color.FromRgb(0xBA, 0xC2, 0xDE));
-    private static readonly Brush TotalBrush = Frozen(Color.FromRgb(0xCD, 0xD6, 0xF4));
-    private static readonly Brush HourBrush = Frozen(Color.FromRgb(0x6C, 0x70, 0x86));
-    private static readonly Brush BarTextBrush = Frozen(Color.FromRgb(0x1E, 0x1E, 0x2E));
+    private static Brush StripeBrush => AppThemes.Brush("Crust");
+    private static Brush LabelBrush => AppThemes.Brush("Subtext1");
+    private static Brush TotalBrush => AppThemes.Brush("Text");
+    private static Brush HourBrush => AppThemes.Brush("Overlay0");
+    private static Brush BarTextBrush => AppThemes.Brush("OnAccent");
 
-    private static readonly Brush[] Palette =
-    [
-        Frozen(Color.FromRgb(0x89, 0xB4, 0xFA)),
-        Frozen(Color.FromRgb(0xA6, 0xE3, 0xA1)),
-        Frozen(Color.FromRgb(0xF9, 0xE2, 0xAF)),
-        Frozen(Color.FromRgb(0xCB, 0xA6, 0xF7)),
-        Frozen(Color.FromRgb(0xFA, 0xB3, 0x87)),
-        Frozen(Color.FromRgb(0x94, 0xE2, 0xD5)),
-        Frozen(Color.FromRgb(0xF3, 0x8B, 0xA8))
-    ];
+    private static readonly string[] PaletteRoles = ["Blue", "Green", "Yellow", "Mauve", "Peach", "Teal", "Red"];
 
     public static readonly DependencyProperty BarsProperty = DependencyProperty.Register(
         nameof(Bars), typeof(IReadOnlyList<GanttBar>), typeof(GanttChart),
@@ -154,7 +145,7 @@ public class GanttChart : Canvas
                 Height = barHeight,
                 RadiusX = 3,
                 RadiusY = 3,
-                Fill = bar.ColorKey < 0 ? HourBrush : Palette[bar.ColorKey % Palette.Length],
+                Fill = bar.ColorKey < 0 ? HourBrush : AppThemes.Brush(PaletteRoles[bar.ColorKey % PaletteRoles.Length]),
                 ToolTip = bar.ToolTip,
                 Cursor = System.Windows.Input.Cursors.Hand
             };

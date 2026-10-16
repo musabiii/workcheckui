@@ -3,8 +3,8 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using WorkCheck.Helpers;
 using WorkCheck.Models;
-using Color = System.Windows.Media.Color;
 
 namespace WorkCheck.Views;
 
@@ -13,13 +13,13 @@ public partial class NotificationWindow : Window
     private readonly DispatcherTimer _autoCloseTimer;
     private bool _isClosing;
 
-    private static readonly Dictionary<NotificationType, Color> StripeColors = new()
+    private static readonly Dictionary<NotificationType, string> StripeRoles = new()
     {
-        [NotificationType.Welcome] = Color.FromRgb(0xA6, 0xE3, 0xA1),
-        [NotificationType.Pomodoro] = Color.FromRgb(0xF9, 0xE2, 0xAF),
-        [NotificationType.Pomodoro2] = Color.FromRgb(0xF3, 0x8B, 0xA8),
-        [NotificationType.ShortBreak] = Color.FromRgb(0x89, 0xB4, 0xFA),
-        [NotificationType.Inactivity] = Color.FromRgb(0xF3, 0x8B, 0xA8)
+        [NotificationType.Welcome] = "Green",
+        [NotificationType.Pomodoro] = "Yellow",
+        [NotificationType.Pomodoro2] = "Red",
+        [NotificationType.ShortBreak] = "Blue",
+        [NotificationType.Inactivity] = "Red"
     };
 
     public NotificationWindow(NotificationType type, string title, string message,
@@ -42,8 +42,7 @@ public partial class NotificationWindow : Window
             QuoteBlock.Visibility = Visibility.Visible;
         }
 
-        var color = StripeColors.GetValueOrDefault(type, Color.FromRgb(0x89, 0xB4, 0xFA));
-        Stripe.Background = new SolidColorBrush(color);
+        Stripe.Background = AppThemes.Brush(StripeRoles.GetValueOrDefault(type, "Blue"));
 
         if (type == NotificationType.Inactivity)
         {

@@ -4,7 +4,6 @@ using System.Windows.Media;
 using System.Windows.Threading;
 using Application = System.Windows.Application;
 using Brush = System.Windows.Media.Brush;
-using Color = System.Windows.Media.Color;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using WorkCheck.Helpers;
@@ -46,24 +45,13 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private string _sessionIcon = "🖥";
     [ObservableProperty] private string _sessionLabel = "  Текущая сессия:";
     [ObservableProperty] private Brush _compactSessionBrush = DriftingGrayBrush;
-    private static readonly Brush ActiveBrush = new SolidColorBrush(Color.FromRgb(0xA6, 0xE3, 0xA1));
-    private static readonly Brush ShortBreakBrush = new SolidColorBrush(Color.FromRgb(0xF9, 0xE2, 0xAF));
-    private static readonly Brush InactiveBrush = new SolidColorBrush(Color.FromRgb(0xF3, 0x8B, 0xA8));
-    private static readonly Brush NormalTextBrush = new SolidColorBrush(Color.FromRgb(0xBA, 0xC2, 0xDE));
-    private static readonly Brush DriftingGrayBrush = new SolidColorBrush(Color.FromRgb(0x6C, 0x70, 0x86));
-    private static readonly Brush DriftingBgBrush = new SolidColorBrush(Color.FromRgb(0x31, 0x31, 0x31));
-    private static readonly Brush WorkingBgBrush = new SolidColorBrush(Color.FromRgb(0x1E, 0x1E, 0x2E));
-
-    static StatusViewModel()
-    {
-        ActiveBrush.Freeze();
-        ShortBreakBrush.Freeze();
-        InactiveBrush.Freeze();
-        NormalTextBrush.Freeze();
-        DriftingGrayBrush.Freeze();
-        DriftingBgBrush.Freeze();
-        WorkingBgBrush.Freeze();
-    }
+    private static Brush ActiveBrush => AppThemes.Brush("Green");
+    private static Brush ShortBreakBrush => AppThemes.Brush("Yellow");
+    private static Brush InactiveBrush => AppThemes.Brush("Red");
+    private static Brush NormalTextBrush => AppThemes.Brush("Subtext1");
+    private static Brush DriftingGrayBrush => AppThemes.Brush("Overlay0");
+    private static Brush DriftingBgBrush => AppThemes.Brush("DriftBase");
+    private static Brush WorkingBgBrush => AppThemes.Brush("Base");
 
     public StatusViewModel(
         ActivityTracker tracker,
@@ -228,6 +216,8 @@ public partial class StatusViewModel : ObservableObject
             : "  Текущая сессия:";
 
         UpdateTodayTotals(session);
+
+        WindowBgBrush = IsWorkMode ? WorkingBgBrush : DriftingBgBrush;
 
         if (IsWorkMode)
         {
@@ -395,7 +385,8 @@ public partial class StatusViewModel : ObservableObject
             _tracker.ApplySettings(_settings);
             _telegram.Settings = _settings;
             _soundService.Enabled = _settings.SoundEnabled;
-            AppFonts.Apply(_settings.Font);
+            AppThemes.Apply(_settings.Theme);
+            AppFonts.Apply(_settings.Font, _settings.Theme);
         }
     }
 

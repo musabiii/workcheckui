@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStyle="None"
         AllowsTransparency="True"
-        Background="#DD1E1E2E"
+        Background="{DynamicResource BaseTranslucentBrush}"
         ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="False"
@@ -20,11 +20,11 @@
 
         <!-- Header -->
         <Grid>
-            <TextBlock Text="Проекты" Foreground="#CDD6F4"
+            <TextBlock Text="Проекты" Foreground="{DynamicResource TextBrush}"
                        FontSize="18" FontWeight="Bold"/>
             <Button Content="✕" HorizontalAlignment="Right"
                    Click="OnCloseClick"
-                   Background="Transparent" Foreground="#6C7086"
+                   Background="Transparent" Foreground="{DynamicResource Overlay0Brush}"
                    BorderThickness="0" FontSize="14" Cursor="Hand"
                    Padding="4,0"/>
         </Grid>
@@ -33,7 +33,7 @@
         <ListBox x:Name="ProjectsList" Grid.Row="1"
                  Background="Transparent"
                  BorderThickness="0"
-                 Foreground="#CDD6F4">
+                 Foreground="{DynamicResource TextBrush}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="4">
@@ -41,11 +41,11 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Text="{Binding Name}" FontSize="14" Foreground="#CDD6F4"
+                        <TextBlock Text="{Binding Name}" FontSize="14" Foreground="{DynamicResource TextBrush}"
                                    VerticalAlignment="Center"/>
                         <Button Grid.Column="1" Content="✕"
                                 Click="OnDeleteClick"
-                                Background="Transparent" Foreground="#F38BA8"
+                                Background="Transparent" Foreground="{DynamicResource RedBrush}"
                                 BorderThickness="0" FontSize="12" Cursor="Hand"
                                 Padding="8,4"/>
                     </Grid>
@@ -56,13 +56,13 @@
         <!-- Add New Project -->
         <StackPanel Grid.Row="2" Margin="0,16,0,0">
             <TextBox x:Name="NewProjectName" 
-                    Foreground="#CDD6F4" Background="#313244"
-                    BorderBrush="#45475A" BorderThickness="1"
+                    Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
+                    BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
                     FontSize="14" Padding="8,6"
                     Margin="0,0,0,8"
                     ToolTip="Название проекта"/>
             <Button Content="Добавить" Click="OnAddClick"
-                    Background="#A6E3A1" Foreground="#1E1E2E"
+                    Background="{DynamicResource GreenBrush}" Foreground="{DynamicResource OnAccentBrush}"
                     Padding="12,6"/>
         </StackPanel>
     </Grid>

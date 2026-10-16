@@ -3,6 +3,12 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              ShutdownMode="OnExplicitShutdown">
     <Application.Resources>
+    <ResourceDictionary>
+        <ResourceDictionary.MergedDictionaries>
+            <!-- Swapped at runtime by AppThemes.Apply; Mocha is the default -->
+            <ResourceDictionary Source="Themes/Mocha.xaml"/>
+        </ResourceDictionary.MergedDictionaries>
+
         <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
         <FontFamily x:Key="AppFont">Segoe UI</FontFamily>
@@ -16,7 +22,7 @@
 
         <!-- ========== Segmented toggle (RadioButton) ========== -->
         <Style x:Key="SegmentRadio" TargetType="RadioButton">
-            <Setter Property="Foreground" Value="#BAC2DE"/>
+            <Setter Property="Foreground" Value="{DynamicResource Subtext1Brush}"/>
             <Setter Property="FontSize" Value="12"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Padding" Value="12,5"/>
@@ -32,8 +38,8 @@
                                 <Setter TargetName="Bg" Property="Background" Value="#1AFFFFFF"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#45475A"/>
-                                <Setter Property="Foreground" Value="#CDD6F4"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Surface1Brush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -44,7 +50,7 @@
         <!-- ========== Header buttons (⚙) ========== -->
         <Style x:Key="HeaderButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#6C7086"/>
+            <Setter Property="Foreground" Value="{DynamicResource Overlay0Brush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontSize" Value="15"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -59,7 +65,7 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="#33FFFFFF"/>
-                                <Setter Property="Foreground" Value="#CDD6F4"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -70,7 +76,7 @@
         <!-- ========== Close button (✕) ========== -->
         <Style x:Key="CloseButton" TargetType="Button">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="Foreground" Value="#6C7086"/>
+            <Setter Property="Foreground" Value="{DynamicResource Overlay0Brush}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="FontSize" Value="14"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -84,8 +90,8 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#44F38BA8"/>
-                                <Setter Property="Foreground" Value="#F38BA8"/>
+                                <Setter Property="Background" Value="{DynamicResource RedTranslucentBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource RedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -95,10 +101,10 @@
 
         <!-- ========== Dark TextBox ========== -->
         <Style x:Key="DarkTextBox" TargetType="TextBox">
-            <Setter Property="Background" Value="#313244"/>
-            <Setter Property="Foreground" Value="#CDD6F4"/>
-            <Setter Property="CaretBrush" Value="#CDD6F4"/>
-            <Setter Property="BorderBrush" Value="#45475A"/>
+            <Setter Property="Background" Value="{DynamicResource Surface0Brush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Surface1Brush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,6"/>
             <Setter Property="FontSize" Value="13"/>
@@ -113,7 +119,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="#89B4FA"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -123,10 +129,10 @@
 
         <!-- ========== Dark PasswordBox ========== -->
         <Style x:Key="DarkPasswordBox" TargetType="PasswordBox">
-            <Setter Property="Background" Value="#313244"/>
-            <Setter Property="Foreground" Value="#CDD6F4"/>
-            <Setter Property="CaretBrush" Value="#CDD6F4"/>
-            <Setter Property="BorderBrush" Value="#45475A"/>
+            <Setter Property="Background" Value="{DynamicResource Surface0Brush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource Surface1Brush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,6"/>
             <Setter Property="FontSize" Value="13"/>
@@ -141,7 +147,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="#89B4FA"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -151,8 +157,8 @@
 
         <!-- ========== Primary button (Сохранить) ========== -->
         <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="Background" Value="#89B4FA"/>
-            <Setter Property="Foreground" Value="#1E1E2E"/>
+            <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Padding" Value="20,8"/>
@@ -167,10 +173,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#B4D0FB"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource BlueHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#74A8F8"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource BluePressedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -180,8 +186,8 @@
 
         <!-- ========== Secondary button (Отмена) ========== -->
         <Style x:Key="SecondaryButton" TargetType="Button">
-            <Setter Property="Background" Value="#313244"/>
-            <Setter Property="Foreground" Value="#BAC2DE"/>
+            <Setter Property="Background" Value="{DynamicResource Surface0Brush}"/>
+            <Setter Property="Foreground" Value="{DynamicResource Subtext1Brush}"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Padding" Value="20,8"/>
             <Setter Property="Cursor" Value="Hand"/>
@@ -195,10 +201,10 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#3E3E52"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Surface3Brush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="#45475A"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Surface1Brush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -206,5 +212,6 @@
             </Setter>
         </Style>
 
+    </ResourceDictionary>
     </Application.Resources>
 </Application>

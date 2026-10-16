@@ -11,7 +11,8 @@ public class AppSettings
     public string ProxyUrl { get; set; } = "";
     public bool TelegramEnabled { get; set; }
     public bool SoundEnabled { get; set; } = true;
-    public string Font { get; set; } = "System";
+    public string Font { get; set; } = "Theme";
+    public string Theme { get; set; } = "Catppuccin Mocha";
 
     public TimeSpan PomodoroTime => TimeSpan.FromMinutes(PomodoroMinutes);
     public TimeSpan Pomodoro2Time => TimeSpan.FromMinutes(Pomodoro2Minutes);

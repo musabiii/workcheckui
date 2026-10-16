@@ -4,7 +4,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         WindowStyle="None"
         AllowsTransparency="True"
-        Background="#DD1E1E2E"
+        Background="{DynamicResource BaseTranslucentBrush}"
         ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="False"
@@ -12,7 +12,7 @@
 
     <Grid x:Name="OuterRoot" Opacity="0">
         <Border HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="#E6181825" CornerRadius="16"
+                Background="{DynamicResource MantleTranslucentBrush}" CornerRadius="16"
                 BorderBrush="#22FFFFFF" BorderThickness="1"
                 Padding="0" MinWidth="420" MaxWidth="500">
             <Border.Effect>
@@ -30,14 +30,14 @@
                 <!-- Prompt mode -->
                 <StackPanel x:Name="PromptPanel" Grid.Row="1" Margin="36,28,36,32">
                     <TextBlock x:Name="TitleBlock"
-                               Foreground="#CDD6F4"
+                               Foreground="{DynamicResource TextBrush}"
                                FontSize="24" FontWeight="Bold"
                                HorizontalAlignment="Center"
                                TextWrapping="Wrap"
                                TextAlignment="Center"/>
 
 <TextBlock x:Name="MessageBlock"
-                               Foreground="#BAC2DE"
+                               Foreground="{DynamicResource Subtext1Brush}"
                                FontSize="15"
                                Margin="0,12,0,0"
                                HorizontalAlignment="Center"
@@ -45,16 +45,16 @@
                                TextAlignment="Center"/>
 
                     <TextBlock x:Name="ChoiceCountdownBlock"
-                               Foreground="#F9E2AF"
+                               Foreground="{DynamicResource YellowBrush}"
                                FontSize="18"
                                FontWeight="Bold"
                                Margin="0,8,0,0"
                                HorizontalAlignment="Center"/>
 
                     <TextBox x:Name="DescriptionBox"
-                             Foreground="#CDD6F4"
-                             Background="#313244"
-                             BorderBrush="#45475A"
+                             Foreground="{DynamicResource TextBrush}"
+                             Background="{DynamicResource Surface0Brush}"
+                             BorderBrush="{DynamicResource Surface1Brush}"
                              BorderThickness="1"
                              FontSize="14"
                              Padding="12,10"
@@ -75,7 +75,7 @@
 
                         <Button x:Name="BreakBtn" Content="☕  Сделать перерыв"
                                 Click="OnBreakClick" Cursor="Hand"
-                                FontSize="14" Foreground="#1E1E2E"
+                                FontSize="14" Foreground="{DynamicResource OnAccentBrush}"
                                 Padding="20,10" Margin="0,0,12,0">
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -83,7 +83,7 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
-                                                        Background="#A6E3A1"
+                                                        Background="{DynamicResource GreenBrush}"
                                                         CornerRadius="8"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
@@ -91,7 +91,7 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#B8EBB2"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource GreenHoverBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -103,7 +103,7 @@
 
                         <Button x:Name="ContinueBtn" Content="Продолжить работать"
                                 Click="OnContinueClick" Cursor="Hand"
-                                FontSize="14" Foreground="#BAC2DE"
+                                FontSize="14" Foreground="{DynamicResource Subtext1Brush}"
                                 Padding="20,10">
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -111,7 +111,7 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
-                                                        Background="#45475A"
+                                                        Background="{DynamicResource Surface1Brush}"
                                                         CornerRadius="8"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
@@ -119,8 +119,8 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -136,19 +136,19 @@
                 <StackPanel x:Name="TimerPanel" Grid.Row="1" Margin="36,28,36,32"
                             Visibility="Collapsed">
                     <TextBlock Text="☕  Перерыв"
-                               Foreground="#A6E3A1"
+                               Foreground="{DynamicResource GreenBrush}"
                                FontSize="20" FontWeight="Bold"
                                HorizontalAlignment="Center"/>
 
                     <TextBlock x:Name="CountdownBlock"
-                               Foreground="#CDD6F4"
+                               Foreground="{DynamicResource TextBrush}"
                                FontSize="56" FontWeight="Bold"
                                HorizontalAlignment="Center"
                                Margin="0,16,0,0"
                                FontFamily="{DynamicResource TimerFont}"/>
 
                     <TextBlock Text="Отдыхайте, активность не учитывается"
-                               Foreground="#6C7086"
+                               Foreground="{DynamicResource Overlay0Brush}"
                                FontSize="13"
                                HorizontalAlignment="Center"
                                Margin="0,8,0,0"/>
@@ -156,20 +156,20 @@
                     <!-- Time selection buttons -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
                         <Button Content="5 мин" Click="OnSet5Min" Cursor="Hand"
-                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                                FontSize="13" Foreground="{DynamicResource Subtext1Brush}" Padding="16,8" Margin="0,0,8,0">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="6"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -179,20 +179,20 @@
                             </Button.Style>
                         </Button>
                         <Button Content="15 мин" Click="OnSet15Min" Cursor="Hand"
-                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                                FontSize="13" Foreground="{DynamicResource Subtext1Brush}" Padding="16,8" Margin="0,0,8,0">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="6"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -202,20 +202,20 @@
                             </Button.Style>
                         </Button>
                         <Button Content="30 мин" Click="OnSet30Min" Cursor="Hand"
-                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                                FontSize="13" Foreground="{DynamicResource Subtext1Brush}" Padding="16,8" Margin="0,0,8,0">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="6"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -225,20 +225,20 @@
                             </Button.Style>
                         </Button>
                         <Button Content="1 час" Click="OnSet1Hour" Cursor="Hand"
-                                FontSize="13" Foreground="#BAC2DE" Padding="16,8">
+                                FontSize="13" Foreground="{DynamicResource Subtext1Brush}" Padding="16,8">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="6"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -252,20 +252,20 @@
                     <!-- Time addition buttons -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
                         <Button Content="+5 мин" Click="OnAdd5Min" Cursor="Hand"
-                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                                FontSize="13" Foreground="{DynamicResource Subtext1Brush}" Padding="16,8" Margin="0,0,8,0">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="6"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -275,20 +275,20 @@
                             </Button.Style>
                         </Button>
                         <Button Content="+10 мин" Click="OnAdd10Min" Cursor="Hand"
-                                FontSize="13" Foreground="#BAC2DE" Padding="16,8" Margin="0,0,8,0">
+                                FontSize="13" Foreground="{DynamicResource Subtext1Brush}" Padding="16,8" Margin="0,0,8,0">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="6"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -298,20 +298,20 @@
                             </Button.Style>
                         </Button>
                         <Button Content="+30 мин" Click="OnAdd30Min" Cursor="Hand"
-                                FontSize="13" Foreground="#BAC2DE" Padding="16,8">
+                                FontSize="13" Foreground="{DynamicResource Subtext1Brush}" Padding="16,8">
                             <Button.Style>
                                 <Style TargetType="Button">
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="#45475A" CornerRadius="6"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="6"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -326,23 +326,23 @@
                     <Border Background="#11FFFFFF" CornerRadius="8"
                             Margin="0,20,0,0" Padding="16,12">
                         <StackPanel>
-                            <TextBlock Text="Чем заняться:" Foreground="#A6ADC8"
+                            <TextBlock Text="Чем заняться:" Foreground="{DynamicResource Subtext0Brush}"
                                        FontSize="13" FontWeight="SemiBold" Margin="0,0,0,6"/>
-                            <TextBlock Text="•  Разомни шею" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
-                            <TextBlock Text="•  10 приседаний" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
-                            <TextBlock Text="•  Разминка для глаз" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
-                            <TextBlock Text="•  Выпей воды" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
-                            <TextBlock Text="•  Убери стол" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
-                            <TextBlock Text="•  Приоритеты на следующий час" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
-                            <TextBlock Text="•  Планы на вечер" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
-                            <TextBlock Text="•  Посчитай траты" Foreground="#6C7086" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Разомни шею" Foreground="{DynamicResource Overlay0Brush}" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  10 приседаний" Foreground="{DynamicResource Overlay0Brush}" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Разминка для глаз" Foreground="{DynamicResource Overlay0Brush}" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Выпей воды" Foreground="{DynamicResource Overlay0Brush}" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Убери стол" Foreground="{DynamicResource Overlay0Brush}" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Приоритеты на следующий час" Foreground="{DynamicResource Overlay0Brush}" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Планы на вечер" Foreground="{DynamicResource Overlay0Brush}" FontSize="12.5" Margin="0,2"/>
+                            <TextBlock Text="•  Посчитай траты" Foreground="{DynamicResource Overlay0Brush}" FontSize="12.5" Margin="0,2"/>
                         </StackPanel>
                     </Border>
 
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,24,0,0">
                         <Button x:Name="PlayPauseBtn" Content="⏯  Пауза/Воспроизведение"
                                 Click="OnPlayPauseClick" Cursor="Hand"
-                                FontSize="14" Foreground="#BAC2DE"
+                                FontSize="14" Foreground="{DynamicResource Subtext1Brush}"
                                 Padding="20,10" Margin="0,0,12,0">
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -350,7 +350,7 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
-                                                        Background="#45475A"
+                                                        Background="{DynamicResource Surface1Brush}"
                                                         CornerRadius="8"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
@@ -358,8 +358,8 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -371,7 +371,7 @@
 
                         <Button x:Name="CancelBreakBtn" Content="Прервать"
                                 Click="OnCancelBreakClick" Cursor="Hand"
-                                FontSize="14" Foreground="#BAC2DE"
+                                FontSize="14" Foreground="{DynamicResource Subtext1Brush}"
                                 Padding="24,10">
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -379,7 +379,7 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
-                                                        Background="#45475A"
+                                                        Background="{DynamicResource Surface1Brush}"
                                                         CornerRadius="8"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
@@ -387,8 +387,8 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#585B70"/>
-                                                        <Setter Property="Foreground" Value="#CDD6F4"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Surface2Brush}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -404,13 +404,13 @@
                 <StackPanel x:Name="ModeSelectionPanel" Grid.Row="1" Margin="36,28,36,32"
                             Visibility="Collapsed">
                     <TextBlock Text="Не у компьютера!"
-                               Foreground="#A6E3A1"
+                               Foreground="{DynamicResource GreenBrush}"
                                FontSize="24" FontWeight="Bold"
                                HorizontalAlignment="Center"
                                TextAlignment="Center"/>
 
                     <TextBlock x:Name="LateTimerBlock"
-                               Foreground="#F38BA8"
+                               Foreground="{DynamicResource RedBrush}"
                                FontSize="42" FontWeight="Bold"
                                HorizontalAlignment="Center"
                                Margin="0,16,0,0"
@@ -426,22 +426,22 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Всего вне компьютера:" Foreground="#BAC2DE" FontSize="16"
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="Всего вне компьютера:" Foreground="{DynamicResource Subtext1Brush}" FontSize="16"
                                    HorizontalAlignment="Right" Margin="0,2,6,2"/>
-                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TotalAwayValue" Foreground="#F38BA8" FontSize="16"
+                        <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TotalAwayValue" Foreground="{DynamicResource RedBrush}" FontSize="16"
                                    FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
-                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Сегодня:" Foreground="#BAC2DE" FontSize="16"
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="Сегодня:" Foreground="{DynamicResource Subtext1Brush}" FontSize="16"
                                    HorizontalAlignment="Right" Margin="0,2,6,2"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TodayValue" Foreground="#A6E3A1" FontSize="16"
+                        <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TodayValue" Foreground="{DynamicResource GreenBrush}" FontSize="16"
                                    FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Общее время:" Foreground="#BAC2DE" FontSize="16"
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="Общее время:" Foreground="{DynamicResource Subtext1Brush}" FontSize="16"
                                    HorizontalAlignment="Right" Margin="0,2,6,2"/>
-                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="GrandTotalValue" Foreground="#89B4FA" FontSize="16"
+                        <TextBlock Grid.Row="2" Grid.Column="1" x:Name="GrandTotalValue" Foreground="{DynamicResource BlueBrush}" FontSize="16"
                                    FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
                     </Grid>
 
                     <TextBlock Text="Выберите режим работы:"
-                               Foreground="#BAC2DE"
+                               Foreground="{DynamicResource Subtext1Brush}"
                                FontSize="16"
                                Margin="0,8,0,0"
                                HorizontalAlignment="Center"
@@ -453,7 +453,7 @@
 
                         <Button x:Name="DriftBtn" Content="💤  Дрейфовать"
                                 Click="OnDriftClick" Cursor="Hand"
-                                FontSize="14" Foreground="#1E1E2E"
+                                FontSize="14" Foreground="{DynamicResource OnAccentBrush}"
                                 Padding="20,10" Margin="0,0,12,0">
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -461,7 +461,7 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
-                                                        Background="#6C7086"
+                                                        Background="{DynamicResource Overlay0Brush}"
                                                         CornerRadius="8"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
@@ -469,7 +469,7 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#7C8094"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource Overlay1Brush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>
@@ -481,7 +481,7 @@
 
                         <Button x:Name="WorkBtn" Content="▶  В работе"
                                 Click="OnWorkClick" Cursor="Hand"
-                                FontSize="14" Foreground="#1E1E2E"
+                                FontSize="14" Foreground="{DynamicResource OnAccentBrush}"
                                 Padding="20,10">
                             <Button.Style>
                                 <Style TargetType="Button">
@@ -489,7 +489,7 @@
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
-                                                        Background="#A6E3A1"
+                                                        Background="{DynamicResource GreenBrush}"
                                                         CornerRadius="8"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
@@ -497,7 +497,7 @@
                                                 </Border>
                                                 <ControlTemplate.Triggers>
                                                     <Trigger Property="IsMouseOver" Value="True">
-                                                        <Setter TargetName="BtnBorder" Property="Background" Value="#B8EBB2"/>
+                                                        <Setter TargetName="BtnBorder" Property="Background" Value="{DynamicResource GreenHoverBrush}"/>
                                                     </Trigger>
                                                 </ControlTemplate.Triggers>
                                             </ControlTemplate>

@@ -23,12 +23,18 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private string _testStatus = "";
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsSystemFont), nameof(IsJetBrainsMonoFont))]
-    private string _font = AppFonts.System;
+    [NotifyPropertyChangedFor(nameof(IsThemeFont), nameof(IsSystemFont), nameof(IsJetBrainsMonoFont))]
+    private string _font = AppFonts.FromTheme;
+
+    public bool IsThemeFont
+    {
+        get => Font != AppFonts.System && Font != AppFonts.JetBrainsMono;
+        set { if (value) Font = AppFonts.FromTheme; }
+    }
 
     public bool IsSystemFont
     {
-        get => Font != AppFonts.JetBrainsMono;
+        get => Font == AppFonts.System;
         set { if (value) Font = AppFonts.System; }
     }
 
@@ -36,6 +42,22 @@ public partial class SettingsViewModel : ObservableObject
     {
         get => Font == AppFonts.JetBrainsMono;
         set { if (value) Font = AppFonts.JetBrainsMono; }
+    }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsMochaTheme), nameof(IsGitHubDarkTheme))]
+    private string _theme = AppThemes.Mocha;
+
+    public bool IsMochaTheme
+    {
+        get => Theme != AppThemes.GitHubDark;
+        set { if (value) Theme = AppThemes.Mocha; }
+    }
+
+    public bool IsGitHubDarkTheme
+    {
+        get => Theme == AppThemes.GitHubDark;
+        set { if (value) Theme = AppThemes.GitHubDark; }
     }
 
     public event Action<bool>? RequestClose;
@@ -55,6 +77,7 @@ public partial class SettingsViewModel : ObservableObject
         TelegramEnabled = current.TelegramEnabled;
         SoundEnabled = current.SoundEnabled;
         Font = current.Font;
+        Theme = current.Theme;
     }
 
     [RelayCommand]
@@ -81,7 +104,8 @@ public partial class SettingsViewModel : ObservableObject
             ProxyUrl = ProxyUrl,
             TelegramEnabled = TelegramEnabled,
             SoundEnabled = SoundEnabled,
-            Font = Font
+            Font = Font,
+            Theme = Theme
         };
         _settingsService.Save(settings);
         RequestClose?.Invoke(true);
