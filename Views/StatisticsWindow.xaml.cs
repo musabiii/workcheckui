@@ -62,6 +62,10 @@ public partial class StatisticsWindow : Window
             _ => from.ToString("dd.MM.yyyy")
         };
 
+        var showsToday = DateTime.Today >= from && DateTime.Today < to;
+        TodayButton.IsEnabled = !showsToday;
+        TodayButton.Opacity = showsToday ? 0.4 : 1;
+
         var minDuration = AllSessionsRadio.IsChecked == true ? TimeSpan.FromMinutes(1) : FullSessionDuration;
         var sessions = _dataService.GetSessionsInRange(from, to)
             .Where(s => s.IsWorkMode && s.Duration >= minDuration)
@@ -235,6 +239,12 @@ public partial class StatisticsWindow : Window
         if (RangeOf(CurrentPeriod, next).From > DateTime.Today) return;
 
         _currentDate = Min(next, DateTime.Today);
+        LoadStatistics();
+    }
+
+    private void OnTodayClick(object sender, RoutedEventArgs e)
+    {
+        _currentDate = DateTime.Today;
         LoadStatistics();
     }
 

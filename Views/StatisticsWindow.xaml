@@ -98,6 +98,9 @@
                     <Button Content="▶" Click="OnNextClick" Cursor="Hand"
                             Padding="10,4" FontSize="14" FontWeight="Bold"
                             Style="{StaticResource CloseButton}"/>
+                    <Button x:Name="TodayButton" Content="Сегодня" Click="OnTodayClick"
+                            Style="{StaticResource SecondaryButton}" Padding="10,4" FontSize="12"
+                            VerticalAlignment="Center" Margin="8,0,0,0"/>
                 </StackPanel>
 
                 <Border Grid.Column="1" Background="#313244" CornerRadius="6" Padding="3"
