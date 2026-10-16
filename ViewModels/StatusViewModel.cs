@@ -362,28 +362,32 @@ public partial class StatusViewModel : ObservableObject
         window.ShowDialog();
     }
 
-    [RelayCommand]
-    private void OpenProjects()
-    {
-        // Not modal: the list closes as soon as it loses focus, including a click on the status window
-        var window = new ProjectsWindow(_dataService, _selectedProject, SelectProject);
-        window.Closed += (_, _) =>
-        {
-            _projectNames = _dataService.GetAllProjects().ToDictionary(p => p.Id, p => p.Name);
-            UpdateTodayTotals(_tracker.CurrentSession);
-        };
-        window.Show();
-        window.Activate();
-    }
+    public IReadOnlyList<Project> GetProjects() => _dataService.GetAllProjects();
+
+    public int? CurrentProjectId => _selectedProject?.Id;
 
     [RelayCommand]
-    private void OpenSettings()
+    private void ChooseProject(Project project) => SelectProject(project);
+
+    [RelayCommand]
+    private void OpenProjectSettings() => ShowSettings(SettingsTab.Projects);
+
+    [RelayCommand]
+    private void OpenSettings() => ShowSettings(SettingsTab.Appearance);
+
+    private void ShowSettings(SettingsTab tab)
     {
         var vm = new SettingsViewModel(_settings, _settingsService, _telegram);
-        var window = new SettingsWindow { DataContext = vm };
+        var window = new SettingsWindow(_dataService, _selectedProject?.Id, tab) { DataContext = vm };
         vm.RequestClose += result => { window.DialogResult = result; };
 
-        if (window.ShowDialog() == true)
+        var saved = window.ShowDialog() == true;
+
+        // Project edits apply immediately, even when the rest of the settings is cancelled
+        _projectNames = _dataService.GetAllProjects().ToDictionary(p => p.Id, p => p.Name);
+        UpdateTodayTotals(_tracker.CurrentSession);
+
+        if (saved)
         {
             _settings = _settingsService.Load();
             _tracker.ApplySettings(_settings);

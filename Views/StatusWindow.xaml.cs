@@ -1,7 +1,13 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using WorkCheck.Helpers;
 using WorkCheck.ViewModels;
+using Button = System.Windows.Controls.Button;
+using ContextMenu = System.Windows.Controls.ContextMenu;
+using MenuItem = System.Windows.Controls.MenuItem;
 
 namespace WorkCheck.Views;
 
@@ -50,9 +56,41 @@ public partial class StatusWindow : Window
 
     private void OnMenuClick(object sender, RoutedEventArgs e)
     {
-        if (sender is not System.Windows.Controls.Button { ContextMenu: { } menu } button) return;
+        if (sender is not Button { ContextMenu: { } menu } button) return;
+        OpenMenu(menu, button);
+    }
+
+    // The project list is rebuilt on every open so it reflects projects added or deleted in settings
+    private void OnProjectsClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { ContextMenu: { } menu } button || DataContext is not StatusViewModel vm) return;
+
+        menu.Items.Clear();
+        foreach (var project in vm.GetProjects())
+        {
+            var isCurrent = project.Id == vm.CurrentProjectId;
+            menu.Items.Add(new MenuItem
+            {
+                Header = new TextBlock
+                {
+                    Text = project.Name,
+                    FontWeight = isCurrent ? FontWeights.SemiBold : FontWeights.Normal,
+                    Foreground = AppThemes.Brush(isCurrent ? "Yellow" : "Text")
+                },
+                Command = vm.ChooseProjectCommand,
+                CommandParameter = project
+            });
+        }
+        menu.Items.Add(new Separator());
+        menu.Items.Add(new MenuItem { Header = "⚙  Управление проектами", Command = vm.OpenProjectSettingsCommand });
+
+        OpenMenu(menu, button);
+    }
+
+    private static void OpenMenu(ContextMenu menu, Button button)
+    {
         menu.PlacementTarget = button;
-        menu.Placement = System.Windows.Controls.Primitives.PlacementMode.Bottom;
+        menu.Placement = PlacementMode.Bottom;
         menu.IsOpen = true;
     }
 

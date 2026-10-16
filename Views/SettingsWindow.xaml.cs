@@ -1,14 +1,28 @@
 using System.Windows;
 using System.Windows.Input;
+using WorkCheck.Services;
 using WorkCheck.ViewModels;
 
 namespace WorkCheck.Views;
 
+public enum SettingsTab { Appearance, Timers, Notifications, Projects }
+
 public partial class SettingsWindow : Window
 {
-    public SettingsWindow()
+    public SettingsWindow(DataService dataService, int? currentProjectId, SettingsTab tab = SettingsTab.Appearance)
     {
         InitializeComponent();
+        Projects.Init(dataService, currentProjectId);
+
+        var tabButton = tab switch
+        {
+            SettingsTab.Timers => TimersTab,
+            SettingsTab.Notifications => NotificationsTab,
+            SettingsTab.Projects => ProjectsTab,
+            _ => AppearanceTab
+        };
+        tabButton.IsChecked = true;
+
         Loaded += OnLoaded;
     }
 
