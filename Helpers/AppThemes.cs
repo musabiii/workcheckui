@@ -11,12 +11,14 @@ public static class AppThemes
     public const string Mocha = "Catppuccin Mocha";
     public const string GitHubDark = "GitHub Dark";
     public const string Darcula = "Darcula";
+    public const string Gruvbox = "Gruvbox Dark";
 
     private static readonly Dictionary<string, Uri> Sources = new()
     {
         [Mocha] = new Uri("Themes/Mocha.xaml", UriKind.Relative),
         [GitHubDark] = new Uri("Themes/GitHubDark.xaml", UriKind.Relative),
-        [Darcula] = new Uri("Themes/Darcula.xaml", UriKind.Relative)
+        [Darcula] = new Uri("Themes/Darcula.xaml", UriKind.Relative),
+        [Gruvbox] = new Uri("Themes/Gruvbox.xaml", UriKind.Relative)
     };
 
     // Font used by the "from theme" font option. GitHub's own Mona Sans has no Cyrillic, so GitHub Dark
@@ -25,7 +27,8 @@ public static class AppThemes
     {
         [Mocha] = AppFonts.System,
         [GitHubDark] = AppFonts.System,
-        [Darcula] = AppFonts.JetBrainsMono
+        [Darcula] = AppFonts.JetBrainsMono,
+        [Gruvbox] = AppFonts.JetBrainsMono
     };
 
     public static string FontOf(string theme) => Fonts.GetValueOrDefault(theme, AppFonts.System);
