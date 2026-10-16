@@ -15,7 +15,9 @@ namespace WorkCheck.Views;
 // Inside a group, rows with Indent 0 come first and Indent 1 rows follow as their indented children,
 // by Order and then by total; a row is identified by its Group and Row, so a name can repeat across groups.
 public record GanttBar(string Row, int ColorKey, DateTime Start, DateTime End, TimeSpan Duration, string ToolTip,
-    string? Label = null, string? ColorRole = null, int Group = 0, int Indent = 0, int Order = 0);
+    string? Label = null, string? ColorRole = null, int Group = 0, int Indent = 0, int Order = 0, bool Hidden = false);
+
+// Hidden bars are not drawn; they only make their row exist (e.g. a parent row with nothing of its own)
 
 public record GanttColumn(DateTime Start, DateTime End, string Label);
 
@@ -65,6 +67,14 @@ public class GanttChart : Canvas
         set => SetValue(ColumnsProperty, value);
     }
 
+    // Parent rows (rows with indented children) start folded; this holds the names of the ones the user
+    // opened, shared with the owner so its table unfolds the same rows. ExpandedChanged fires after a click.
+    public ISet<string> Expanded { get; set; } = new HashSet<string>();
+    public event Action? ExpandedChanged;
+
+    public const string ExpandedMark = "  ▾";
+    public const string CollapsedMark = "  ▸";
+
     public GanttChart()
     {
         ClipToBounds = true;
@@ -97,6 +107,13 @@ public class GanttChart : Canvas
             .ThenByDescending(r => r.Total)
             .ToList();
 
+        // A group with indented rows has its plain row as their parent
+        var parents = rows.Where(r => r.Indent > 0).Select(r => r.Group).ToHashSet();
+        string? ParentName(int group) => parents.Contains(group) ? rows.First(r => r.Group == group && r.Indent == 0).Name : null;
+        rows = rows
+            .Where(r => r.Indent == 0 || ParentName(r.Group) is not { } parent || Expanded.Contains(parent))
+            .ToList();
+
         Height = HeaderHeight + rows.Count * RowHeight;
         if (rows.Count == 0 || ActualWidth <= LabelWidth) return;
 
@@ -117,15 +134,31 @@ public class GanttChart : Canvas
                 Add(new Rectangle { Width = ActualWidth, Height = 1, Fill = DividerBrush }, 0, top);
 
             var indent = rows[i].Indent * IndentWidth;
-            Add(new TextBlock
+            var name = rows[i].Name;
+            var isParent = rows[i].Indent == 0 && parents.Contains(rows[i].Group);
+            var label = new TextBlock
             {
-                Text = rows[i].Name,
+                Text = isParent ? name + (Expanded.Contains(name) ? ExpandedMark : CollapsedMark) : name,
                 Foreground = rows[i].Indent > 0 ? ChildLabelBrush : LabelBrush,
                 FontSize = 12,
                 Width = LabelWidth - TotalWidth - 12 - indent,
                 TextTrimming = TextTrimming.CharacterEllipsis,
-                ToolTip = rows[i].Name
-            }, indent, top + 5);
+                ToolTip = name
+            };
+            if (isParent)
+            {
+                label.Cursor = System.Windows.Input.Cursors.Hand;
+                label.Background = System.Windows.Media.Brushes.Transparent;
+                label.MouseLeftButtonDown += (_, e) =>
+                {
+                    // Handled, so the window does not start dragging
+                    e.Handled = true;
+                    if (!Expanded.Remove(name)) Expanded.Add(name);
+                    Rebuild();
+                    ExpandedChanged?.Invoke();
+                };
+            }
+            Add(label, indent, top + 5);
 
             Add(new TextBlock
             {
@@ -149,6 +182,7 @@ public class GanttChart : Canvas
         foreach (var bar in Bars)
         {
             var row = rows.FindIndex(r => r.Name == bar.Row && r.Group == bar.Group);
+            if (row < 0 || bar.Hidden) continue;
             var x = X(bar.Start) + inset;
             var width = Math.Max(MinBarWidth, X(bar.End) - X(bar.Start) - 2 * inset);
             var top = HeaderHeight + row * RowHeight + (RowHeight - barHeight) / 2;

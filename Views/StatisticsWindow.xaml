@@ -168,10 +168,10 @@
                                     ToolTip="Как показывать перерывы и время не у компа">
                                 <StackPanel Orientation="Horizontal">
                                     <RadioButton Content="По типу" GroupName="Grouping"
-                                                 Style="{StaticResource SmallSegment}" IsChecked="True"
+                                                 Style="{StaticResource SmallSegment}"
                                                  Checked="OnFilterChanged"/>
                                     <RadioButton x:Name="ProjectGroupingRadio" Content="По проектам" GroupName="Grouping"
-                                                 Style="{StaticResource SmallSegment}"
+                                                 Style="{StaticResource SmallSegment}" IsChecked="True"
                                                  Checked="OnFilterChanged"/>
                                 </StackPanel>
                             </Border>
