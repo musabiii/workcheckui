@@ -18,6 +18,7 @@ public partial class StatusViewModel : ObservableObject
     private readonly ActivityTracker _tracker;
     private readonly NotificationService _notifications;
     private readonly TelegramService _telegram;
+    private readonly NtfyService _ntfy;
     private readonly TrayIconService _trayIcon;
     private readonly SettingsService _settingsService;
     private readonly DataService _dataService;
@@ -83,6 +84,7 @@ public partial class StatusViewModel : ObservableObject
         ActivityTracker tracker,
         NotificationService notifications,
         TelegramService telegram,
+        NtfyService ntfy,
         SettingsService settingsService,
         DataService dataService,
         AppSettings settings,
@@ -93,6 +95,7 @@ public partial class StatusViewModel : ObservableObject
         _tracker = tracker;
         _notifications = notifications;
         _telegram = telegram;
+        _ntfy = ntfy;
         _trayIcon = trayIcon;
         _settingsService = settingsService;
         _dataService = dataService;
@@ -217,8 +220,12 @@ public partial class StatusViewModel : ObservableObject
                 _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
             }
 
+            // TelegramText is the remote-notification text; ntfy gets the same messages as Telegram
             if (IsWorkMode && req.SendTelegram && !string.IsNullOrEmpty(req.TelegramText))
+            {
                 _ = _telegram.SendAsync(req.TelegramText, req.SilentTelegram);
+                _ = _ntfy.SendAsync(req.TelegramText, req.SilentTelegram);
+            }
         }
     }
 
@@ -410,7 +417,7 @@ public partial class StatusViewModel : ObservableObject
 
     private void ShowSettings(SettingsTab tab)
     {
-        var vm = new SettingsViewModel(_settings, _settingsService, _telegram);
+        var vm = new SettingsViewModel(_settings, _settingsService, _telegram, _ntfy);
         var window = new SettingsWindow(_dataService, _selectedProject?.Id, tab) { DataContext = vm };
         vm.RequestClose += result => { window.DialogResult = result; };
 
@@ -425,6 +432,7 @@ public partial class StatusViewModel : ObservableObject
             _settings = _settingsService.Load();
             _tracker.ApplySettings(_settings);
             _telegram.Settings = _settings;
+            _ntfy.Settings = _settings;
             _soundService.Enabled = _settings.SoundEnabled;
             AppThemes.Apply(_settings.Theme);
             AppFonts.Apply(_settings.Font, _settings.Theme);

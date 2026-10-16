@@ -137,10 +137,11 @@
                               Padding="0,0,4,0"
                               Visibility="{Binding IsChecked, ElementName=NotificationsTab, Converter={StaticResource BoolToVisibility}}">
                     <StackPanel>
-                        <TextBlock Text="Telegram Bot Token" Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,0,0,4"/>
+                        <TextBlock Text="Telegram" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8"/>
+                        <TextBlock Text="Bot Token" Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,0,0,4"/>
                         <PasswordBox x:Name="TokenBox" Style="{StaticResource DarkPasswordBox}"/>
 
-                        <TextBlock Text="Telegram Chat ID" Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,10,0,4"/>
+                        <TextBlock Text="Chat ID" Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,10,0,4"/>
                         <TextBox Text="{Binding TelegramChatId, UpdateSourceTrigger=PropertyChanged}"
                                  Style="{StaticResource DarkTextBox}"/>
 
@@ -171,6 +172,40 @@
                             </CheckBox.Style>
                         </CheckBox>
 
+                        <TextBlock Text="ntfy" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="SemiBold" Margin="0,22,0,8"/>
+                        <TextBlock Text="Сервер" Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,0,0,4"/>
+                        <TextBox Text="{Binding NtfyServer, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource DarkTextBox}" ToolTip="Пусто — https://ntfy.sh. Свой сервер: https://ntfy.example.com"/>
+
+                        <TextBlock Text="Подписка (топик)" Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,10,0,4"/>
+                        <TextBox Text="{Binding NtfyTopic, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource DarkTextBox}"
+                                 ToolTip="Имя топика, на который подписано приложение ntfy на телефоне. На ntfy.sh лучше выбрать трудноугадываемое"/>
+
+                        <Grid Margin="0,10,0,0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Column="0" Text="{Binding NtfyTestStatus}"
+                                       Foreground="{DynamicResource Subtext1Brush}" FontSize="11"
+                                       VerticalAlignment="Center" TextWrapping="Wrap"/>
+                            <Button Grid.Column="1" Content="Тест"
+                                    Style="{StaticResource SecondaryButton}"
+                                    Command="{Binding TestNtfyCommand}"/>
+                        </Grid>
+
+                        <CheckBox Content="Отправлять в ntfy"
+                                  IsChecked="{Binding NtfyEnabled}"
+                                  Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,12,0,0">
+                            <CheckBox.Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Cursor" Value="Hand"/>
+                                </Style>
+                            </CheckBox.Style>
+                        </CheckBox>
+
+                        <TextBlock Text="Звук" Foreground="{DynamicResource TextBrush}" FontSize="13" FontWeight="SemiBold" Margin="0,22,0,0"/>
                         <CheckBox Content="Звуковое уведомление о конце перерыва"
                                   IsChecked="{Binding SoundEnabled}"
                                   Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,12,0,0">

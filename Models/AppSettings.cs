@@ -10,6 +10,9 @@ public class AppSettings
     public string TelegramChatId { get; set; } = "";
     public string ProxyUrl { get; set; } = "";
     public bool TelegramEnabled { get; set; }
+    public string NtfyServer { get; set; } = "https://ntfy.sh";
+    public string NtfyTopic { get; set; } = "";
+    public bool NtfyEnabled { get; set; }
     public bool SoundEnabled { get; set; } = true;
     public string Font { get; set; } = "Theme";
     public string Theme { get; set; } = "Catppuccin Mocha";

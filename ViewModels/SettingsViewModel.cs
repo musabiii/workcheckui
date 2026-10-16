@@ -10,6 +10,7 @@ public partial class SettingsViewModel : ObservableObject
 {
     private readonly SettingsService _settingsService;
     private readonly TelegramService _telegramService;
+    private readonly NtfyService _ntfyService;
     private readonly AppSettings _current;
 
     [ObservableProperty] private int _pomodoroMinutes;
@@ -22,6 +23,10 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty] private bool _telegramEnabled;
     [ObservableProperty] private bool _soundEnabled;
     [ObservableProperty] private string _testStatus = "";
+    [ObservableProperty] private string _ntfyServer = "";
+    [ObservableProperty] private string _ntfyTopic = "";
+    [ObservableProperty] private bool _ntfyEnabled;
+    [ObservableProperty] private string _ntfyTestStatus = "";
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsThemeFont), nameof(IsSystemFont), nameof(IsJetBrainsMonoFont))]
@@ -75,10 +80,12 @@ public partial class SettingsViewModel : ObservableObject
 
     public event Action<bool>? RequestClose;
 
-    public SettingsViewModel(AppSettings current, SettingsService settingsService, TelegramService telegramService)
+    public SettingsViewModel(AppSettings current, SettingsService settingsService, TelegramService telegramService,
+        NtfyService ntfyService)
     {
         _settingsService = settingsService;
         _telegramService = telegramService;
+        _ntfyService = ntfyService;
         _current = current;
 
         PomodoroMinutes = current.PomodoroMinutes;
@@ -89,6 +96,9 @@ public partial class SettingsViewModel : ObservableObject
         TelegramChatId = current.TelegramChatId;
         ProxyUrl = current.ProxyUrl;
         TelegramEnabled = current.TelegramEnabled;
+        NtfyServer = current.NtfyServer;
+        NtfyTopic = current.NtfyTopic;
+        NtfyEnabled = current.NtfyEnabled;
         SoundEnabled = current.SoundEnabled;
         Font = current.Font;
         Theme = current.Theme;
@@ -105,6 +115,16 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
+    private async Task TestNtfy()
+    {
+        NtfyTestStatus = "Отправка...";
+
+        var (success, error) = await _ntfyService.SendTestAsync(NtfyServer, NtfyTopic);
+
+        NtfyTestStatus = success ? "✅ Сообщение отправлено" : $"❌ Ошибка: {error}";
+    }
+
+    [RelayCommand]
     private void Save()
     {
         var settings = new AppSettings
@@ -117,6 +137,9 @@ public partial class SettingsViewModel : ObservableObject
             TelegramChatId = TelegramChatId,
             ProxyUrl = ProxyUrl,
             TelegramEnabled = TelegramEnabled,
+            NtfyServer = string.IsNullOrWhiteSpace(NtfyServer) ? NtfyService.DefaultServer : NtfyServer.Trim(),
+            NtfyTopic = NtfyTopic.Trim(),
+            NtfyEnabled = NtfyEnabled,
             SoundEnabled = SoundEnabled,
             Font = Font,
             Theme = Theme,

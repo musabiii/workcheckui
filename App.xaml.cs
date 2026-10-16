@@ -28,6 +28,7 @@ public partial class App : Application
 
         var dataService = new DataService();
         var telegramService = new TelegramService(settings);
+        var ntfyService = new NtfyService(settings);
         var notificationService = new NotificationService();
         var soundService = new SoundService { Enabled = settings.SoundEnabled };
         var ambientSound = new AmbientSoundService();
@@ -62,7 +63,7 @@ public partial class App : Application
             },
             onToggleWindow: ShowNormal);
 
-        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, settingsService, dataService, settings, trayIcon, soundService, ambientSound);
+        var statusVm = new StatusViewModel(_tracker, notificationService, telegramService, ntfyService, settingsService, dataService, settings, trayIcon, soundService, ambientSound);
         statusWindow = new StatusWindow { DataContext = statusVm };
         statusWindow.OnMinimize = ShowCompact;
 
