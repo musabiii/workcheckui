@@ -203,19 +203,26 @@
                             BorderThickness="1" CornerRadius="6" Padding="4"
                             TextElement.FontFamily="{DynamicResource AppFont}">
                         <StackPanel>
-                            <Button Content="Белый шум" Style="{StaticResource PopupItem}" Tag="{Binding IsWhiteSelected}"
-                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.White}"/>
-                            <Button Content="Розовый шум" Style="{StaticResource PopupItem}" Tag="{Binding IsPinkSelected}"
-                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.Pink}"/>
-                            <Button Content="Коричневый шум" Style="{StaticResource PopupItem}" Tag="{Binding IsBrownSelected}"
-                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.Brown}"/>
-
-                            <Border Height="1" Margin="8,4" Background="{DynamicResource Surface1Brush}"/>
-
-                            <Button Content="Серверная" Style="{StaticResource PopupItem}" Tag="{Binding IsServerRoomSelected}"
-                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.ServerRoom}"/>
-                            <Button Content="Офис" Style="{StaticResource PopupItem}" Tag="{Binding IsOfficeSelected}"
-                                    Command="{Binding SelectAmbientCommand}" Click="OnSoundChosen" CommandParameter="{x:Static services:AmbientSound.Office}"/>
+                            <ItemsControl ItemsSource="{Binding AmbientGroups}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel>
+                                            <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Overlay1Brush}"
+                                                       FontSize="11" Margin="12,6,12,2"/>
+                                            <ItemsControl ItemsSource="{Binding Options}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Button Content="{Binding Title}" Style="{StaticResource PopupItem}"
+                                                                Tag="{Binding IsSelected}" CommandParameter="{Binding Sound}"
+                                                                Command="{Binding DataContext.SelectAmbientCommand, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}"
+                                                                Click="OnSoundChosen"/>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
 
                             <Border Height="1" Margin="8,4" Background="{DynamicResource Surface1Brush}"/>
 

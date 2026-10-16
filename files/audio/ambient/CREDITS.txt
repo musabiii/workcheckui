@@ -5,3 +5,11 @@ server-room.ogg  "AMBTech_Server Room Noise 01_KVV_FREE" by KVV_Audio
                  https://freesound.org/people/KVV_Audio/sounds/715475/
 office.ogg       "Office Ambience 01 OWI.wav" by DavidFrbr
                  https://freesound.org/people/DavidFrbr/sounds/327497/
+computer.ogg     "computer PC processing data.flac" by kyles
+                 https://freesound.org/people/kyles/sounds/453814/
+cyberpunk.ogg    "cyberpunk_drones.flac" by Bertsz
+                 https://freesound.org/people/Bertsz/sounds/672905/
+rain-thunder.ogg "rain on the window + thunder" by marythewitch
+                 https://freesound.org/people/marythewitch/sounds/636532/
+distant-thunder.ogg "Distant Thunder and Rain from Half Open Window 1.aif" by RutgerMuller
+                 https://freesound.org/people/RutgerMuller/sounds/158692/

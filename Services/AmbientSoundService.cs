@@ -6,13 +6,25 @@ using NAudio.Wave;
 
 namespace WorkCheck.Services;
 
-public enum AmbientSound { White, Pink, Brown, ServerRoom, Office }
+public enum AmbientSound { White, Pink, Brown, ServerRoom, Office, Computer, Cyberpunk, RainThunder, DistantThunder }
 
 // Background sound for focus. Noises are generated on the fly; recordings from files/audio/ambient
 // are looped with a crossfade, so neither has an audible seam.
 public sealed class AmbientSoundService : IDisposable
 {
     private static readonly string RecordingsDir = Path.Combine(AppContext.BaseDirectory, "files", "audio", "ambient");
+
+    // Level multipliers bring each recording close to the noises' loudness;
+    // CutEnd drops a silent fade-out at the end so the loop has no gap
+    private static readonly Dictionary<AmbientSound, (string File, float Level, double CutEnd)> Recordings = new()
+    {
+        [AmbientSound.ServerRoom] = ("server-room.ogg", 3f, 0),
+        [AmbientSound.Office] = ("office.ogg", 5f, 0.2),
+        [AmbientSound.Computer] = ("computer.ogg", 40f, 0),
+        [AmbientSound.Cyberpunk] = ("cyberpunk.ogg", 1.2f, 1.5),
+        [AmbientSound.RainThunder] = ("rain-thunder.ogg", 5f, 0),
+        [AmbientSound.DistantThunder] = ("distant-thunder.ogg", 2.2f, 0)
+    };
 
     private WaveOutEvent? _output;
     private GainProvider? _gain;
@@ -38,13 +50,9 @@ public sealed class AmbientSoundService : IDisposable
 
         try
         {
-            ISampleProvider source = sound switch
-            {
-                // Levels bring the recordings close to the noises' loudness without clipping their peaks
-                AmbientSound.ServerRoom => Recording("server-room.ogg", 3f),
-                AmbientSound.Office => Recording("office.ogg", 5f),
-                _ => new NoiseProvider(sound)
-            };
+            ISampleProvider source = Recordings.TryGetValue(sound, out var recording)
+                ? new CrossfadeLoopProvider(Path.Combine(RecordingsDir, recording.File), recording.Level, recording.CutEnd)
+                : new NoiseProvider(sound);
             _source = source as IDisposable;
             _gain = new GainProvider(source) { Volume = _volume };
             _output = new WaveOutEvent { DesiredLatency = 200 };
@@ -58,8 +66,6 @@ public sealed class AmbientSoundService : IDisposable
             Stop();
         }
     }
-
-    private static CrossfadeLoopProvider Recording(string file, float level) => new(Path.Combine(RecordingsDir, file), level);
 
     public void Stop()
     {
@@ -94,9 +100,17 @@ internal sealed class GainProvider(ISampleProvider source) : ISampleProvider
         for (var i = 0; i < read; i++)
         {
             _gain += (target - _gain) * 0.0005f;
-            buffer[offset + i] *= _gain;
+            buffer[offset + i] = SoftLimit(buffer[offset + i] * _gain);
         }
         return read;
+    }
+
+    // Leaves normal levels untouched and bends peaks above 0.9 (thunder at full volume) instead of clipping
+    private static float SoftLimit(float x)
+    {
+        var a = MathF.Abs(x);
+        if (a <= 0.9f) return x;
+        return MathF.CopySign(0.9f + 0.1f * MathF.Tanh((a - 0.9f) / 0.1f), x);
     }
 }
 
@@ -159,7 +173,7 @@ internal sealed class CrossfadeLoopProvider : ISampleProvider, IDisposable
     private long _played;
     private float[] _mix = [];
 
-    public CrossfadeLoopProvider(string path, float level = 1f)
+    public CrossfadeLoopProvider(string path, float level = 1f, double cutEndSeconds = 0)
     {
         _path = path;
         _level = level;
@@ -168,7 +182,7 @@ internal sealed class CrossfadeLoopProvider : ISampleProvider, IDisposable
 
         // Positions are counted in interleaved samples
         var channels = WaveFormat.Channels;
-        var frames = (long)(_current.TotalTime.TotalSeconds * WaveFormat.SampleRate);
+        var frames = (long)((_current.TotalTime.TotalSeconds - cutEndSeconds) * WaveFormat.SampleRate);
         _total = frames * channels;
         _fade = Math.Min((long)(FadeSeconds * WaveFormat.SampleRate), frames / 4) * channels;
     }

@@ -46,16 +46,20 @@ public partial class StatusViewModel : ObservableObject
     public bool IsAmbientPlaying => PlayingSound != null;
 
     // The sound the on/off button plays; highlighted in the picker even while off
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsWhiteSelected), nameof(IsPinkSelected), nameof(IsBrownSelected),
-        nameof(IsServerRoomSelected), nameof(IsOfficeSelected))]
-    private AmbientSound _selectedSound;
+    [ObservableProperty] private AmbientSound _selectedSound;
 
-    public bool IsWhiteSelected => SelectedSound == AmbientSound.White;
-    public bool IsPinkSelected => SelectedSound == AmbientSound.Pink;
-    public bool IsBrownSelected => SelectedSound == AmbientSound.Brown;
-    public bool IsServerRoomSelected => SelectedSound == AmbientSound.ServerRoom;
-    public bool IsOfficeSelected => SelectedSound == AmbientSound.Office;
+    public IReadOnlyList<AmbientGroup> AmbientGroups { get; } =
+    [
+        new("Шумы", [new(AmbientSound.White, "Белый шум"), new(AmbientSound.Pink, "Розовый шум"), new(AmbientSound.Brown, "Коричневый шум")]),
+        new("Работа", [new(AmbientSound.ServerRoom, "Серверная"), new(AmbientSound.Office, "Офис"), new(AmbientSound.Computer, "Компьютер")]),
+        new("Атмосфера", [new(AmbientSound.Cyberpunk, "Киберпанк"), new(AmbientSound.RainThunder, "Дождь и гром"), new(AmbientSound.DistantThunder, "Дальний гром")])
+    ];
+
+    partial void OnSelectedSoundChanged(AmbientSound value)
+    {
+        foreach (var option in AmbientGroups.SelectMany(g => g.Options))
+            option.IsSelected = option.Sound == value;
+    }
 
     // 0–100 for the slider
     [ObservableProperty] private double _ambientVolume;
@@ -98,7 +102,8 @@ public partial class StatusViewModel : ObservableObject
 
         _ambient.Volume = (float)settings.AmbientVolume;
         _ambientVolume = settings.AmbientVolume * 100;
-        _selectedSound = Enum.TryParse<AmbientSound>(settings.AmbientSound, out var sound) ? sound : AmbientSound.Brown;
+        SelectedSound = Enum.TryParse<AmbientSound>(settings.AmbientSound, out var sound) ? sound : AmbientSound.Brown;
+        OnSelectedSoundChanged(SelectedSound);
 
         LoadProjects();
 
