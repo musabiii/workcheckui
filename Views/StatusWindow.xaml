@@ -26,10 +26,19 @@
 
             <!-- Header -->
             <Grid Grid.Row="0" Margin="0,0,0,4">
-                <TextBlock Text="{Binding ProjectName}" Foreground="{DynamicResource YellowBrush}"
-                           FontSize="12" FontWeight="SemiBold"
-                           VerticalAlignment="Center" HorizontalAlignment="Left"
-                           MaxWidth="120" TextTrimming="CharacterEllipsis"/>
+                <Button Click="OnProjectsClick" Style="{StaticResource HeaderButton}"
+                        Foreground="{DynamicResource YellowBrush}" FontSize="12" FontWeight="SemiBold"
+                        Padding="6,2" Margin="-6,0,0,0"
+                        VerticalAlignment="Center" HorizontalAlignment="Left"
+                        ToolTip="Выбрать проект">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding ProjectName}" MaxWidth="120" TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Text="▾" Margin="4,0,0,0" Opacity="0.7"/>
+                    </StackPanel>
+                    <Button.ContextMenu>
+                        <ContextMenu Style="{StaticResource PopupMenu}"/>
+                    </Button.ContextMenu>
+                </Button>
 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Content="☰" Click="OnMenuClick"
@@ -42,13 +51,6 @@
                                 <MenuItem Header="↺  Обнулить" Command="{Binding ResetCommand}"/>
                                 <MenuItem Header="ℹ  О приложении" Command="{Binding OpenAboutCommand}"/>
                             </ContextMenu>
-                        </Button.ContextMenu>
-                    </Button>
-                    <Button Content="📁" Click="OnProjectsClick"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,4,0"
-                            ToolTip="Проекты">
-                        <Button.ContextMenu>
-                            <ContextMenu Style="{StaticResource PopupMenu}"/>
                         </Button.ContextMenu>
                     </Button>
                     <Button Content="☕" Command="{Binding ManualBreakCommand}"
