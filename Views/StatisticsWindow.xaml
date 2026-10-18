@@ -190,7 +190,8 @@
 
                     <ScrollViewer x:Name="GanttView" Grid.Row="2" VerticalScrollBarVisibility="Auto"
                                   HorizontalScrollBarVisibility="Disabled">
-                        <views:GanttChart x:Name="Gantt" VerticalAlignment="Top"/>
+                        <views:GanttChart x:Name="Gantt" VerticalAlignment="Top"
+                                         MinHeight="{Binding ViewportHeight, ElementName=GanttView}"/>
                     </ScrollViewer>
 
                     <ScrollViewer x:Name="ListView" Grid.Row="2" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">

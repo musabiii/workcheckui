@@ -1,10 +1,13 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using WorkCheck.Helpers;
 using Brush = System.Windows.Media.Brush;
 using Color = System.Windows.Media.Color;
+using Cursors = System.Windows.Input.Cursors;
+using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Rectangle = System.Windows.Shapes.Rectangle;
 
 namespace WorkCheck.Views;
@@ -75,9 +78,27 @@ public class GanttChart : Canvas
     public const string ExpandedMark = "  ▾";
     public const string CollapsedMark = "  ▸";
 
+    // Zoom on the hour scale: drag over the timeline to zoom in, Ctrl+wheel zooms around the cursor,
+    // Shift+wheel pans, a double click or "весь день" resets. A new day (a different full range) resets too.
+    private static readonly TimeSpan MinZoomSpan = TimeSpan.FromMinutes(10);
+    private static readonly int[] StepMinutes = [5, 10, 15, 30, 60, 120, 180, 240, 360];
+    private (DateTime From, DateTime To)? _zoom;
+    private (DateTime From, DateTime To) _fullRange;
+    private (DateTime From, DateTime To) _view;
+    private double? _dragStartX;
+    private Rectangle? _selection;
+
+    private bool CanZoom => Columns.Count == 0 && Bars.Count > 0;
+
     public GanttChart()
     {
         ClipToBounds = true;
+        // Transparent, not null, so empty space still receives the mouse for selecting a range
+        Background = System.Windows.Media.Brushes.Transparent;
+        MouseLeftButtonDown += OnZoomMouseDown;
+        MouseMove += OnZoomMouseMove;
+        MouseLeftButtonUp += OnZoomMouseUp;
+        MouseWheel += OnZoomWheel;
         SizeChanged += (_, e) =>
         {
             if (e.WidthChanged) Rebuild();
@@ -117,8 +138,11 @@ public class GanttChart : Canvas
         Height = HeaderHeight + rows.Count * RowHeight;
         if (rows.Count == 0 || ActualWidth <= LabelWidth) return;
 
-        var (from, to) = AxisRange();
         var cellScale = Columns.Count > 0;
+        var full = AxisRange();
+        if (cellScale || full != _fullRange) _zoom = null;
+        _fullRange = full;
+        var (from, to) = _view = _zoom ?? full;
 
         var chartWidth = ActualWidth - LabelWidth;
         var totalHours = (to - from).TotalHours;
@@ -174,7 +198,10 @@ public class GanttChart : Canvas
         if (cellScale)
             DrawColumns(X);
         else
+        {
             DrawHourScale(from, to, X, chartWidth / totalHours);
+            DrawZoomInfo();
+        }
 
         var barHeight = cellScale ? CellBarHeight : BarHeight;
         var inset = cellScale ? CellBarInset : 0;
@@ -183,8 +210,12 @@ public class GanttChart : Canvas
         {
             var row = rows.FindIndex(r => r.Name == bar.Row && r.Group == bar.Group);
             if (row < 0 || bar.Hidden) continue;
-            var x = X(bar.Start) + inset;
-            var width = Math.Max(MinBarWidth, X(bar.End) - X(bar.Start) - 2 * inset);
+            // Cut to the visible span so a zoomed-in chart does not draw over the labels
+            var left = Math.Max(X(bar.Start), LabelWidth);
+            var right = Math.Min(X(bar.End), ActualWidth);
+            if (right < left) continue;
+            var x = left + inset;
+            var width = Math.Max(MinBarWidth, right - left - 2 * inset);
             var top = HeaderHeight + row * RowHeight + (RowHeight - barHeight) / 2;
 
             var rect = new Rectangle
@@ -232,14 +263,145 @@ public class GanttChart : Canvas
         return (from, to);
     }
 
+    // Labels every 5 minutes to 6 hours, whichever first leaves room; grid lines at most an hour apart
     private void DrawHourScale(DateTime from, DateTime to, Func<DateTime, double> x, double pixelsPerHour)
     {
-        var hourStep = Math.Max(1, (int)Math.Ceiling(MinHourLabelSpacing / pixelsPerHour));
-        for (var t = from; t <= to; t = t.AddHours(1))
+        var labelStep = StepMinutes.FirstOrDefault(m => m * pixelsPerHour / 60 >= MinHourLabelSpacing, StepMinutes[^1]);
+        var gridStep = Math.Min(labelStep, 60);
+
+        var first = from.Date.AddMinutes(Math.Ceiling((from - from.Date).TotalMinutes / gridStep) * gridStep);
+        for (var t = first; t <= to; t = t.AddMinutes(gridStep))
         {
             DrawGridLine(x(t));
-            if ((t - from).TotalHours % hourStep == 0 && t < to)
+            if ((int)(t - t.Date).TotalMinutes % labelStep == 0 && t < to)
                 Add(new TextBlock { Text = t.ToString("HH:mm"), Foreground = HourBrush, FontSize = 10 }, x(t) + 3, 2);
+        }
+    }
+
+    // Top left corner, above the labels: the shown span with a reset link, or a hint
+    private void DrawZoomInfo()
+    {
+        if (_zoom is not { } zoom)
+        {
+            Add(new TextBlock { Text = "выделите отрезок, чтобы приблизить", Foreground = HourBrush, FontSize = 10 }, 0, 2);
+            return;
+        }
+
+        var info = new TextBlock { FontSize = 10, Cursor = Cursors.Hand, Background = System.Windows.Media.Brushes.Transparent };
+        info.Inlines.Add(new System.Windows.Documents.Run($"{zoom.From:HH:mm}–{zoom.To:HH:mm}  ") { Foreground = LabelBrush });
+        info.Inlines.Add(new System.Windows.Documents.Run("⟲ весь день") { Foreground = AppThemes.Brush("Blue") });
+        info.MouseLeftButtonDown += (_, e) =>
+        {
+            e.Handled = true;
+            ResetZoom();
+        };
+        Add(info, 0, 2);
+    }
+
+    private void ResetZoom()
+    {
+        _zoom = null;
+        Rebuild();
+    }
+
+    private DateTime TimeAt(double x)
+    {
+        var chartWidth = ActualWidth - LabelWidth;
+        var fraction = Math.Clamp((x - LabelWidth) / chartWidth, 0, 1);
+        return _view.From + TimeSpan.FromTicks((long)((_view.To - _view.From).Ticks * fraction));
+    }
+
+    // Keeps the span inside the full range and at least MinZoomSpan long; the full span means no zoom
+    private void SetZoom(DateTime from, DateTime to)
+    {
+        var fullSpan = _fullRange.To - _fullRange.From;
+        var span = to - from;
+        if (span >= fullSpan)
+        {
+            ResetZoom();
+            return;
+        }
+        if (span < MinZoomSpan)
+        {
+            var middle = from + span / 2;
+            span = MinZoomSpan;
+            from = middle - span / 2;
+        }
+        if (from < _fullRange.From) from = _fullRange.From;
+        if (from + span > _fullRange.To) from = _fullRange.To - span;
+        _zoom = (from, from + span);
+        Rebuild();
+    }
+
+    private void OnZoomMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (!CanZoom) return;
+        var x = e.GetPosition(this).X;
+        if (x <= LabelWidth) return;
+
+        // Handled, so the window does not start dragging
+        e.Handled = true;
+        if (e.ClickCount == 2)
+        {
+            ResetZoom();
+            return;
+        }
+
+        _dragStartX = x;
+        _selection = new Rectangle
+        {
+            Height = ActualHeight,
+            Width = 0,
+            Fill = new SolidColorBrush(AppThemes.Color("Blue")) { Opacity = 0.2 },
+            IsHitTestVisible = false
+        };
+        Add(_selection, x, 0);
+        CaptureMouse();
+    }
+
+    private void OnZoomMouseMove(object sender, MouseEventArgs e)
+    {
+        if (_dragStartX is not { } start || _selection == null) return;
+        var x = Math.Clamp(e.GetPosition(this).X, LabelWidth, ActualWidth);
+        SetLeft(_selection, Math.Min(start, x));
+        _selection.Width = Math.Abs(x - start);
+    }
+
+    private void OnZoomMouseUp(object sender, MouseButtonEventArgs e)
+    {
+        if (_dragStartX is not { } start) return;
+        _dragStartX = null;
+        ReleaseMouseCapture();
+        if (_selection != null) Children.Remove(_selection);
+        _selection = null;
+
+        var x = Math.Clamp(e.GetPosition(this).X, LabelWidth, ActualWidth);
+        if (Math.Abs(x - start) < 8) return;   // a click, not a selection
+        SetZoom(TimeAt(Math.Min(start, x)), TimeAt(Math.Max(start, x)));
+    }
+
+    private void OnZoomWheel(object sender, MouseWheelEventArgs e)
+    {
+        if (!CanZoom) return;
+        var ctrl = Keyboard.Modifiers.HasFlag(ModifierKeys.Control);
+        var shift = Keyboard.Modifiers.HasFlag(ModifierKeys.Shift);
+        if (!ctrl && !shift) return;   // a plain wheel scrolls the rows as before
+        e.Handled = true;
+
+        var (from, to) = _view;
+        var span = to - from;
+        if (ctrl)
+        {
+            var anchor = TimeAt(e.GetPosition(this).X);
+            var factor = e.Delta > 0 ? 0.8 : 1.25;
+            var newSpan = TimeSpan.FromTicks((long)(span.Ticks * factor));
+            var newFrom = anchor - TimeSpan.FromTicks((long)((anchor - from).Ticks * factor));
+            SetZoom(newFrom, newFrom + newSpan);
+        }
+        else if (_zoom != null)
+        {
+            var shift10 = TimeSpan.FromTicks(span.Ticks / 10) * (e.Delta > 0 ? -1 : 1);
+            SetZoom(from + shift10, to + shift10);
         }
     }
 
