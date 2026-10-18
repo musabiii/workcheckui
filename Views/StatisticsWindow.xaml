@@ -130,6 +130,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Margin="0,0,0,12">
@@ -193,6 +194,13 @@
                         <views:GanttChart x:Name="Gantt" VerticalAlignment="Top"
                                          MinHeight="{Binding ViewportHeight, ElementName=GanttView}"/>
                     </ScrollViewer>
+
+                    <!-- Productivity: work on projects as a share of all time at the computer -->
+                    <TextBlock x:Name="ProductivityText" Grid.Row="3" Margin="0,10,0,0" FontSize="12"
+                               ToolTip="Время работы по проектам / время за компьютером (работа + дрейф)">
+                        <Run Text="Продуктивность: " Foreground="{DynamicResource Subtext1Brush}"/><Run x:Name="ProductivityValue"
+                             FontWeight="SemiBold"/><Run x:Name="ProductivityDetail" Foreground="{DynamicResource Overlay1Brush}"/>
+                    </TextBlock>
 
                     <ScrollViewer x:Name="ListView" Grid.Row="2" VerticalScrollBarVisibility="Auto" Visibility="Collapsed">
                         <Grid>

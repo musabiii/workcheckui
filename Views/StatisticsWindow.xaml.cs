@@ -128,6 +128,7 @@ public partial class StatisticsWindow : Window
 
         SessionCountText.Text = sessions.Count.ToString();
         TotalTimeText.Text = TimeFormatter.FormatShort(Total(sessions));
+        ShowProductivity(Total(sessions), Total(sessions) + Total(drift));
 
         var projectNames = _dataService.GetAllProjects().ToDictionary(p => p.Id, p => p.Name);
         string ProjectName(Session s) =>
@@ -404,6 +405,24 @@ public partial class StatisticsWindow : Window
             Binding = new Binding(nameof(PeriodRow.Total)),
             Width = 68
         });
+    }
+
+    // Work on projects as a share of all time at the computer (work + drift)
+    private void ShowProductivity(TimeSpan work, TimeSpan atComputer)
+    {
+        if (atComputer <= TimeSpan.Zero)
+        {
+            ProductivityValue.Text = "—";
+            ProductivityValue.Foreground = AppThemes.Brush("Overlay1");
+            ProductivityDetail.Text = "";
+            return;
+        }
+
+        var percent = (int)Math.Round(work.TotalMinutes / atComputer.TotalMinutes * 100);
+        ProductivityValue.Text = $"{percent}%";
+        ProductivityValue.Foreground = AppThemes.Brush(percent >= 70 ? "Green" : percent >= 40 ? "Yellow" : "Red");
+        ProductivityDetail.Text =
+            $"  ·  {TimeFormatter.FormatShort(work)} работы из {TimeFormatter.FormatShort(atComputer)} за компьютером";
     }
 
     private static TimeSpan Total(IEnumerable<Session> sessions) =>
