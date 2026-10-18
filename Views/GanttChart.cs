@@ -47,7 +47,9 @@ public class GanttChart : Canvas
     private static Brush DividerBrush => AppThemes.Brush("Surface2");
     private static Brush ChildLabelBrush => AppThemes.Brush("Overlay1");
 
-    private static readonly string[] PaletteRoles = ["Blue", "Green", "Yellow", "Mauve", "Peach", "Teal", "Red"];
+    // Project colors by Id % 7. Green belongs to the "За компьютером" row, so its slot is Blue:
+    // replacing it rather than removing it keeps every other project on the color it already had.
+    private static readonly string[] PaletteRoles = ["Blue", "Blue", "Yellow", "Mauve", "Peach", "Teal", "Red"];
 
     public static readonly DependencyProperty BarsProperty = DependencyProperty.Register(
         nameof(Bars), typeof(IReadOnlyList<GanttBar>), typeof(GanttChart),

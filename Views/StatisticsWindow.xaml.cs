@@ -117,11 +117,13 @@ public partial class StatisticsWindow : Window
 
         // Shown as their own rows under the projects; the totals above stay work-only
         var stored = _dataService.GetAwayPeriodsInRange(from, to, isWorkMode: true);
+        var drift = allSessions.Where(s => !s.IsWorkMode && s.Duration >= minDuration).ToList();
         var extras = new List<ExtraRow>
         {
             new("Перерыв", "Teal", CleanAway(stored, AwayKind.Break, allSessions, from, to), ByProject: true),
             new("Не у компа", "Red", CleanAway(stored, AwayKind.Away, allSessions, from, to), ByProject: true),
-            new("Дрейф", "Overlay1", allSessions.Where(s => !s.IsWorkMode && s.Duration >= minDuration).ToList())
+            new("Дрейф", "Overlay1", drift),
+            new("За компьютером", "Green", AtComputer(sessions, drift), ShowProject: false)
         };
 
         SessionCountText.Text = sessions.Count.ToString();
@@ -159,8 +161,10 @@ public partial class StatisticsWindow : Window
         var bars = new List<GanttBar>();
 
         GanttBar Bar(Session s, string row, string tip, int group, int indent = 0, int order = 0, string? role = null, int key = -1) =>
-            new(row, key, s.StartTime, s.EndTime, s.EndTime - s.StartTime, tip, ColorRole: role, Group: group, Indent: indent, Order: order);
-        string Tip(ExtraRow extra, Session s) => $"{extra.Name} · {OwnerName(s, projectName)}\n{RangeText(s)}";
+            new(row, key, s.StartTime, s.EndTime, s.Duration, tip, ColorRole: role, Group: group, Indent: indent, Order: order);
+        string Tip(ExtraRow extra, Session s) => extra.ShowProject
+            ? $"{extra.Name} · {OwnerName(s, projectName)}\n{RangeText(s)}"
+            : $"{extra.Name}\n{RangeText(s)}";
 
         if (ProjectGroupingRadio.IsChecked == true)
         {
@@ -217,7 +221,15 @@ public partial class StatisticsWindow : Window
             .ToList();
 
     // A row under the projects: breaks, time away or drift; Items carry the project they belong to
-    private record ExtraRow(string Name, string Role, List<Session> Items, bool ByProject = false);
+    private record ExtraRow(string Name, string Role, List<Session> Items, bool ByProject = false, bool ShowProject = true);
+
+    // Work on any project plus drift is all the time spent at the computer. Only one mode runs at a time,
+    // so the two never overlap, and keeping the stored durations makes the total match Работа + Дрейф.
+    private static List<Session> AtComputer(List<Session> work, List<Session> drift) =>
+        work.Concat(drift)
+            .Select(s => new Session { StartTime = s.StartTime, EndTime = s.EndTime, Duration = s.Duration })
+            .OrderBy(s => s.StartTime)
+            .ToList();
 
     // Child rows in the period table: the grid has no tree, so the indent is leading spaces
     private const string ChildIndent = "    ";
