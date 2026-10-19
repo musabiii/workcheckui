@@ -7,7 +7,8 @@ public static class TimeRanges
     // Older versions saved the whole away total again on every mode switch, as one period ending at the
     // switch, so stored away periods overlap each other and real sessions. This keeps only time that is
     // plausibly away: overlaps merged, session time cut out, and each day limited to the span between its
-    // first and last session, so a night left in work mode does not show up as hours away.
+    // first and last session, so a night left in work mode does not show up as hours away. Today runs up to
+    // now: time away is saved as soon as the user is back, but the session after it only when that ends.
     public static List<TimeRange> CleanAway(IEnumerable<TimeRange> away, IReadOnlyList<Session> sessions,
         DateTime from, DateTime to, TimeSpan minLength)
     {
@@ -20,7 +21,9 @@ public static class TimeRanges
             var daySessions = sessions.Where(s => s.StartTime >= day && s.StartTime < day.AddDays(1)).ToList();
             if (daySessions.Count == 0) continue;
 
-            var span = new TimeRange(daySessions.Min(s => s.StartTime), daySessions.Max(s => s.EndTime));
+            var spanEnd = daySessions.Max(s => s.EndTime);
+            if (day == DateTime.Today && DateTime.Now > spanEnd) spanEnd = DateTime.Now;
+            var span = new TimeRange(daySessions.Min(s => s.StartTime), spanEnd);
             foreach (var range in merged)
             {
                 var clipped = Clip(range, span);

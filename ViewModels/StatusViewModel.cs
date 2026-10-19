@@ -255,7 +255,7 @@ public partial class StatusViewModel : ObservableObject
     }
 
     private TimeSpan? GetAwayBase() =>
-        IsWorkMode ? _tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime : null;
+        IsWorkMode ? _tracker.GetAwayTimeFromDatabase() + _tracker.UnsavedAwayTime : null;
 
     private TimeSpan? GetTodayBase() =>
         IsWorkMode
@@ -267,7 +267,7 @@ public partial class StatusViewModel : ObservableObject
         var session = _tracker.CurrentSession;
         CurrentSessionText = TimeFormatter.FormatShort(session);
         
-        AwayTimeText = TimeFormatter.FormatShort(_tracker.GetAwayTimeFromDatabase() + _tracker.DisplayAwayTime);
+        AwayTimeText = TimeFormatter.FormatShort(_tracker.GetAwayTimeFromDatabase() + _tracker.UnsavedAwayTime);
 
         var sessions = _tracker.CompletedSessions;
         SessionLabel = sessions > 0

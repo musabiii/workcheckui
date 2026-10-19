@@ -117,6 +117,19 @@ public sealed class ActivityTracker : IDisposable
         _awayTime = TimeSpan.Zero;
     }
 
+    // The away stretch still in progress: not in the database yet, it is saved when the user comes back.
+    // Totals for today are this plus GetAwayTimeFromDatabase(); DisplayAwayTime would count saved stretches twice.
+    public TimeSpan UnsavedAwayTime
+    {
+        get
+        {
+            if (_userActive && !_userShortBreak) return TimeSpan.Zero;
+            var interval = DateTime.Now - _lastActivityTime;
+            var away = _userShortBreak ? interval - _shortBreakTime : interval;
+            return away > TimeSpan.Zero ? away : TimeSpan.Zero;
+        }
+    }
+
     public TimeSpan DisplayAwayTime
     {
         get
