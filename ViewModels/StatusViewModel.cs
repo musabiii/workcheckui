@@ -27,6 +27,11 @@ public partial class StatusViewModel : ObservableObject
     private AppSettings _settings;
     private readonly DispatcherTimer _timer;
     private bool _wasUserShortBreak;
+
+    // The break overlay is modal but ticks keep running under it; a popup shown then ("welcome back"
+    // with a quote) lands under the full-screen overlay and fades out unseen, so it waits for the overlay
+    private bool _overlayOpen;
+    private readonly List<NotificationRequest> _deferred = [];
     private Project? _selectedProject;
     private Dictionary<int, string> _projectNames = [];
 
@@ -186,6 +191,7 @@ public partial class StatusViewModel : ObservableObject
             if (req.Type is NotificationType.Pomodoro or NotificationType.Pomodoro2)
             {
                 var overlayShownAt = DateTime.Now;
+                _overlayOpen = true;
 
                 var (choseBreak, description, modeSelected, breakLength) = _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
@@ -209,11 +215,13 @@ public partial class StatusViewModel : ObservableObject
                 // пользователь не работал — это не должно считаться рабочим временем
                 _tracker.AccountOverlayIdle(overlayShownAt, description, continueSession, breakLength: breakLength);
                 ApplyModeSelection(modeSelected);
+                ShowDeferred();
             }
             else if (req.Type is NotificationType.ShortBreak && !_wasUserShortBreak)
             {
                 _wasUserShortBreak = true;
                 var overlayShownAt = DateTime.Now;
+                _overlayOpen = true;
 
                 var (_, _, modeSelected, _) = _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
@@ -230,12 +238,29 @@ public partial class StatusViewModel : ObservableObject
 
                 _tracker.AccountOverlayIdle(overlayShownAt, "", countIdleAsAway: false);
                 ApplyModeSelection(modeSelected);
+                ShowDeferred();
+            }
+            else if (_overlayOpen)
+            {
+                _deferred.Add(req);
             }
             else if (IsWorkMode)
             {
                 _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
             }
         }
+    }
+
+    private void ShowDeferred()
+    {
+        _overlayOpen = false;
+        var pending = _deferred.ToList();
+        _deferred.Clear();
+
+        // The overlay already showed a quote
+        if (!IsWorkMode) return;
+        foreach (var req in pending)
+            _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage);
     }
 
     // The tracker is paused during a break countdown, so these come from the overlay instead of Tick

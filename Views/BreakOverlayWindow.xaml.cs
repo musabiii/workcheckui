@@ -260,6 +260,7 @@ public partial class BreakOverlayWindow : Window
         TimerPanel.Visibility = Visibility.Collapsed;
         ModeSelectionPanel.Visibility = Visibility.Visible;
         Stripe.Background = AppThemes.Brush(BreakStripeRole);
+        QuoteBlock.Text = $"«{Quotes.GetRandom()}»";
 
         _modeSelectionStartTime = DateTime.Now;
         _lateTime = TimeSpan.Zero;

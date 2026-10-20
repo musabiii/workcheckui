@@ -439,6 +439,13 @@
                                    FontWeight="Bold" HorizontalAlignment="Left" Margin="0,2,0,2"/>
                     </Grid>
 
+                    <TextBlock x:Name="QuoteBlock"
+                               Foreground="{DynamicResource Subtext0Brush}"
+                               FontSize="{StaticResource FontSizeLarge}" FontStyle="Italic"
+                               TextWrapping="Wrap" TextAlignment="Center"
+                               HorizontalAlignment="Center"
+                               Margin="0,20,0,4"/>
+
                     <TextBlock Text="Выберите режим работы:"
                                Foreground="{DynamicResource Subtext1Brush}"
                                FontSize="{StaticResource FontSizeSubtitle}"
