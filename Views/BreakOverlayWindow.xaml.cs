@@ -53,6 +53,15 @@ public partial class BreakOverlayWindow : Window
     public bool? ModeSelected { get; private set; }
     public Action? OnBreakStarted { get; set; }
 
+    public string? ProjectName
+    {
+        set
+        {
+            ProjectBlock.Text = $"📁  {value}";
+            ProjectBlock.Visibility = string.IsNullOrWhiteSpace(value) ? Visibility.Collapsed : Visibility.Visible;
+        }
+    }
+
     // The last break countdown started (the default or a 5/15/30/60 minute pick); zero if none
     public TimeSpan BreakLength { get; private set; }
 

@@ -31,10 +31,25 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
+                <!-- Projects only matter in work mode; drifting shows a plain label instead of the picker -->
+                <TextBlock Text="Дрейф" Foreground="{DynamicResource Overlay1Brush}" FontSize="12" FontWeight="SemiBold"
+                           VerticalAlignment="Center" HorizontalAlignment="Left">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsWorkMode}" Value="False">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
                 <Button Click="OnProjectsClick" Style="{StaticResource HeaderButton}"
                         Foreground="{DynamicResource YellowBrush}" FontSize="12" FontWeight="SemiBold"
                         Padding="6,2" Margin="-6,0,0,0"
                         VerticalAlignment="Center" HorizontalAlignment="Left"
+                        Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}"
                         ToolTip="Выбрать проект">
                     <DockPanel>
                         <TextBlock DockPanel.Dock="Right" Text="▾" Margin="4,0,0,0" Opacity="0.7"/>

@@ -93,12 +93,13 @@ public class NotificationService
     public (bool choseBreak, string description, bool? modeSelected, TimeSpan breakLength) ShowBreakOverlay(NotificationType type, string title, string message,
         TimeSpan breakDuration, Action? onBreakStarted = null, bool skipPrompt = false, bool showChoice = false,
         SoundService? soundService = null, bool playSoundOnBreakEnd = false, bool fromWorkMode = false, TimeSpan? awayBase = null, TimeSpan? todayBase = null,
-        Action? onBreakEnded = null, Action? onStillAway = null, TimeSpan? stillAwayAfter = null)
+        Action? onBreakEnded = null, Action? onStillAway = null, TimeSpan? stillAwayAfter = null, string? projectName = null)
     {
         try
         {
             var overlay = new BreakOverlayWindow(type, title, message, breakDuration, skipPrompt, showChoice, soundService, playSoundOnBreakEnd, fromWorkMode, awayBase, todayBase);
             overlay.OnBreakStarted = onBreakStarted;
+            overlay.ProjectName = projectName;
             overlay.OnBreakEnded = onBreakEnded;
             overlay.OnStillAway = onStillAway;
             if (stillAwayAfter.HasValue)

@@ -195,6 +195,7 @@ public partial class StatusViewModel : ObservableObject
                     playSoundOnBreakEnd: true,
                     awayBase: GetAwayBase(),
                     todayBase: GetTodayBase(),
+                    projectName: IsWorkMode ? ProjectName : null,
                     onBreakEnded: OnBreakCountdownEnded,
                     onStillAway: OnStillAwayAfterBreak,
                     stillAwayAfter: _settings.InactivityTime);
@@ -223,7 +224,8 @@ public partial class StatusViewModel : ObservableObject
                     soundService: _soundService,
                     fromWorkMode: true,
                     awayBase: GetAwayBase(),
-                    todayBase: GetTodayBase());
+                    todayBase: GetTodayBase(),
+                    projectName: IsWorkMode ? ProjectName : null);
                 _tracker.IsPaused = false;
 
                 _tracker.AccountOverlayIdle(overlayShownAt, "", countIdleAsAway: false);
@@ -375,6 +377,7 @@ public partial class StatusViewModel : ObservableObject
             fromWorkMode: IsWorkMode,
             awayBase: GetAwayBase(),
             todayBase: GetTodayBase(),
+            projectName: IsWorkMode ? ProjectName : null,
             onBreakEnded: OnBreakCountdownEnded,
             onStillAway: OnStillAwayAfterBreak,
             stillAwayAfter: _settings.InactivityTime);
