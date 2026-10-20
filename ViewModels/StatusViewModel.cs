@@ -196,7 +196,7 @@ public partial class StatusViewModel : ObservableObject
                 var (choseBreak, description, modeSelected, breakLength) = _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
                     _settings.ShortBreakTime,
-                    onBreakStarted: () => _tracker.IsPaused = true,
+                    onBreakStarted: StartBreak,
                     soundService: _soundService,
                     playSoundOnBreakEnd: true,
                     awayBase: GetAwayBase(),
@@ -206,6 +206,7 @@ public partial class StatusViewModel : ObservableObject
                     onStillAway: OnStillAwayAfterBreak,
                     stillAwayAfter: _settings.InactivityTime);
                 _tracker.IsPaused = false;
+                _ambient.Resume();
 
                 // Если пользователь нажал "Продолжить работать" сразу (не пошел на перерыв)
                 // тогда сессия продолжается до Pomodoro2
@@ -222,6 +223,7 @@ public partial class StatusViewModel : ObservableObject
                 _wasUserShortBreak = true;
                 var overlayShownAt = DateTime.Now;
                 _overlayOpen = true;
+                _ambient.Pause();
 
                 var (_, _, modeSelected, _) = _notifications.ShowBreakOverlay(
                     req.Type, req.Title, req.Message,
@@ -235,6 +237,7 @@ public partial class StatusViewModel : ObservableObject
                     todayBase: GetTodayBase(),
                     projectName: IsWorkMode ? ProjectName : null);
                 _tracker.IsPaused = false;
+                _ambient.Resume();
 
                 _tracker.AccountOverlayIdle(overlayShownAt, "", countIdleAsAway: false);
                 ApplyModeSelection(modeSelected);
@@ -249,6 +252,13 @@ public partial class StatusViewModel : ObservableObject
                 _notifications.Show(req.Type, req.Title, req.Message, req.SecondaryMessage, req.Quote);
             }
         }
+    }
+
+    // The break countdown starts: activity no longer counts and the background sound goes quiet until the overlay closes
+    private void StartBreak()
+    {
+        _tracker.IsPaused = true;
+        _ambient.Pause();
     }
 
     private void ShowDeferred()
@@ -389,7 +399,7 @@ public partial class StatusViewModel : ObservableObject
     [RelayCommand]
     private void ManualBreak()
     {
-        _tracker.IsPaused = true;
+        StartBreak();
         var overlayShownAt = DateTime.Now;
 
         var (_, description, modeSelected, breakLength) = _notifications.ShowBreakOverlay(
@@ -408,6 +418,7 @@ public partial class StatusViewModel : ObservableObject
             stillAwayAfter: _settings.InactivityTime);
 
         _tracker.IsPaused = false;
+        _ambient.Resume();
 
         _tracker.AccountOverlayIdle(overlayShownAt, description, breakLength: breakLength);
         ApplyModeSelection(modeSelected);

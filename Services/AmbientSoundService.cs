@@ -67,6 +67,15 @@ public sealed class AmbientSoundService : IDisposable
         }
     }
 
+    // Keeps the sound and its position, so a break can silence it and Resume picks up where it was
+    public void Pause() => _output?.Pause();
+
+    public void Resume()
+    {
+        if (_output?.PlaybackState == PlaybackState.Paused)
+            _output.Play();
+    }
+
     public void Stop()
     {
         _output?.Stop();
