@@ -106,6 +106,20 @@ public class GanttChart : Canvas
 
     public bool ShowZoomHint { get; set; } = true;
 
+    // A vertical line through all rows with its time above the scale (e.g. where a plan ends),
+    // in the MarkerRole color
+    public string MarkerRole { get; set; } = "Red";
+    private DateTime? _marker;
+    public DateTime? Marker
+    {
+        get => _marker;
+        set
+        {
+            _marker = value;
+            Rebuild();
+        }
+    }
+
     public GanttChart()
     {
         ClipToBounds = true;
@@ -263,6 +277,24 @@ public class GanttChart : Canvas
                 }, x, top + (barHeight - 15) / 2);
             }
         }
+
+        if (!cellScale && Marker is { } marker && marker >= from && marker <= to)
+            DrawMarker(X(marker), marker);
+    }
+
+    private void DrawMarker(double x, DateTime time)
+    {
+        var color = AppThemes.Brush(MarkerRole);
+        Add(new Rectangle { Width = 2, Height = Math.Max(ActualHeight, Height) - HeaderHeight + 4, Fill = color, IsHitTestVisible = false },
+            x - 1, HeaderHeight - 4);
+        // On the card color so it stays readable over the hour labels
+        Add(new Border
+        {
+            Background = AppThemes.Brush("Mantle"),
+            Padding = new Thickness(3, 0, 3, 0),
+            IsHitTestVisible = false,
+            Child = new TextBlock { Text = time.ToString("HH:mm"), Foreground = color, FontSize = 10, FontWeight = FontWeights.Bold }
+        }, Math.Min(x - 16, ActualWidth - 36), 1);
     }
 
     private (DateTime From, DateTime To) AxisRange()

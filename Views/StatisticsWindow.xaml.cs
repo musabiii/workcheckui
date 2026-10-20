@@ -197,7 +197,7 @@ public partial class StatisticsWindow : Window
         }
 
         ShowPlan(now, bars, summary + current +
-            $"закончу в {t:HH:mm} · помидоров: {count}, перерывы {TimeFormatter.FormatShort(breaks)}", "Text");
+            $"закончу в {t:HH:mm} · помидоров: {count}, перерывы {TimeFormatter.FormatShort(breaks)}", "Text", end: t);
     }
 
     // The added blocks one after another from now, cut where the planned work is reached: the last
@@ -235,12 +235,14 @@ public partial class StatisticsWindow : Window
             ShowPlan(now, bars, summary + "добавляйте блоки кнопками, пока не наберётся нужное время", "Overlay1");
             return;
         }
+        var end = t;
 
         var text = $"набрано {TimeFormatter.FormatShort(work)} из {TimeFormatter.FormatShort(planned)}" +
                    (_manualFull ? "" : $", не хватает {TimeFormatter.FormatShort(planned - work)}") +
                    $" · перерывы {TimeFormatter.FormatShort(breaks)} · закончу в {t:HH:mm}" +
                    (_manualFull ? " · время заполнено" : "");
-        ShowPlan(now, bars, summary + text, _manualFull ? "Green" : "Text");
+        // Blue while the plan still falls short, red once it reaches the planned time
+        ShowPlan(now, bars, summary + text, _manualFull ? "Green" : "Text", end, _manualFull ? "Red" : "Blue");
     }
 
     private static GanttBar WorkBar(DateTime start, TimeSpan length, string title) =>
@@ -251,9 +253,13 @@ public partial class StatisticsWindow : Window
         new("Перерыв", -1, start, start + length, length,
             $"{title}\n{start:HH:mm}–{start + length:HH:mm}", ColorRole: "Teal", Order: 1);
 
-    // Both rows are always there (hidden placeholders when empty), so the empty plan still shows its scale
-    private void ShowPlan(DateTime now, List<GanttBar> bars, string text, string role)
+    // Both rows are always there (hidden placeholders when empty), so the empty plan still shows its scale.
+    // end, when given, is marked with a line and its time, red by default.
+    private void ShowPlan(DateTime now, List<GanttBar> bars, string text, string role, DateTime? end = null,
+        string markerRole = "Red")
     {
+        PlanChart.MarkerRole = markerRole;
+        PlanChart.Marker = end;
         bars.Add(new GanttBar("Работа", -1, now, now, TimeSpan.Zero, "", Hidden: true));
         bars.Add(new GanttBar("Перерыв", -1, now, now, TimeSpan.Zero, "", Order: 1, Hidden: true));
         PlanChart.Bars = bars;
