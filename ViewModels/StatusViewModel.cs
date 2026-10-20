@@ -35,7 +35,7 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private bool _isWorkMode;
     [ObservableProperty] private string _currentSessionText = "0 мин";
     [ObservableProperty] private string _projectName = "";
-    [ObservableProperty] private string _awayTimeText = "0 мин";
+    [ObservableProperty] private string _totalTimeText = "0 мин";
     [ObservableProperty] private string _todayWorkedText = "0 мин";
     [ObservableProperty] private IReadOnlyList<ProjectTimeRow> _projectRows = [];
     [ObservableProperty] private string _statusText = "Дрейфую";
@@ -68,7 +68,9 @@ public partial class StatusViewModel : ObservableObject
     [ObservableProperty] private Brush _sessionBrush = NormalTextBrush;
     [ObservableProperty] private Brush _windowBgBrush = DriftingBgBrush;
     [ObservableProperty] private string _modeButtonText = "▶  В работе";
-    [ObservableProperty] private string _awayLabel = "☕  Вне компьютера:";
+    // Work mode: today's work on all projects, the sum of the project rows above it
+    private const string TotalCaption = "Всего:";
+    [ObservableProperty] private string _totalLabel = TotalCaption;
     [ObservableProperty] private string _sessionIcon = "🖥";
     [ObservableProperty] private string _sessionLabel = "  Текущая сессия:";
     [ObservableProperty] private Brush _compactSessionBrush = DriftingGrayBrush;
@@ -271,7 +273,6 @@ public partial class StatusViewModel : ObservableObject
         var session = _tracker.CurrentSession;
         CurrentSessionText = TimeFormatter.FormatShort(session);
         
-        AwayTimeText = TimeFormatter.FormatShort(_tracker.GetAwayTimeFromDatabase() + _tracker.UnsavedAwayTime);
 
         var sessions = _tracker.CompletedSessions;
         SessionLabel = sessions > 0
@@ -354,6 +355,8 @@ public partial class StatusViewModel : ObservableObject
 
         if (!rows.SequenceEqual(ProjectRows))
             ProjectRows = rows;
+
+        TotalTimeText = TimeFormatter.FormatShort(TimeSpan.FromTicks(totals.Values.Sum(t => t.Ticks)));
     }
 
     [RelayCommand]
@@ -387,7 +390,7 @@ public partial class StatusViewModel : ObservableObject
     {
         _tracker.Reset();
         CurrentSessionText = "0 мин";
-        AwayTimeText = "0 мин";
+        TotalTimeText = "0 мин";
         UpdateTodayTotals();
     }
 
@@ -403,20 +406,20 @@ public partial class StatusViewModel : ObservableObject
         _tracker.Reset();
 
         CurrentSessionText = "0 мин";
-        AwayTimeText = "0 мин";
+        TotalTimeText = "0 мин";
 
         if (IsWorkMode)
         {
             ModeButtonText = "⏸  Дрейфую";
             WindowBgBrush = WorkingBgBrush;
-            AwayLabel = "☕  Вне компьютера:";
+            TotalLabel = TotalCaption;
             SessionIcon = "🟢";
         }
         else
         {
             ModeButtonText = "▶  В работе";
             WindowBgBrush = DriftingBgBrush;
-            AwayLabel = "";
+            TotalLabel = "";
             SessionIcon = "🖥";
         }
     }

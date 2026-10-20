@@ -143,14 +143,14 @@
                 <Separator Margin="0,2,0,2" Background="#33FFFFFF" Height="1"
                            Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
 
-                <!-- Вне компьютера -->
+                <!-- Всего за сегодня по проектам -->
                 <Grid Margin="0,0" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding AwayLabel}" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"/>
-                    <TextBlock Grid.Column="1" Text="{Binding AwayTimeText}" Foreground="{DynamicResource TextBrush}"
+                    <TextBlock Grid.Column="0" Text="{Binding TotalLabel}" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"/>
+                    <TextBlock Grid.Column="1" Text="{Binding TotalTimeText}" Foreground="{DynamicResource TextBrush}"
                                FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
