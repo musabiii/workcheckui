@@ -535,6 +535,12 @@
             </Setter>
         </Style>
 
+        <!-- ========== Chip button (5 мин, +10 мин): a compact secondary button for a row of quick picks ========== -->
+        <Style x:Key="ChipButton" TargetType="Button" BasedOn="{StaticResource SecondaryButton}">
+            <Setter Property="Padding" Value="14,6"/>
+            <Setter Property="Margin" Value="4,0"/>
+        </Style>
+
         <!-- ========== Themed window (Views/ThemedWindow.cs) ========== -->
         <Style TargetType="views:ThemedWindow">
             <Setter Property="WindowStyle" Value="None"/>
