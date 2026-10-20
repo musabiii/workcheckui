@@ -56,4 +56,11 @@
 
     <!-- Outline of every window -->
     <SolidColorBrush x:Key="WindowBorderBrush" Color="#30363D"/>
+
+    <!-- Light overlays on top of any surface: hover, separators, chart grid, faint panels -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#33FFFFFF"/>
+    <SolidColorBrush x:Key="HoverSubtleBrush" Color="#1AFFFFFF"/>
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#33FFFFFF"/>
+    <SolidColorBrush x:Key="GridLineBrush" Color="#22FFFFFF"/>
+    <SolidColorBrush x:Key="PanelTintBrush" Color="#11FFFFFF"/>
 </ResourceDictionary>

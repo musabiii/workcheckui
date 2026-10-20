@@ -52,7 +52,8 @@ public partial class SettingsViewModel : ObservableObject
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(IsMochaTheme), nameof(IsGitHubDarkTheme), nameof(IsDarculaTheme), nameof(IsGruvboxTheme),
-        nameof(IsTokyoNightTheme), nameof(IsDraculaTheme), nameof(IsNordTheme))]
+        nameof(IsTokyoNightTheme), nameof(IsDraculaTheme), nameof(IsNordTheme),
+        nameof(IsLatteTheme), nameof(IsGitHubLightTheme), nameof(IsSolarizedLightTheme))]
     private string _theme = AppThemes.Mocha;
 
     public bool IsMochaTheme
@@ -95,6 +96,24 @@ public partial class SettingsViewModel : ObservableObject
     {
         get => Theme == AppThemes.Nord;
         set { if (value) Theme = AppThemes.Nord; }
+    }
+
+    public bool IsLatteTheme
+    {
+        get => Theme == AppThemes.Latte;
+        set { if (value) Theme = AppThemes.Latte; }
+    }
+
+    public bool IsGitHubLightTheme
+    {
+        get => Theme == AppThemes.GitHubLight;
+        set { if (value) Theme = AppThemes.GitHubLight; }
+    }
+
+    public bool IsSolarizedLightTheme
+    {
+        get => Theme == AppThemes.SolarizedLight;
+        set { if (value) Theme = AppThemes.SolarizedLight; }
     }
 
     public event Action<bool>? RequestClose;

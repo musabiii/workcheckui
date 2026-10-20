@@ -38,7 +38,7 @@ public class GanttChart : Canvas
     private const double MinHourLabelSpacing = 34;
     private const double IndentWidth = 16;
 
-    private static readonly Brush GridBrush = Frozen(Color.FromArgb(0x22, 0xFF, 0xFF, 0xFF));
+    private static Brush GridBrush => AppThemes.Brush("GridLine");
     private static Brush StripeBrush => AppThemes.Brush("Crust");
     private static Brush LabelBrush => AppThemes.Brush("Subtext1");
     private static Brush TotalBrush => AppThemes.Brush("Text");
@@ -136,13 +136,6 @@ public class GanttChart : Canvas
     }
 
     private static void OnChanged(DependencyObject d, DependencyPropertyChangedEventArgs e) => ((GanttChart)d).Rebuild();
-
-    private static Brush Frozen(Color color)
-    {
-        var brush = new SolidColorBrush(color);
-        brush.Freeze();
-        return brush;
-    }
 
     private void Rebuild()
     {

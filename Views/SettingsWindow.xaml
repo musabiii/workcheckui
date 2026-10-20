@@ -111,6 +111,19 @@
                                              IsChecked="{Binding IsNordTheme}"/>
                             </UniformGrid>
                         </Border>
+                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3" Margin="0,4,0,0">
+                            <UniformGrid Columns="4">
+                                <RadioButton Content="Latte" GroupName="Theme"
+                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
+                                             IsChecked="{Binding IsLatteTheme}"/>
+                                <RadioButton Content="GitHub Light" GroupName="Theme"
+                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
+                                             IsChecked="{Binding IsGitHubLightTheme}"/>
+                                <RadioButton Content="Solarized" GroupName="Theme"
+                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
+                                             IsChecked="{Binding IsSolarizedLightTheme}"/>
+                            </UniformGrid>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"

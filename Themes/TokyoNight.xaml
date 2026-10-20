@@ -68,4 +68,11 @@
     <DropShadowEffect x:Key="ShadowSm" Color="#7AA2F7" BlurRadius="18" Opacity="0.3" ShadowDepth="0"/>
     <DropShadowEffect x:Key="ShadowMd" Color="#7AA2F7" BlurRadius="22" Opacity="0.35" ShadowDepth="0"/>
     <DropShadowEffect x:Key="ShadowLg" Color="#7AA2F7" BlurRadius="32" Opacity="0.4" ShadowDepth="0"/>
+
+    <!-- Light overlays on top of any surface: hover, separators, chart grid, faint panels -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#33FFFFFF"/>
+    <SolidColorBrush x:Key="HoverSubtleBrush" Color="#1AFFFFFF"/>
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#33FFFFFF"/>
+    <SolidColorBrush x:Key="GridLineBrush" Color="#22FFFFFF"/>
+    <SolidColorBrush x:Key="PanelTintBrush" Color="#11FFFFFF"/>
 </ResourceDictionary>
