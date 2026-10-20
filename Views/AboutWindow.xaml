@@ -5,7 +5,7 @@
         Title="О приложении"
         ShowHeader="True"
         WindowStartupLocation="CenterScreen"
-        Width="440" Height="340">
+        Width="440" Height="410">
 
     <Grid>
         <Grid.RowDefinitions>
@@ -21,24 +21,18 @@
             <TextBlock Text="WorkCheck" Foreground="{DynamicResource YellowBrush}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
             <TextBlock x:Name="VersionBlock" Foreground="{DynamicResource Overlay0Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,2,0,16"/>
 
-            <TextBlock Text="Программа" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-            <TextBox x:Name="AppPathBox" IsReadOnly="True"
-                     Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
-                     BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
+            <TextBlock Text="Программа" Style="{StaticResource FieldLabel}"/>
+            <TextBox Style="{StaticResource TextInput}" x:Name="AppPathBox" IsReadOnly="True"
                      FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
                      TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-            <TextBlock Text="База данных" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-            <TextBox x:Name="DbPathBox" IsReadOnly="True"
-                     Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
-                     BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
+            <TextBlock Text="База данных" Style="{StaticResource FieldLabel}"/>
+            <TextBox Style="{StaticResource TextInput}" x:Name="DbPathBox" IsReadOnly="True"
                      FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
                      TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-            <TextBlock Text="Настройки" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-            <TextBox x:Name="SettingsPathBox" IsReadOnly="True"
-                     Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
-                     BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
+            <TextBlock Text="Настройки" Style="{StaticResource FieldLabel}"/>
+            <TextBox Style="{StaticResource TextInput}" x:Name="SettingsPathBox" IsReadOnly="True"
                      FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
                      TextWrapping="Wrap"/>
         </StackPanel>

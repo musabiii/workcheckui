@@ -147,12 +147,21 @@
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Surface1Brush}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource AccentTextBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
+        </Style>
+
+        <!-- Frame around a row of SegmentRadio buttons -->
+        <Style x:Key="SegmentGroup" TargetType="Border">
+            <Setter Property="Background" Value="{DynamicResource Surface0Brush}"/>
+            <Setter Property="CornerRadius" Value="{DynamicResource RadiusMd}"/>
+            <Setter Property="Padding" Value="3"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource ControlBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="{DynamicResource ControlBorderThickness}"/>
         </Style>
 
         <!-- ========== Header buttons (⚙) ========== -->
@@ -285,18 +294,25 @@
             <Setter Property="Background" Value="{DynamicResource Surface0Brush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
             <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource Surface1Brush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="{DynamicResource InputBorderThickness}"/>
             <Setter Property="Padding" Value="8,6"/>
             <Setter Property="FontSize" Value="{StaticResource FontSizeBody}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
-                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        <!-- Sunken bevel: dark edge top-left, light edge bottom-right -->
+                        <Border BorderBrush="{DynamicResource BevelDarkBrush}" BorderThickness="{DynamicResource BevelTopLeft}"
+                                CornerRadius="{DynamicResource RadiusMd}">
+                            <Border BorderBrush="{DynamicResource BevelLightBrush}" BorderThickness="{DynamicResource BevelBottomRight}"
+                                    CornerRadius="{DynamicResource RadiusMd}">
+                                <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                    <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Border>
+                            </Border>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
@@ -313,18 +329,25 @@
             <Setter Property="Background" Value="{DynamicResource Surface0Brush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
             <Setter Property="CaretBrush" Value="{DynamicResource TextBrush}"/>
-            <Setter Property="BorderBrush" Value="{DynamicResource Surface1Brush}"/>
-            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="{DynamicResource InputBorderThickness}"/>
             <Setter Property="Padding" Value="8,6"/>
             <Setter Property="FontSize" Value="{StaticResource FontSizeBody}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="PasswordBox">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
-                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        <!-- Sunken bevel: dark edge top-left, light edge bottom-right -->
+                        <Border BorderBrush="{DynamicResource BevelDarkBrush}" BorderThickness="{DynamicResource BevelTopLeft}"
+                                CornerRadius="{DynamicResource RadiusMd}">
+                            <Border BorderBrush="{DynamicResource BevelLightBrush}" BorderThickness="{DynamicResource BevelBottomRight}"
+                                    CornerRadius="{DynamicResource RadiusMd}">
+                                <Border Background="{TemplateBinding Background}"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding BorderThickness}"
+                                        CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                    <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                                </Border>
+                            </Border>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
@@ -372,7 +395,7 @@
                         <StackPanel Orientation="Horizontal" Background="Transparent">
                             <Border x:Name="Box" Width="16" Height="16" VerticalAlignment="Center"
                                     Background="{DynamicResource Surface0Brush}"
-                                    BorderBrush="{DynamicResource Surface2Brush}" BorderThickness="1"
+                                    BorderBrush="{DynamicResource Surface2Brush}" BorderThickness="{DynamicResource InputBorderThickness}"
                                     CornerRadius="{DynamicResource RadiusSm}">
                                 <Path x:Name="Mark" Data="M 3,8 L 6.5,11.5 L 13,4.5" Stroke="{DynamicResource OnAccentBrush}"
                                       StrokeThickness="2" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
@@ -414,9 +437,17 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bg" Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <!-- Raised bevel: light edge top-left, dark edge bottom-right; a pressed button sinks -->
+                        <Border x:Name="BevelOuter" BorderBrush="{DynamicResource BevelLightBrush}" BorderThickness="{DynamicResource BevelTopLeft}"
+                                CornerRadius="{DynamicResource RadiusMd}" Effect="{DynamicResource ControlShadow}">
+                            <Border x:Name="BevelInner" BorderBrush="{DynamicResource BevelDarkBrush}" BorderThickness="{DynamicResource BevelBottomRight}"
+                                    CornerRadius="{DynamicResource RadiusMd}">
+                                <Border x:Name="Bg" Background="{TemplateBinding Background}"
+                                        BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="{DynamicResource ControlBorderThickness}"
+                                        CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Border>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -424,6 +455,8 @@
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="Bg" Property="Background" Value="{DynamicResource AccentPressedBrush}"/>
+                                <Setter TargetName="BevelOuter" Property="BorderBrush" Value="{DynamicResource BevelDarkBrush}"/>
+                                <Setter TargetName="BevelInner" Property="BorderBrush" Value="{DynamicResource BevelLightBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -437,9 +470,17 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bg" Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <!-- Raised bevel: light edge top-left, dark edge bottom-right; a pressed button sinks -->
+                        <Border x:Name="BevelOuter" BorderBrush="{DynamicResource BevelLightBrush}" BorderThickness="{DynamicResource BevelTopLeft}"
+                                CornerRadius="{DynamicResource RadiusMd}" Effect="{DynamicResource ControlShadow}">
+                            <Border x:Name="BevelInner" BorderBrush="{DynamicResource BevelDarkBrush}" BorderThickness="{DynamicResource BevelBottomRight}"
+                                    CornerRadius="{DynamicResource RadiusMd}">
+                                <Border x:Name="Bg" Background="{TemplateBinding Background}"
+                                        BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="{DynamicResource ControlBorderThickness}"
+                                        CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Border>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -447,6 +488,8 @@
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="Bg" Property="Background" Value="{DynamicResource RedPressedBrush}"/>
+                                <Setter TargetName="BevelOuter" Property="BorderBrush" Value="{DynamicResource BevelDarkBrush}"/>
+                                <Setter TargetName="BevelInner" Property="BorderBrush" Value="{DynamicResource BevelLightBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -465,9 +508,17 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bg" Background="{TemplateBinding Background}"
-                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <!-- Raised bevel: light edge top-left, dark edge bottom-right; a pressed button sinks -->
+                        <Border x:Name="BevelOuter" BorderBrush="{DynamicResource BevelLightBrush}" BorderThickness="{DynamicResource BevelTopLeft}"
+                                CornerRadius="{DynamicResource RadiusMd}" Effect="{DynamicResource ControlShadow}">
+                            <Border x:Name="BevelInner" BorderBrush="{DynamicResource BevelDarkBrush}" BorderThickness="{DynamicResource BevelBottomRight}"
+                                    CornerRadius="{DynamicResource RadiusMd}">
+                                <Border x:Name="Bg" Background="{TemplateBinding Background}"
+                                        BorderBrush="{DynamicResource ControlBorderBrush}" BorderThickness="{DynamicResource ControlBorderThickness}"
+                                        CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                    <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                            </Border>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
@@ -475,6 +526,8 @@
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Surface1Brush}"/>
+                                <Setter TargetName="BevelOuter" Property="BorderBrush" Value="{DynamicResource BevelDarkBrush}"/>
+                                <Setter TargetName="BevelInner" Property="BorderBrush" Value="{DynamicResource BevelLightBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -498,24 +551,34 @@
                     <ControlTemplate TargetType="views:ThemedWindow">
                         <Border x:Name="PART_Card" Background="{TemplateBinding Surface}"
                                 CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
-                                BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1"
+                                BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="{DynamicResource WindowBorderThickness}"
                                 Effect="{TemplateBinding Shadow}">
-                            <Grid>
-                                <DockPanel Margin="{TemplateBinding Padding}">
-                                    <Grid x:Name="Header" DockPanel.Dock="Top" Margin="0,0,0,16" Visibility="Collapsed">
-                                        <TextBlock Text="{TemplateBinding Title}" Foreground="{DynamicResource TextBrush}"
-                                                   FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold"
-                                                   VerticalAlignment="Center"/>
-                                        <Button x:Name="PART_Close" Content="✕" HorizontalAlignment="Right"
-                                                Style="{StaticResource CloseButton}"/>
+                            <!-- Raised bevel (only themes with bevels give it a thickness) -->
+                            <Border BorderBrush="{DynamicResource BevelLightBrush}" BorderThickness="{DynamicResource BevelTopLeft}"
+                                    CornerRadius="{DynamicResource RadiusXl}">
+                                <Border BorderBrush="{DynamicResource BevelDarkBrush}" BorderThickness="{DynamicResource BevelBottomRight}"
+                                        CornerRadius="{DynamicResource RadiusXl}">
+                                    <Grid>
+                                        <DockPanel>
+                                            <Border x:Name="Header" DockPanel.Dock="Top" Visibility="Collapsed"
+                                                    Background="{DynamicResource WindowHeaderBrush}" Padding="{DynamicResource WindowHeaderPadding}">
+                                                <Grid>
+                                                    <TextBlock Text="{TemplateBinding Title}" Foreground="{DynamicResource WindowHeaderTextBrush}"
+                                                               FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold"
+                                                               VerticalAlignment="Center"/>
+                                                    <Button x:Name="PART_Close" Content="✕" HorizontalAlignment="Right"
+                                                            Style="{StaticResource CloseButton}"/>
+                                                </Grid>
+                                            </Border>
+                                            <AdornerDecorator Margin="{TemplateBinding Padding}">
+                                                <ContentPresenter/>
+                                            </AdornerDecorator>
+                                        </DockPanel>
+                                        <ResizeGrip x:Name="Grip" HorizontalAlignment="Right" VerticalAlignment="Bottom"
+                                                    Margin="0,0,2,2" IsTabStop="False" Visibility="Collapsed"/>
                                     </Grid>
-                                    <AdornerDecorator>
-                                        <ContentPresenter/>
-                                    </AdornerDecorator>
-                                </DockPanel>
-                                <ResizeGrip x:Name="Grip" HorizontalAlignment="Right" VerticalAlignment="Bottom"
-                                            Margin="0,0,2,2" IsTabStop="False" Visibility="Collapsed"/>
-                            </Grid>
+                                </Border>
+                            </Border>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="ShowHeader" Value="True">

@@ -25,6 +25,13 @@ public static class AppThemes
     public const string FluentDark = "Fluent Dark";
     public const string FluentLight = "Fluent Light";
     public const string GlassDark = "Liquid Glass Dark";
+    public const string Pomodoro = "Pomodoro";
+    public const string Zen = "Zen";
+    public const string Windows95 = "Windows 95";
+    public const string RosePine = "Rosé Pine";
+    public const string RosePineDawn = "Rosé Pine Dawn";
+    public const string Neobrutalism = "Neobrutalism";
+    public const string Tron = "Tron";
 
     // Themes whose dialogs get a system backdrop behind them (see WindowBackdrop)
     private static readonly Dictionary<string, Backdrop> Backdrops = new()
@@ -58,7 +65,14 @@ public static class AppThemes
         [Terminal] = new Uri("Themes/Terminal.xaml", UriKind.Relative),
         [FluentDark] = new Uri("Themes/FluentDark.xaml", UriKind.Relative),
         [FluentLight] = new Uri("Themes/FluentLight.xaml", UriKind.Relative),
-        [GlassDark] = new Uri("Themes/GlassDark.xaml", UriKind.Relative)
+        [GlassDark] = new Uri("Themes/GlassDark.xaml", UriKind.Relative),
+        [Pomodoro] = new Uri("Themes/Pomodoro.xaml", UriKind.Relative),
+        [Zen] = new Uri("Themes/Zen.xaml", UriKind.Relative),
+        [Windows95] = new Uri("Themes/Windows95.xaml", UriKind.Relative),
+        [RosePine] = new Uri("Themes/RosePine.xaml", UriKind.Relative),
+        [RosePineDawn] = new Uri("Themes/RosePineDawn.xaml", UriKind.Relative),
+        [Neobrutalism] = new Uri("Themes/Neobrutalism.xaml", UriKind.Relative),
+        [Tron] = new Uri("Themes/Tron.xaml", UriKind.Relative)
     };
 
     // Font used by the "from theme" font option. GitHub's own Mona Sans has no Cyrillic, so GitHub Dark
@@ -81,7 +95,14 @@ public static class AppThemes
         [Terminal] = AppFonts.JetBrainsMono,
         [FluentDark] = AppFonts.System,
         [FluentLight] = AppFonts.System,
-        [GlassDark] = AppFonts.System
+        [GlassDark] = AppFonts.System,
+        [Pomodoro] = AppFonts.System,
+        [Zen] = AppFonts.System,
+        [Windows95] = "Microsoft Sans Serif",
+        [RosePine] = AppFonts.System,
+        [RosePineDawn] = AppFonts.System,
+        [Neobrutalism] = AppFonts.System,
+        [Tron] = "Bahnschrift"
     };
 
     public static bool IsKnown(string theme) => Sources.ContainsKey(theme);

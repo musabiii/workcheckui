@@ -20,10 +20,13 @@ public static class AppFonts
         if (font == FromTheme)
             font = AppThemes.FontOf(theme);
 
+        // Besides the two picker options a theme may name any installed font family
         var resources = Application.Current.Resources;
-        var mono = font == JetBrainsMono;
-
-        resources["AppFont"] = mono ? JetBrainsMonoFamily : SystemFonts.MessageFontFamily;
-        resources["TimerFont"] = mono ? JetBrainsMonoFamily : ConsolasFamily;
+        (resources["AppFont"], resources["TimerFont"]) = font switch
+        {
+            JetBrainsMono => (JetBrainsMonoFamily, JetBrainsMonoFamily),
+            System => (SystemFonts.MessageFontFamily, ConsolasFamily),
+            _ => (new FontFamily(font), new FontFamily(font))
+        };
     }
 }

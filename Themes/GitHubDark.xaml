@@ -26,6 +26,8 @@
     <SolidColorBrush x:Key="Surface1Brush" Color="#30363D"/>
     <SolidColorBrush x:Key="Surface2Brush" Color="#484F58"/>
     <SolidColorBrush x:Key="Surface3Brush" Color="#262C36"/>
+    <!-- Outline of text fields and check boxes -->
+    <SolidColorBrush x:Key="InputBorderBrush" Color="#30363D"/>
 
     <!-- Muted text and icons -->
     <SolidColorBrush x:Key="Overlay0Brush" Color="#6E7681"/>
@@ -56,9 +58,14 @@
     <SolidColorBrush x:Key="AccentBrush" Color="#58A6FF"/>
     <SolidColorBrush x:Key="AccentHoverBrush" Color="#79C0FF"/>
     <SolidColorBrush x:Key="AccentPressedBrush" Color="#388BFD"/>
+    <!-- Accent used as a text color, e.g. the selected segment -->
+    <SolidColorBrush x:Key="AccentTextBrush" Color="#58A6FF"/>
 
     <!-- Outline of every window -->
     <SolidColorBrush x:Key="WindowBorderBrush" Color="#30363D"/>
+
+    <!-- Title text of a window title bar -->
+    <SolidColorBrush x:Key="WindowHeaderTextBrush" Color="#E6EDF3"/>
 
     <!-- Light overlays on top of any surface: hover, separators, chart grid, faint panels -->
     <SolidColorBrush x:Key="HoverBrush" Color="#33FFFFFF"/>

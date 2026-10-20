@@ -55,11 +55,7 @@
                                Margin="0,8,0,0"
                                HorizontalAlignment="Center"/>
 
-                    <TextBox x:Name="DescriptionBox"
-                             Foreground="{DynamicResource TextBrush}"
-                             Background="{DynamicResource Surface0Brush}"
-                             BorderBrush="{DynamicResource Surface1Brush}"
-                             BorderThickness="1"
+                    <TextBox Style="{StaticResource TextInput}" x:Name="DescriptionBox"
                              FontSize="{StaticResource FontSizeLarge}"
                              Padding="12,10"
                              Margin="0,20,0,0"

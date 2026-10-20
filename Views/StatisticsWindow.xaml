@@ -104,7 +104,7 @@
                 <Button Content="◀" Click="OnPreviousClick" Cursor="Hand"
                         Padding="10,4" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"
                         Style="{StaticResource CloseButton}"/>
-                <TextBlock x:Name="DateText" Text="05.03.2026" Foreground="{DynamicResource AccentBrush}"
+                <TextBlock x:Name="DateText" Text="05.03.2026" Foreground="{DynamicResource AccentTextBrush}"
                            FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold"
                            VerticalAlignment="Center"
                            Margin="12,0"/>
@@ -169,7 +169,7 @@
                 <Grid Grid.Row="1" Margin="0,0,0,8">
                     <TextBlock Text="Сессии:" Foreground="{DynamicResource Overlay0Brush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2" Margin="0,0,8,0">
+                        <Border Style="{StaticResource SegmentGroup}" Padding="2" Margin="0,0,8,0">
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton x:Name="AllSessionsRadio" Content="Все" GroupName="SessionFilter"
                                              Style="{StaticResource SmallSegment}" IsChecked="True"
@@ -179,7 +179,7 @@
                                              Checked="OnFilterChanged"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2" Margin="0,0,8,0"
+                        <Border Style="{StaticResource SegmentGroup}" Padding="2" Margin="0,0,8,0"
                                 ToolTip="Как показывать перерывы и время не у компа">
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton Content="По типу" GroupName="Grouping"
@@ -190,7 +190,7 @@
                                              Checked="OnFilterChanged"/>
                             </StackPanel>
                         </Border>
-                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2">
+                        <Border Style="{StaticResource SegmentGroup}" Padding="2">
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton x:Name="ListViewRadio" Content="Список" GroupName="SessionView"
                                              Style="{StaticResource SmallSegment}"
@@ -222,7 +222,7 @@
                     <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,16,0,8">
                         <TextBlock Text="План: поработать" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
                                    VerticalAlignment="Center"/>
-                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2" Margin="8,0,0,0"
+                        <Border Style="{StaticResource SegmentGroup}" Padding="2" Margin="8,0,0,0"
                                 ToolTip="«ещё» — с этого момента; «всего» — за сегодня, с учётом уже отработанного">
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton x:Name="PlanMoreRadio" Content="ещё" GroupName="PlanMode" Style="{StaticResource SmallSegment}"
@@ -231,23 +231,17 @@
                                              Style="{StaticResource SmallSegment}" Checked="OnPlanChanged"/>
                             </StackPanel>
                         </Border>
-                        <TextBox x:Name="PlanInput" Width="48" Height="24" Margin="8,0,4,0" Padding="4,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="{StaticResource FontSizeSmall}"
-                                 Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
-                                 BorderBrush="{DynamicResource Surface1Brush}" CaretBrush="{DynamicResource TextBrush}"
+                        <TextBox Style="{StaticResource TextInput}" x:Name="PlanInput" Width="48" Height="24" Margin="8,0,4,0" Padding="4,0" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" FontSize="{StaticResource FontSizeSmall}"
                                  TextChanged="OnPlanChanged"
                                  ToolTip="Часы: 3, 2,5 или 2:30. Минуты: 90м"/>
                         <TextBlock Text="ч" Foreground="{DynamicResource Overlay1Brush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
                         <TextBlock Text="·  помидор" Margin="12,0,0,0" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
                                    VerticalAlignment="Center"/>
-                        <TextBox x:Name="PomodoroInput" Width="40" Height="24" Margin="8,0,4,0" Padding="4,0" VerticalContentAlignment="Center" FontSize="{StaticResource FontSizeSmall}"
-                                 Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
-                                 BorderBrush="{DynamicResource Surface1Brush}" CaretBrush="{DynamicResource TextBrush}"
+                        <TextBox Style="{StaticResource TextInput}" x:Name="PomodoroInput" Width="40" Height="24" Margin="8,0,4,0" Padding="4,0" VerticalContentAlignment="Center" FontSize="{StaticResource FontSizeSmall}"
                                  HorizontalContentAlignment="Center" TextChanged="OnPlanChanged" ToolTip="Длина помидора в минутах"/>
                         <TextBlock Text="перерыв" Margin="12,0,0,0" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
                                    VerticalAlignment="Center"/>
-                        <TextBox x:Name="PauseInput" Width="40" Height="24" Margin="8,0,4,0" Padding="4,0" VerticalContentAlignment="Center" FontSize="{StaticResource FontSizeSmall}"
-                                 Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
-                                 BorderBrush="{DynamicResource Surface1Brush}" CaretBrush="{DynamicResource TextBrush}"
+                        <TextBox Style="{StaticResource TextInput}" x:Name="PauseInput" Width="40" Height="24" Margin="8,0,4,0" Padding="4,0" VerticalContentAlignment="Center" FontSize="{StaticResource FontSizeSmall}"
                                  HorizontalContentAlignment="Center" TextChanged="OnPlanChanged" ToolTip="Длина перерыва в минутах"/>
                         <TextBlock Text="мин" Foreground="{DynamicResource Overlay1Brush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
                     </StackPanel>
@@ -255,7 +249,7 @@
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
                         <TextBlock Text="Заполнение:" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
                                    VerticalAlignment="Center"/>
-                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2" Margin="8,0,12,0">
+                        <Border Style="{StaticResource SegmentGroup}" Padding="2" Margin="8,0,12,0">
                             <StackPanel Orientation="Horizontal">
                                 <RadioButton x:Name="PlanAutoRadio" Content="авто" GroupName="PlanFill"
                                              Style="{StaticResource SmallSegment}" IsChecked="True" Checked="OnPlanChanged"/>

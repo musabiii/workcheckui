@@ -25,6 +25,27 @@
     <CornerRadius x:Key="RadiusXlStart">12,0,0,12</CornerRadius>
     <CornerRadius x:Key="Radius2xlTop">16,16,0,0</CornerRadius>
 
+    <!-- Shape of borders. The defaults keep the plain look; a theme overrides them for its style:
+         thick black outlines (Neobrutalism), 3D bevels (Windows 95), outlined glowing controls (Tron) -->
+    <Thickness x:Key="WindowBorderThickness">1</Thickness>
+    <Thickness x:Key="ControlBorderThickness">0</Thickness>
+    <Thickness x:Key="InputBorderThickness">1</Thickness>
+    <SolidColorBrush x:Key="ControlBorderBrush" Color="Transparent"/>
+
+    <!-- 3D bevel: a light edge top-left and a dark edge bottom-right (swapped for sunken inputs and pressed buttons) -->
+    <Thickness x:Key="BevelTopLeft">0</Thickness>
+    <Thickness x:Key="BevelBottomRight">0</Thickness>
+    <SolidColorBrush x:Key="BevelLightBrush" Color="Transparent"/>
+    <SolidColorBrush x:Key="BevelDarkBrush" Color="Transparent"/>
+
+    <!-- Shadow under buttons: none by default, a hard offset one or a glow in some themes -->
+    <x:Null x:Key="ControlShadow"/>
+
+    <!-- Title bar of a ThemedWindow (ShowHeader): transparent and inside the window padding by default,
+         a full-width colored bar in Windows 95 -->
+    <Thickness x:Key="WindowHeaderPadding">20,16,20,0</Thickness>
+    <SolidColorBrush x:Key="WindowHeaderBrush" Color="Transparent"/>
+
     <!-- Transparent space around a window so its shadow or glow isn't clipped; AppThemes.WindowShadowSpace in code -->
     <Thickness x:Key="WindowShadowSpace">16</Thickness>
 

@@ -1,0 +1,91 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Rosé Pine Dawn: the light morning version, parchment with rose and pine -->
+
+    <!-- Window background -->
+    <SolidColorBrush x:Key="BaseBrush" Color="#FAF4ED"/>
+
+    <!-- Card background in dialogs with a system backdrop; this theme has none, so it is the window background -->
+    <SolidColorBrush x:Key="BackdropTintBrush" Color="#FAF4ED"/>
+
+    <!-- Semi-transparent window background -->
+    <SolidColorBrush x:Key="BaseTranslucentBrush" Color="#EEFAF4ED"/>
+
+    <!-- Inset panels -->
+    <SolidColorBrush x:Key="MantleBrush" Color="#FFFAF3"/>
+    <SolidColorBrush x:Key="MantleTranslucentBrush" Color="#F2FFFAF3"/>
+
+    <!-- Alternating rows and stripes -->
+    <SolidColorBrush x:Key="CrustBrush" Color="#F4EDE8"/>
+
+    <!-- Status window background while drifting -->
+    <SolidColorBrush x:Key="DriftBaseBrush" Color="#E6E2DE"/>
+
+    <!-- Inputs, toggles, buttons -->
+    <SolidColorBrush x:Key="Surface0Brush" Color="#F2E9E1"/>
+    <SolidColorBrush x:Key="Surface1Brush" Color="#DFDAD9"/>
+    <SolidColorBrush x:Key="Surface2Brush" Color="#CECACD"/>
+    <SolidColorBrush x:Key="Surface3Brush" Color="#E8E1DB"/>
+
+    <!-- Outline of text fields and check boxes -->
+    <SolidColorBrush x:Key="InputBorderBrush" Color="#DFDAD9"/>
+
+    <!-- Muted text and icons -->
+    <SolidColorBrush x:Key="Overlay0Brush" Color="#9893A5"/>
+    <SolidColorBrush x:Key="Overlay1Brush" Color="#8A85A0"/>
+    <SolidColorBrush x:Key="Subtext0Brush" Color="#797593"/>
+    <SolidColorBrush x:Key="Subtext1Brush" Color="#625D85"/>
+    <SolidColorBrush x:Key="TextBrush" Color="#575279"/>
+
+    <!-- Text on accent-colored buttons and bars -->
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#FAF4ED"/>
+
+    <!-- Accents -->
+    <SolidColorBrush x:Key="GreenBrush" Color="#56949F"/>
+    <SolidColorBrush x:Key="GreenHoverBrush" Color="#4A8590"/>
+    <SolidColorBrush x:Key="YellowBrush" Color="#EA9D34"/>
+    <SolidColorBrush x:Key="RedBrush" Color="#B4637A"/>
+    <SolidColorBrush x:Key="RedHoverBrush" Color="#A0566C"/>
+    <SolidColorBrush x:Key="RedPressedBrush" Color="#8C4A5E"/>
+    <SolidColorBrush x:Key="RedTranslucentBrush" Color="#33B4637A"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="#286983"/>
+    <SolidColorBrush x:Key="BlueHoverBrush" Color="#225B71"/>
+    <SolidColorBrush x:Key="BluePressedBrush" Color="#1C4C5E"/>
+    <SolidColorBrush x:Key="MauveBrush" Color="#907AA9"/>
+    <SolidColorBrush x:Key="PeachBrush" Color="#D7827E"/>
+    <SolidColorBrush x:Key="TealBrush" Color="#56949F"/>
+
+    <!-- Signature color of the theme: primary button, selected segment, focus, sliders -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#D7827E"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#CC716C"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#B9605B"/>
+
+    <!-- Accent used as a text color, e.g. the selected segment -->
+    <SolidColorBrush x:Key="AccentTextBrush" Color="#B4637A"/>
+
+    <!-- Outline of every window -->
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#33D7827E"/>
+
+    <!-- Title text of a window title bar -->
+    <SolidColorBrush x:Key="WindowHeaderTextBrush" Color="#575279"/>
+
+    <!-- Overlays on top of any surface: hover, separators, chart grid, faint panels -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#14000000"/>
+    <SolidColorBrush x:Key="HoverSubtleBrush" Color="#0B000000"/>
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#1A000000"/>
+    <SolidColorBrush x:Key="GridLineBrush" Color="#14000000"/>
+    <SolidColorBrush x:Key="PanelTintBrush" Color="#0A000000"/>
+
+    <!-- Shape: round corners, a light shadow -->
+    <CornerRadius x:Key="RadiusXs">4</CornerRadius>
+    <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">8</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">12</CornerRadius>
+    <CornerRadius x:Key="RadiusXl">16</CornerRadius>
+    <CornerRadius x:Key="Radius2xl">20</CornerRadius>
+    <CornerRadius x:Key="RadiusXlStart">16,0,0,16</CornerRadius>
+    <CornerRadius x:Key="Radius2xlTop">20,20,0,0</CornerRadius>
+    <DropShadowEffect x:Key="ShadowSm" Color="#575279" BlurRadius="24" Opacity="0.15" ShadowDepth="4"/>
+    <DropShadowEffect x:Key="ShadowMd" Color="#575279" BlurRadius="28" Opacity="0.18" ShadowDepth="6"/>
+    <DropShadowEffect x:Key="ShadowLg" Color="#575279" BlurRadius="36" Opacity="0.22" ShadowDepth="8"/>
+</ResourceDictionary>

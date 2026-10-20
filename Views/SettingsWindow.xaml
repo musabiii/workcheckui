@@ -6,7 +6,7 @@
         Title="Настройки"
         ShowHeader="True"
         WindowStartupLocation="CenterScreen"
-        Width="400" Height="520">
+        Width="400" Height="580">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
@@ -66,7 +66,7 @@
                           Visibility="{Binding IsChecked, ElementName=AppearanceTab, Converter={StaticResource BoolToVisibility}}">
                 <StackPanel>
                     <TextBlock Text="Шрифт" Style="{StaticResource FieldLabel}"/>
-                    <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
+                    <Border Style="{StaticResource SegmentGroup}">
                         <UniformGrid Columns="3">
                             <RadioButton Content="Из темы" GroupName="Font"
                                          Style="{StaticResource SegmentRadio}" Padding="0,6"
@@ -85,7 +85,7 @@
 
                     <TextBlock Text="Тема" Style="{StaticResource FieldLabel}" Margin="0,16,0,8"/>
                     <TextBlock Text="Тёмные" Style="{StaticResource GroupCaption}"/>
-                    <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
+                    <Border Style="{StaticResource SegmentGroup}">
                         <UniformGrid Columns="4">
                             <RadioButton Content="Catppuccin" Style="{StaticResource ThemeOption}"
                                          IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Mocha}}"/>
@@ -111,11 +111,17 @@
                                          IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.FluentDark}}"/>
                             <RadioButton Content="Glass" Style="{StaticResource ThemeOption}"
                                          IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.GlassDark}}"/>
+                            <RadioButton Content="Zen" Style="{StaticResource ThemeOption}"
+                                         IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Zen}}"/>
+                            <RadioButton Content="Rosé Pine" Style="{StaticResource ThemeOption}"
+                                         IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.RosePine}}"/>
+                            <RadioButton Content="Tron" Style="{StaticResource ThemeOption}"
+                                         IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Tron}}"/>
                         </UniformGrid>
                     </Border>
 
                     <TextBlock Text="Светлые" Style="{StaticResource GroupCaption}" Margin="0,12,0,4"/>
-                    <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
+                    <Border Style="{StaticResource SegmentGroup}">
                         <UniformGrid Columns="4">
                             <RadioButton Content="Latte" Style="{StaticResource ThemeOption}"
                                          IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Latte}}"/>
@@ -127,6 +133,14 @@
                                          IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Glass}}"/>
                             <RadioButton Content="Fluent" Style="{StaticResource ThemeOption}"
                                          IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.FluentLight}}"/>
+                            <RadioButton Content="Pomodoro" Style="{StaticResource ThemeOption}"
+                                         IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Pomodoro}}"/>
+                            <RadioButton Content="Rosé Dawn" Style="{StaticResource ThemeOption}"
+                                         IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.RosePineDawn}}"/>
+                            <RadioButton Content="Windows 95" Style="{StaticResource ThemeOption}"
+                                         IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Windows95}}"/>
+                            <RadioButton Content="Brutalism" Style="{StaticResource ThemeOption}"
+                                         IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Neobrutalism}}"/>
                         </UniformGrid>
                     </Border>
                 </StackPanel>
