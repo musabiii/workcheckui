@@ -1,15 +1,12 @@
 using System.Windows;
-using System.Windows.Input;
-using WorkCheck.Helpers;
 
 namespace WorkCheck.Views;
 
-public partial class ConfirmWindow : Window
+public partial class ConfirmWindow : ThemedWindow
 {
     private ConfirmWindow(string title, string message, string confirmText, string? cancelText)
     {
         InitializeComponent();
-        WindowBackdrop.Apply(this);
         TitleBlock.Text = title;
         MessageBlock.Text = message;
         ConfirmButton.Content = confirmText;
@@ -30,12 +27,6 @@ public partial class ConfirmWindow : Window
 
     public static void Inform(Window owner, string title, string message) =>
         new ConfirmWindow(title, message, "Понятно", null) { Owner = owner }.ShowDialog();
-
-    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-    {
-        base.OnMouseLeftButtonDown(e);
-        DragMove();
-    }
 
     private void OnConfirmClick(object sender, RoutedEventArgs e) => DialogResult = true;
 

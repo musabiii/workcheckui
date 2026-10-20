@@ -11,8 +11,8 @@ using Color = System.Windows.Media.Color;
 namespace WorkCheck.Helpers;
 
 // Windows 11 draws a system backdrop (blurred Acrylic, or Mica tinted by the wallpaper) only under regular
-// windows, not under layered ones (AllowsTransparency). For themes with a backdrop a dialog is switched to
-// WindowChrome before it is shown; Windows then also draws its rounded corners and shadow, so the window's
+// windows, not under layered ones (AllowsTransparency). For themes with a backdrop a ThemedWindow is switched
+// to WindowChrome before it is shown; Windows then also draws its rounded corners and shadow, so the card's
 // own ones are dropped.
 public static class WindowBackdrop
 {
@@ -32,24 +32,18 @@ public static class WindowBackdrop
     // DWMWA_SYSTEMBACKDROP_TYPE exists from Windows 11 22H2
     private static bool IsSupported => Environment.OSVersion.Version.Build >= 22621;
 
-    // Call after InitializeComponent and before the window is shown
-    public static void Apply(Window window)
+    // Switches the window to WindowChrome if the current theme has a backdrop; must run before it is shown.
+    // Returns whether it did, so the caller knows the card should give up its own shadow and corners
+    public static bool TryEnable(Window window)
     {
         var backdrop = AppThemes.BackdropOf(AppThemes.Current);
-        if (backdrop == Backdrop.None || !IsSupported) return;
+        if (backdrop == Backdrop.None || !IsSupported) return false;
 
         window.AllowsTransparency = false;
         window.WindowStyle = WindowStyle.SingleBorderWindow;
         window.Background = Brushes.Transparent;
         if (window.ResizeMode == ResizeMode.CanResizeWithGrip)
             window.ResizeMode = ResizeMode.CanResize;
-
-        // The transparent space reserved for the window's own shadow is not needed any more
-        var space = 2 * AppThemes.WindowShadowSpace;
-        if (!double.IsNaN(window.Width)) window.Width -= space;
-        if (!double.IsNaN(window.Height)) window.Height -= space;
-        if (window.MinWidth > 0) window.MinWidth -= space;
-        if (window.MinHeight > 0) window.MinHeight -= space;
 
         WindowChrome.SetWindowChrome(window, new WindowChrome
         {
@@ -59,15 +53,17 @@ public static class WindowBackdrop
             UseAeroCaptionButtons = false
         });
 
-        if (window.Content is Border root)
-        {
-            root.Margin = new Thickness(0);
-            root.Effect = null;
-            root.CornerRadius = new CornerRadius(8);
-            root.SetResourceReference(Border.BackgroundProperty, "BackdropTintBrush");
-        }
-
         window.SourceInitialized += (_, _) => EnableBackdrop(window, backdrop);
+        return true;
+    }
+
+    // The card fills the window and lets the backdrop show through its tint
+    public static void StyleCard(Border card)
+    {
+        card.Margin = new Thickness(0);
+        card.Effect = null;
+        card.CornerRadius = new CornerRadius(8);
+        card.SetResourceReference(Border.BackgroundProperty, "BackdropTintBrush");
     }
 
     private static void EnableBackdrop(Window window, Backdrop backdrop)

@@ -1,73 +1,55 @@
-<Window x:Class="WorkCheck.Views.AboutWindow"
-        FontFamily="{DynamicResource AppFont}"
+<views:ThemedWindow x:Class="WorkCheck.Views.AboutWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="О приложении — WorkCheck"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
-        ResizeMode="NoResize"
+        xmlns:views="clr-namespace:WorkCheck.Views"
+        Title="О приложении"
+        ShowHeader="True"
         WindowStartupLocation="CenterScreen"
-        Width="472" Height="372"
-        ShowInTaskbar="False">
+        Width="440" Height="340">
 
-    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
-            BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1">
-        <Border.Effect><DynamicResource ResourceKey="ShadowMd"/></Border.Effect>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <Grid Margin="20,16,20,16">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <!-- Info -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto"
+                      HorizontalScrollBarVisibility="Disabled"
+                      Padding="0,0,4,0">
+        <StackPanel>
+            <TextBlock Text="WorkCheck" Foreground="{DynamicResource YellowBrush}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+            <TextBlock x:Name="VersionBlock" Foreground="{DynamicResource Overlay0Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,2,0,16"/>
 
-            <!-- Header -->
-            <Grid Grid.Row="0" Margin="0,0,0,16">
-                <TextBlock Text="О приложении" Foreground="{DynamicResource TextBrush}" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold"/>
-                <Button Content="✕" HorizontalAlignment="Right"
-                        Style="{StaticResource CloseButton}"
-                        Click="OnCloseClick"/>
-            </Grid>
+            <TextBlock Text="Программа" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
+            <TextBox x:Name="AppPathBox" IsReadOnly="True"
+                     Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
+                     BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
+                     FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
+                     TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-            <!-- Info -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled"
-                          Padding="0,0,4,0">
-            <StackPanel>
-                <TextBlock Text="WorkCheck" Foreground="{DynamicResource YellowBrush}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
-                <TextBlock x:Name="VersionBlock" Foreground="{DynamicResource Overlay0Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,2,0,16"/>
+            <TextBlock Text="База данных" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
+            <TextBox x:Name="DbPathBox" IsReadOnly="True"
+                     Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
+                     BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
+                     FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
+                     TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-                <TextBlock Text="Программа" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-                <TextBox x:Name="AppPathBox" IsReadOnly="True"
-                         Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
-                         BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
-                         FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
-                         TextWrapping="Wrap" Margin="0,0,0,16"/>
+            <TextBlock Text="Настройки" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
+            <TextBox x:Name="SettingsPathBox" IsReadOnly="True"
+                     Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
+                     BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
+                     FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
+                     TextWrapping="Wrap"/>
+        </StackPanel>
+        </ScrollViewer>
 
-                <TextBlock Text="База данных" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-                <TextBox x:Name="DbPathBox" IsReadOnly="True"
-                         Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
-                         BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
-                         FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
-                         TextWrapping="Wrap" Margin="0,0,0,16"/>
-
-                <TextBlock Text="Настройки" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-                <TextBox x:Name="SettingsPathBox" IsReadOnly="True"
-                         Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
-                         BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
-                         FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
-                         TextWrapping="Wrap"/>
-            </StackPanel>
-            </ScrollViewer>
-
-            <!-- Footer -->
-            <Grid Grid.Row="2" Margin="0,16,0,0">
-                <Button Content="Копировать пути" Click="OnCopyClick"
-                        HorizontalAlignment="Left"
-                        Style="{StaticResource HeaderButton}"
-                        FontSize="{StaticResource FontSizeSmall}"/>
-            </Grid>
+        <!-- Footer -->
+        <Grid Grid.Row="1" Margin="0,16,0,0">
+            <Button Content="Копировать пути" Click="OnCopyClick"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource HeaderButton}"
+                    FontSize="{StaticResource FontSizeSmall}"/>
         </Grid>
-    </Border>
-</Window>
+    </Grid>
+</views:ThemedWindow>

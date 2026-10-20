@@ -2,7 +2,6 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Input;
 using WorkCheck.Helpers;
 using WorkCheck.ViewModels;
 using Button = System.Windows.Controls.Button;
@@ -11,7 +10,7 @@ using MenuItem = System.Windows.Controls.MenuItem;
 
 namespace WorkCheck.Views;
 
-public partial class StatusWindow : Window
+public partial class StatusWindow : ThemedWindow
 {
     private bool _forceClose;
     public Action? OnMinimize;
@@ -32,12 +31,6 @@ public partial class StatusWindow : Window
             Top = SystemParameters.WorkArea.Bottom - e.NewSize.Height + AppThemes.WindowShadowSpace - 12;
         else
             Top -= e.NewSize.Height - e.PreviousSize.Height;
-    }
-
-    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-    {
-        base.OnMouseLeftButtonDown(e);
-        DragMove();
     }
 
     protected override void OnClosing(CancelEventArgs e)

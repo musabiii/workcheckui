@@ -13,7 +13,7 @@ namespace WorkCheck.Views;
 // ToggleKey is set on rows with indented children: clicking such a row folds them
 public record PeriodRow(string Name, string[] Cells, string Total, bool IsTotal = false, string? ToggleKey = null);
 
-public partial class StatisticsWindow : Window
+public partial class StatisticsWindow : ThemedWindow
 {
     private enum Period { Day, Week, Month }
 
@@ -27,7 +27,6 @@ public partial class StatisticsWindow : Window
     public StatisticsWindow(DataService dataService, Func<TimeSpan> currentWork)
     {
         InitializeComponent();
-        WindowBackdrop.Apply(this);
         _dataService = dataService;
         _currentWork = currentWork;
         _currentDate = DateTime.Today;
@@ -346,12 +345,6 @@ public partial class StatisticsWindow : Window
         Period.Month => (new DateTime(date.Year, date.Month, 1), new DateTime(date.Year, date.Month, 1).AddMonths(1)),
         _ => (date.Date, date.Date.AddDays(1))
     };
-
-    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-    {
-        base.OnMouseLeftButtonDown(e);
-        DragMove();
-    }
 
     private void LoadStatistics()
     {

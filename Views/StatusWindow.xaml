@@ -1,261 +1,257 @@
-<Window x:Class="WorkCheck.Views.StatusWindow"
-        FontFamily="{DynamicResource AppFont}"
+<views:ThemedWindow x:Class="WorkCheck.Views.StatusWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:views="clr-namespace:WorkCheck.Views"
         xmlns:services="clr-namespace:WorkCheck.Services"
         Title="WorkCheck"
-        WindowStyle="None"
-        AllowsTransparency="True"
-        Background="Transparent"
-        ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="True"
-        Width="356" MinHeight="178" SizeToContent="Height">
+        Width="324" MinHeight="146" SizeToContent="Height"
+        Surface="{Binding WindowBgBrush}"
+        Shadow="{DynamicResource ShadowSm}"
+        Padding="16,12,16,12"
+        UsesSystemBackdrop="False">
 
-    <Border Background="{Binding WindowBgBrush}" CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
-            BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1">
-        <Border.Effect><DynamicResource ResourceKey="ShadowSm"/></Border.Effect>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
 
-        <Grid Margin="16,12,16,12">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
+        <!-- Header -->
+        <Grid Grid.Row="0" Margin="0,0,0,4">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <!-- Projects only matter in work mode; drifting shows a plain label instead of the picker -->
+            <TextBlock Text="Дрейф" Foreground="{DynamicResource Overlay1Brush}" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"
+                       VerticalAlignment="Center" HorizontalAlignment="Left">
+                <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsWorkMode}" Value="False">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </TextBlock.Style>
+            </TextBlock>
+            <Button Click="OnProjectsClick" Style="{StaticResource HeaderButton}"
+                    Foreground="{DynamicResource YellowBrush}" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"
+                    Padding="6,2" Margin="-6,0,0,0"
+                    VerticalAlignment="Center" HorizontalAlignment="Left"
+                    Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}"
+                    ToolTip="Выбрать проект">
+                <DockPanel>
+                    <TextBlock DockPanel.Dock="Right" Text="▾" Margin="4,0,0,0" Opacity="0.7"/>
+                    <TextBlock Text="{Binding ProjectName}" MaxWidth="120" TextTrimming="CharacterEllipsis"/>
+                </DockPanel>
+                <Button.ContextMenu>
+                    <ContextMenu Style="{StaticResource PopupMenu}"/>
+                </Button.ContextMenu>
+            </Button>
 
-            <!-- Header -->
-            <Grid Grid.Row="0" Margin="0,0,0,4">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <!-- Projects only matter in work mode; drifting shows a plain label instead of the picker -->
-                <TextBlock Text="Дрейф" Foreground="{DynamicResource Overlay1Brush}" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"
-                           VerticalAlignment="Center" HorizontalAlignment="Left">
-                    <TextBlock.Style>
-                        <Style TargetType="TextBlock">
-                            <Setter Property="Visibility" Value="Collapsed"/>
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsWorkMode}" Value="False">
-                                    <Setter Property="Visibility" Value="Visible"/>
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </TextBlock.Style>
-                </TextBlock>
-                <Button Click="OnProjectsClick" Style="{StaticResource HeaderButton}"
-                        Foreground="{DynamicResource YellowBrush}" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"
-                        Padding="6,2" Margin="-6,0,0,0"
-                        VerticalAlignment="Center" HorizontalAlignment="Left"
-                        Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}"
-                        ToolTip="Выбрать проект">
-                    <DockPanel>
-                        <TextBlock DockPanel.Dock="Right" Text="▾" Margin="4,0,0,0" Opacity="0.7"/>
-                        <TextBlock Text="{Binding ProjectName}" MaxWidth="120" TextTrimming="CharacterEllipsis"/>
-                    </DockPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4,0,0,0">
+                <Button Content="☰" Click="OnMenuClick"
+                        Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                        ToolTip="Меню">
                     <Button.ContextMenu>
-                        <ContextMenu Style="{StaticResource PopupMenu}"/>
+                        <ContextMenu Style="{StaticResource PopupMenu}">
+                            <MenuItem Header="↺  Обнулить" Command="{Binding ResetCommand}"/>
+                            <MenuItem Header="ℹ  О приложении" Command="{Binding OpenAboutCommand}"/>
+                        </ContextMenu>
                     </Button.ContextMenu>
                 </Button>
+                <Button Content="📊" Command="{Binding OpenStatisticsCommand}"
+                        Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                        Foreground="{DynamicResource BlueBrush}"
+                        ToolTip="Статистика"/>
+                <Button Content="&#xE713;" Command="{Binding OpenSettingsCommand}"
+                        Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                        FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="{StaticResource FontSizeLarge}"
+                        ToolTip="Настройки"/>
+                <Button Content="☕" Command="{Binding ManualBreakCommand}"
+                        Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                        Foreground="{DynamicResource YellowBrush}"
+                        ToolTip="Ручной перерыв"/>
+                <Button Content="🖃" Click="OnMinimizeClick"
+                        Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                        ToolTip="Свернуть"/>
+                <Button Content="✕" Command="{Binding CloseAppCommand}"
+                        Style="{StaticResource CloseButton}"/>
+            </StackPanel>
+        </Grid>
 
-                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="4,0,0,0">
-                    <Button Content="☰" Click="OnMenuClick"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
-                            ToolTip="Меню">
-                        <Button.ContextMenu>
-                            <ContextMenu Style="{StaticResource PopupMenu}">
-                                <MenuItem Header="↺  Обнулить" Command="{Binding ResetCommand}"/>
-                                <MenuItem Header="ℹ  О приложении" Command="{Binding OpenAboutCommand}"/>
-                            </ContextMenu>
-                        </Button.ContextMenu>
-                    </Button>
-                    <Button Content="📊" Command="{Binding OpenStatisticsCommand}"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
-                            Foreground="{DynamicResource BlueBrush}"
-                            ToolTip="Статистика"/>
-                    <Button Content="&#xE713;" Command="{Binding OpenSettingsCommand}"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
-                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="{StaticResource FontSizeLarge}"
-                            ToolTip="Настройки"/>
-                    <Button Content="☕" Command="{Binding ManualBreakCommand}"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
-                            Foreground="{DynamicResource YellowBrush}"
-                            ToolTip="Ручной перерыв"/>
-                    <Button Content="🖃" Click="OnMinimizeClick"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
-                            ToolTip="Свернуть"/>
-                    <Button Content="✕" Command="{Binding CloseAppCommand}"
-                            Style="{StaticResource CloseButton}"/>
-                </StackPanel>
+        <!-- Stats -->
+        <StackPanel Grid.Row="1" VerticalAlignment="Center">
+            <!-- Текущая сессия -->
+            <Grid Margin="0,0,0,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="{StaticResource FontSizeBody}"
+                           FontWeight="Bold">
+                    <Run Text="{Binding SessionIcon, Mode=OneWay}"/><Run Text="{Binding SessionLabel, Mode=OneWay}"/>
+                </TextBlock>
+                <TextBlock Grid.Column="1" Text="{Binding CurrentSessionText}" Foreground="{Binding SessionBrush}"
+                           FontSize="{StaticResource FontSizeBody}" FontWeight="Bold" HorizontalAlignment="Right"/>
             </Grid>
 
-            <!-- Stats -->
-            <StackPanel Grid.Row="1" VerticalAlignment="Center">
-                <!-- Текущая сессия -->
-                <Grid Margin="0,0,0,2">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="{StaticResource FontSizeBody}"
-                               FontWeight="Bold">
-                        <Run Text="{Binding SessionIcon, Mode=OneWay}"/><Run Text="{Binding SessionLabel, Mode=OneWay}"/>
-                    </TextBlock>
-                    <TextBlock Grid.Column="1" Text="{Binding CurrentSessionText}" Foreground="{Binding SessionBrush}"
-                               FontSize="{StaticResource FontSizeBody}" FontWeight="Bold" HorizontalAlignment="Right"/>
-                </Grid>
+            <Separator Grid.Row="1" Margin="0,0,0,2" Background="{DynamicResource SeparatorBrush}" Height="1"/>
 
-                <Separator Grid.Row="1" Margin="0,0,0,2" Background="{DynamicResource SeparatorBrush}" Height="1"/>
+            <!-- Сегодня (режим «Дрейфую») -->
+            <Grid Margin="0,0">
+                <Grid.Style>
+                    <Style TargetType="Grid">
+                        <Setter Property="Visibility" Value="Collapsed"/>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding IsWorkMode}" Value="False">
+                                <Setter Property="Visibility" Value="Visible"/>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </Grid.Style>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="📊  Сегодня:" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"/>
+                <TextBlock Grid.Column="1" Text="{Binding TodayWorkedText}" Foreground="{DynamicResource TextBrush}"
+                           FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+            </Grid>
 
-                <!-- Сегодня (режим «Дрейфую») -->
-                <Grid Margin="0,0">
-                    <Grid.Style>
-                        <Style TargetType="Grid">
-                            <Setter Property="Visibility" Value="Collapsed"/>
+            <!-- Проекты за сегодня (режим «В работе») -->
+            <ItemsControl ItemsSource="{Binding ProjectRows}"
+                          Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock x:Name="NameText" Grid.Column="0" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
+                                       TextTrimming="CharacterEllipsis" Margin="0,0,8,0">
+                                <Run Text="📁  "/><Run Text="{Binding Name, Mode=OneWay}"/>
+                            </TextBlock>
+                            <TextBlock Grid.Column="1" Text="{Binding TimeText}" Foreground="{DynamicResource TextBrush}"
+                                       FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"/>
+                        </Grid>
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsCurrent}" Value="True">
+                                <Setter TargetName="NameText" Property="Foreground" Value="{DynamicResource YellowBrush}"/>
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+
+            <Separator Margin="0,2,0,2" Background="{DynamicResource SeparatorBrush}" Height="1"
+                       Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
+
+            <!-- Всего за сегодня по проектам -->
+            <Grid Margin="0,0" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="{Binding TotalLabel}" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"/>
+                <TextBlock Grid.Column="1" Text="{Binding TotalTimeText}" Foreground="{DynamicResource TextBrush}"
+                           FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+            </Grid>
+
+        </StackPanel>
+
+        <!-- Footer: mode toggle + status + background sound -->
+        <Grid Grid.Row="2" Margin="0,4,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button Content="{Binding ModeButtonText}"
+                    Command="{Binding ToggleModeCommand}"
+                    HorizontalAlignment="Left"
+                    Style="{StaticResource HeaderButton}"
+                    FontSize="{StaticResource FontSizeSmall}"/>
+
+            <TextBlock Grid.Column="1" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}"
+                       FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="6,0,0,0">
+                <Button x:Name="SoundPickerButton" Content="&#xE8D6;" Click="OnSoundPickerClick"
+                        Style="{StaticResource HeaderButton}"
+                        FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="{StaticResource FontSizeBody}"
+                        Margin="0,0,2,0" ToolTip="Выбрать фоновый звук"/>
+                <Button Command="{Binding ToggleAmbientCommand}"
+                        FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="{StaticResource FontSizeSmall}"
+                        ToolTip="Фоновый звук: вкл/выкл">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource HeaderButton}">
+                            <!-- Play while off, pause while playing -->
+                            <Setter Property="Content" Value="&#xE768;"/>
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding IsWorkMode}" Value="False">
-                                    <Setter Property="Visibility" Value="Visible"/>
+                                <DataTrigger Binding="{Binding IsAmbientPlaying}" Value="True">
+                                    <Setter Property="Content" Value="&#xE769;"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
                                 </DataTrigger>
                             </Style.Triggers>
                         </Style>
-                    </Grid.Style>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="📊  Сегодня:" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"/>
-                    <TextBlock Grid.Column="1" Text="{Binding TodayWorkedText}" Foreground="{DynamicResource TextBrush}"
-                               FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
-                </Grid>
-
-                <!-- Проекты за сегодня (режим «В работе») -->
-                <ItemsControl ItemsSource="{Binding ProjectRows}"
-                              Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock x:Name="NameText" Grid.Column="0" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
-                                           TextTrimming="CharacterEllipsis" Margin="0,0,8,0">
-                                    <Run Text="📁  "/><Run Text="{Binding Name, Mode=OneWay}"/>
-                                </TextBlock>
-                                <TextBlock Grid.Column="1" Text="{Binding TimeText}" Foreground="{DynamicResource TextBrush}"
-                                           FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"/>
-                            </Grid>
-                            <DataTemplate.Triggers>
-                                <DataTrigger Binding="{Binding IsCurrent}" Value="True">
-                                    <Setter TargetName="NameText" Property="Foreground" Value="{DynamicResource YellowBrush}"/>
-                                </DataTrigger>
-                            </DataTemplate.Triggers>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-
-                <Separator Margin="0,2,0,2" Background="{DynamicResource SeparatorBrush}" Height="1"
-                           Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}"/>
-
-                <!-- Всего за сегодня по проектам -->
-                <Grid Margin="0,0" Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding TotalLabel}" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"/>
-                    <TextBlock Grid.Column="1" Text="{Binding TotalTimeText}" Foreground="{DynamicResource TextBrush}"
-                               FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
-                </Grid>
-
+                    </Button.Style>
+                </Button>
             </StackPanel>
 
-            <!-- Footer: mode toggle + status + background sound -->
-            <Grid Grid.Row="2" Margin="0,4,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <Button Content="{Binding ModeButtonText}"
-                        Command="{Binding ToggleModeCommand}"
-                        HorizontalAlignment="Left"
-                        Style="{StaticResource HeaderButton}"
-                        FontSize="{StaticResource FontSizeSmall}"/>
+            <Popup x:Name="SoundPopup" PlacementTarget="{Binding ElementName=SoundPickerButton}"
+                   Placement="Top" HorizontalOffset="-150" VerticalOffset="-4"
+                   StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade"
+                   Closed="OnSoundPopupClosed">
+                <Border Width="200" Background="{DynamicResource BaseBrush}" BorderBrush="{DynamicResource WindowBorderBrush}"
+                        BorderThickness="1" CornerRadius="{DynamicResource RadiusMd}" Padding="4"
+                        TextElement.FontFamily="{DynamicResource AppFont}">
+                    <StackPanel>
+                        <ItemsControl ItemsSource="{Binding AmbientGroups}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <StackPanel>
+                                        <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Overlay1Brush}"
+                                                   FontSize="{StaticResource FontSizeCaption}" Margin="12,6,12,2"/>
+                                        <ItemsControl ItemsSource="{Binding Options}">
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Button Content="{Binding Title}" Style="{StaticResource PopupItem}"
+                                                            Tag="{Binding IsSelected}" CommandParameter="{Binding Sound}"
+                                                            Command="{Binding DataContext.SelectAmbientCommand, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}"
+                                                            Click="OnSoundChosen"/>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                    </StackPanel>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
 
-                <TextBlock Grid.Column="1" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}"
-                           FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
+                        <Border Height="1" Margin="8,4" Background="{DynamicResource Surface1Brush}"/>
 
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="6,0,0,0">
-                    <Button x:Name="SoundPickerButton" Content="&#xE8D6;" Click="OnSoundPickerClick"
-                            Style="{StaticResource HeaderButton}"
-                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="{StaticResource FontSizeBody}"
-                            Margin="0,0,2,0" ToolTip="Выбрать фоновый звук"/>
-                    <Button Command="{Binding ToggleAmbientCommand}"
-                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="{StaticResource FontSizeSmall}"
-                            ToolTip="Фоновый звук: вкл/выкл">
-                        <Button.Style>
-                            <Style TargetType="Button" BasedOn="{StaticResource HeaderButton}">
-                                <!-- Play while off, pause while playing -->
-                                <Setter Property="Content" Value="&#xE768;"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding IsAmbientPlaying}" Value="True">
-                                        <Setter Property="Content" Value="&#xE769;"/>
-                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
-                                    </DataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Button.Style>
-                    </Button>
-                </StackPanel>
+                        <Grid Margin="12,4,12,6">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Громкость" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"/>
+                            <TextBlock Foreground="{DynamicResource Subtext0Brush}" FontSize="{StaticResource FontSizeSmall}" HorizontalAlignment="Right"
+                                       Text="{Binding AmbientVolume, StringFormat={}{0:0}%}"/>
+                            <Slider Grid.Row="1" Margin="0,6,0,0" Style="{StaticResource VolumeSlider}"
+                                    Minimum="0" Maximum="100" Value="{Binding AmbientVolume}"/>
+                        </Grid>
 
-                <Popup x:Name="SoundPopup" PlacementTarget="{Binding ElementName=SoundPickerButton}"
-                       Placement="Top" HorizontalOffset="-150" VerticalOffset="-4"
-                       StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade"
-                       Closed="OnSoundPopupClosed">
-                    <Border Width="200" Background="{DynamicResource BaseBrush}" BorderBrush="{DynamicResource WindowBorderBrush}"
-                            BorderThickness="1" CornerRadius="{DynamicResource RadiusMd}" Padding="4"
-                            TextElement.FontFamily="{DynamicResource AppFont}">
-                        <StackPanel>
-                            <ItemsControl ItemsSource="{Binding AmbientGroups}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <StackPanel>
-                                            <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Overlay1Brush}"
-                                                       FontSize="{StaticResource FontSizeCaption}" Margin="12,6,12,2"/>
-                                            <ItemsControl ItemsSource="{Binding Options}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Button Content="{Binding Title}" Style="{StaticResource PopupItem}"
-                                                                Tag="{Binding IsSelected}" CommandParameter="{Binding Sound}"
-                                                                Command="{Binding DataContext.SelectAmbientCommand, RelativeSource={RelativeSource AncestorType=ItemsControl, AncestorLevel=2}}"
-                                                                Click="OnSoundChosen"/>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </StackPanel>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-
-                            <Border Height="1" Margin="8,4" Background="{DynamicResource Surface1Brush}"/>
-
-                            <Grid Margin="12,4,12,6">
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Text="Громкость" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"/>
-                                <TextBlock Foreground="{DynamicResource Subtext0Brush}" FontSize="{StaticResource FontSizeSmall}" HorizontalAlignment="Right"
-                                           Text="{Binding AmbientVolume, StringFormat={}{0:0}%}"/>
-                                <Slider Grid.Row="1" Margin="0,6,0,0" Style="{StaticResource VolumeSlider}"
-                                        Minimum="0" Maximum="100" Value="{Binding AmbientVolume}"/>
-                            </Grid>
-
-                        </StackPanel>
-                    </Border>
-                </Popup>
-            </Grid>
+                    </StackPanel>
+                </Border>
+            </Popup>
         </Grid>
-    </Border>
-</Window>
+    </Grid>
+</views:ThemedWindow>
+

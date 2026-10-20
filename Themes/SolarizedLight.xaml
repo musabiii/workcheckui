@@ -5,6 +5,9 @@
     <!-- Window background -->
     <SolidColorBrush x:Key="BaseBrush" Color="#FDF6E3"/>
 
+    <!-- Card background in dialogs with a system backdrop; this theme has none, so it is the window background -->
+    <SolidColorBrush x:Key="BackdropTintBrush" Color="#FDF6E3"/>
+
     <!-- Semi-transparent window background -->
     <SolidColorBrush x:Key="BaseTranslucentBrush" Color="#EEFDF6E3"/>
 

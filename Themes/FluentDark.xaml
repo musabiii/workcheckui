@@ -6,7 +6,7 @@
     <!-- Window background -->
     <SolidColorBrush x:Key="BaseBrush" Color="#202020"/>
 
-    <!-- Tint over Mica in dialogs that have it; only themes with a system backdrop define it -->
+    <!-- Tint over Mica in dialogs that have it; themes without a backdrop set it to their BaseBrush -->
     <SolidColorBrush x:Key="BackdropTintBrush" Color="#1A202020"/>
 
     <!-- Semi-transparent window background -->

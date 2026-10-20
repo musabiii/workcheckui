@@ -5,7 +5,7 @@ using Clipboard = System.Windows.Clipboard;
 
 namespace WorkCheck.Views;
 
-public partial class AboutWindow : Window
+public partial class AboutWindow : ThemedWindow
 {
     private readonly string _appPath;
     private readonly string _dbPath;
@@ -13,7 +13,6 @@ public partial class AboutWindow : Window
     public AboutWindow(string dbPath)
     {
         InitializeComponent();
-        WindowBackdrop.Apply(this);
 
         _appPath = Environment.ProcessPath ?? Assembly.GetExecutingAssembly().Location;
         _dbPath = dbPath;
@@ -31,8 +30,4 @@ public partial class AboutWindow : Window
         Clipboard.SetText($"Программа: {_appPath}\nБаза данных: {_dbPath}\nНастройки: {AppPaths.Settings}");
     }
 
-    private void OnCloseClick(object sender, RoutedEventArgs e)
-    {
-        Close();
-    }
 }

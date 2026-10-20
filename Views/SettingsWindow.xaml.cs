@@ -1,6 +1,4 @@
 using System.Windows;
-using System.Windows.Input;
-using WorkCheck.Helpers;
 using WorkCheck.Services;
 using WorkCheck.ViewModels;
 
@@ -8,12 +6,11 @@ namespace WorkCheck.Views;
 
 public enum SettingsTab { Appearance, Timers, Notifications, Projects }
 
-public partial class SettingsWindow : Window
+public partial class SettingsWindow : ThemedWindow
 {
     public SettingsWindow(DataService dataService, int? currentProjectId, SettingsTab tab = SettingsTab.Appearance)
     {
         InitializeComponent();
-        WindowBackdrop.Apply(this);
         Projects.Init(dataService, currentProjectId);
 
         var tabButton = tab switch
@@ -34,11 +31,7 @@ public partial class SettingsWindow : Window
             TokenBox.Password = vm.TelegramBotToken;
     }
 
-    protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
-    {
-        base.OnMouseLeftButtonDown(e);
-        DragMove();
-    }
+    protected override void OnHeaderClose() => OnCancelClick(this, new RoutedEventArgs());
 
     private void OnSaveClick(object sender, RoutedEventArgs e)
     {

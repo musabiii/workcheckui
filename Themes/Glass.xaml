@@ -6,7 +6,7 @@
     <!-- Window background; windows without the system blur need it nearly opaque to stay readable -->
     <SolidColorBrush x:Key="BaseBrush" Color="#EDF5F5F8"/>
 
-    <!-- Tint over the system blur in dialogs that have it; only themes with a system backdrop define it -->
+    <!-- Tint over the system blur in dialogs that have it; themes without a backdrop set it to their BaseBrush -->
     <SolidColorBrush x:Key="BackdropTintBrush" Color="#8CF7F7FA"/>
 
     <!-- Semi-transparent window background -->
