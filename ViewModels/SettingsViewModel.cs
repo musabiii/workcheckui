@@ -32,6 +32,15 @@ public partial class SettingsViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(IsThemeFont), nameof(IsSystemFont), nameof(IsJetBrainsMonoFont))]
     private string _font = AppFonts.FromTheme;
 
+    // Theme and font are previewed live; the caller re-applies the saved ones when the window closes
+    partial void OnFontChanged(string value) => AppFonts.Apply(value, Theme);
+
+    partial void OnThemeChanged(string value)
+    {
+        AppThemes.Apply(value);
+        AppFonts.Apply(Font, value);
+    }
+
     public bool IsThemeFont
     {
         get => Font != AppFonts.System && Font != AppFonts.JetBrainsMono;

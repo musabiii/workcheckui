@@ -470,9 +470,11 @@ public partial class StatusViewModel : ObservableObject
             _telegram.Settings = _settings;
             _ntfy.Settings = _settings;
             _soundService.Enabled = _settings.SoundEnabled;
-            AppThemes.Apply(_settings.Theme);
-            AppFonts.Apply(_settings.Font, _settings.Theme);
         }
+
+        // The window previews themes live, so a cancel has to bring the saved one back
+        AppThemes.Apply(_settings.Theme);
+        AppFonts.Apply(_settings.Font, _settings.Theme);
     }
 
     [RelayCommand]
