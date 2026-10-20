@@ -145,6 +145,10 @@ public partial class StatusViewModel : ObservableObject
 
     private void SelectProject(Project project)
     {
+        // The work so far stays with the project it was done on; the new project starts a fresh session
+        if (_selectedProject?.Id != project.Id)
+            _tracker.StartNewSession();
+
         _selectedProject = project;
         _projectNames[project.Id] = project.Name;
         _tracker.CurrentProjectId = project.Id;

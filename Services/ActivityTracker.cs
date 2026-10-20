@@ -70,6 +70,27 @@ public sealed class ActivityTracker : IDisposable
     public bool UserShortBreak => _userShortBreak;
     public int CompletedSessions => _completedSessions;
 
+    // Ends the session for a project switch: the work so far is saved to the current project, and a new
+    // session starts with the pomodoro timer at zero. Nothing to save while away: the break saved it.
+    public void StartNewSession()
+    {
+        if (!_userActive || _userShortBreak) return;
+
+        var work = _lastActivityTime - _lastInactivityTime;
+        if (work > TimeSpan.Zero)
+        {
+            _workedTime += work;
+            _dataService.SaveSession(_lastInactivityTime, _lastActivityTime, work, IsWorkMode, CurrentProjectId);
+        }
+
+        var now = DateTime.Now;
+        _lastActivityTime = now;
+        _lastInactivityTime = now;
+        _activeSessionStart = now;
+        _pomodoroNotified = false;
+        _pomodoro2Notified = false;
+    }
+
     public TimeSpan CurrentSession
     {
         get
