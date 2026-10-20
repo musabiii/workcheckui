@@ -11,11 +11,9 @@
         ShowInTaskbar="False"
         Width="220" Height="36">
 
-    <Border Background="{Binding WindowBgBrush}" CornerRadius="10"
+    <Border Background="{Binding WindowBgBrush}" CornerRadius="{StaticResource RadiusXl}"
             BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect>
-            <DropShadowEffect Color="Black" BlurRadius="16" Opacity="0.4" ShadowDepth="2"/>
-        </Border.Effect>
+        <Border.Effect><StaticResource ResourceKey="ShadowSm"/></Border.Effect>
 
         <Grid Margin="12,0,4,0">
             <Grid.ColumnDefinitions>
@@ -24,7 +22,7 @@
             </Grid.ColumnDefinitions>
 
             <TextBlock Grid.Column="0" Text="{Binding CurrentSessionText}"
-                       Foreground="{Binding CompactSessionBrush}" FontSize="14" FontWeight="Bold"
+                       Foreground="{Binding CompactSessionBrush}" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"
                        VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
 
             <Button Grid.Column="1" Content="⛶" Click="OnExpandClick"

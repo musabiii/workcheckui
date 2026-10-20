@@ -3,14 +3,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <UserControl.Resources>
         <Style x:Key="RowAction" TargetType="Button" BasedOn="{StaticResource HeaderButton}">
-            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}"/>
             <Setter Property="Padding" Value="8,3"/>
             <Setter Property="Foreground" Value="{DynamicResource Subtext0Brush}"/>
         </Style>
 
         <Style x:Key="ProjectRow" TargetType="Border">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
             <Setter Property="Padding" Value="10,2,2,2"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
@@ -51,7 +51,7 @@
                                         <ColumnDefinition Width="*"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{DynamicResource TextBrush}"
+                                    <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource TextBrush}"
                                                VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                     <Button Grid.Column="1" Content="В архив" Click="OnArchiveClick"
                                             Style="{StaticResource RowAction}"
@@ -64,7 +64,7 @@
 
                 <!-- Archived projects -->
                 <StackPanel x:Name="ArchiveSection" Margin="0,14,0,0">
-                    <TextBlock Text="Архив" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"
+                    <TextBlock Text="Архив" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
                                Margin="0,0,0,4"/>
                     <ItemsControl x:Name="ArchivedList">
                         <ItemsControl.ItemTemplate>
@@ -76,7 +76,7 @@
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{DynamicResource Overlay1Brush}"
+                                        <TextBlock Text="{Binding Name}" FontSize="{StaticResource FontSizeBody}" Foreground="{DynamicResource Overlay1Brush}"
                                                    VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
                                         <Button Grid.Column="1" Content="Восстановить" Click="OnRestoreClick"
                                                 Style="{StaticResource RowAction}"/>

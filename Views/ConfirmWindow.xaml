@@ -18,7 +18,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bg" Background="{TemplateBinding Background}"
-                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -35,16 +35,14 @@
         </Style>
     </Window.Resources>
 
-    <Border Background="{DynamicResource BaseBrush}" CornerRadius="12" Margin="12"
+    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{StaticResource RadiusXl}" Margin="12"
             BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect>
-            <DropShadowEffect Color="Black" BlurRadius="16" Opacity="0.5" ShadowDepth="2"/>
-        </Border.Effect>
+        <Border.Effect><StaticResource ResourceKey="ShadowMd"/></Border.Effect>
 
         <StackPanel Margin="20,16,20,16">
-            <TextBlock x:Name="TitleBlock" Foreground="{DynamicResource TextBrush}" FontSize="15" FontWeight="Bold"
+            <TextBlock x:Name="TitleBlock" Foreground="{DynamicResource TextBrush}" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold"
                        TextWrapping="Wrap" Margin="0,0,0,10"/>
-            <TextBlock x:Name="MessageBlock" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"
+            <TextBlock x:Name="MessageBlock" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
                        TextWrapping="Wrap" LineHeight="18"/>
 
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">

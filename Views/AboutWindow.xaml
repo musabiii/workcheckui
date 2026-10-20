@@ -11,11 +11,9 @@
         Width="440" Height="340"
         ShowInTaskbar="False">
 
-    <Border Background="{DynamicResource BaseBrush}" CornerRadius="12"
+    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{StaticResource RadiusXl}"
             BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect>
-            <DropShadowEffect Color="Black" BlurRadius="20" Opacity="0.5" ShadowDepth="3"/>
-        </Border.Effect>
+        <Border.Effect><StaticResource ResourceKey="ShadowMd"/></Border.Effect>
 
         <Grid Margin="20,16,20,16">
             <Grid.RowDefinitions>
@@ -26,7 +24,7 @@
 
             <!-- Header -->
             <Grid Grid.Row="0" Margin="0,0,0,16">
-                <TextBlock Text="О приложении" Foreground="{DynamicResource TextBrush}" FontSize="16" FontWeight="Bold"/>
+                <TextBlock Text="О приложении" Foreground="{DynamicResource TextBrush}" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold"/>
                 <Button Content="✕" HorizontalAlignment="Right"
                         Style="{StaticResource CloseButton}"
                         Click="OnCloseClick"/>
@@ -37,28 +35,28 @@
                           HorizontalScrollBarVisibility="Disabled"
                           Padding="0,0,4,0">
             <StackPanel>
-                <TextBlock Text="WorkCheck" Foreground="{DynamicResource YellowBrush}" FontSize="14" FontWeight="SemiBold"/>
-                <TextBlock x:Name="VersionBlock" Foreground="{DynamicResource Overlay0Brush}" FontSize="12" Margin="0,2,0,16"/>
+                <TextBlock Text="WorkCheck" Foreground="{DynamicResource YellowBrush}" FontSize="{StaticResource FontSizeLarge}" FontWeight="SemiBold"/>
+                <TextBlock x:Name="VersionBlock" Foreground="{DynamicResource Overlay0Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,2,0,16"/>
 
-                <TextBlock Text="Программа" Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,0,0,4"/>
+                <TextBlock Text="Программа" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
                 <TextBox x:Name="AppPathBox" IsReadOnly="True"
                          Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
                          BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
-                         FontSize="12" Padding="8,6"
+                         FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
                          TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-                <TextBlock Text="База данных" Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,0,0,4"/>
+                <TextBlock Text="База данных" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
                 <TextBox x:Name="DbPathBox" IsReadOnly="True"
                          Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
                          BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
-                         FontSize="12" Padding="8,6"
+                         FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
                          TextWrapping="Wrap" Margin="0,0,0,16"/>
 
-                <TextBlock Text="Настройки" Foreground="{DynamicResource Subtext1Brush}" FontSize="12" Margin="0,0,0,4"/>
+                <TextBlock Text="Настройки" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
                 <TextBox x:Name="SettingsPathBox" IsReadOnly="True"
                          Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
                          BorderBrush="{DynamicResource Surface1Brush}" BorderThickness="1"
-                         FontSize="12" Padding="8,6"
+                         FontSize="{StaticResource FontSizeSmall}" Padding="8,6"
                          TextWrapping="Wrap"/>
             </StackPanel>
             </ScrollViewer>
@@ -68,7 +66,7 @@
                 <Button Content="Копировать пути" Click="OnCopyClick"
                         HorizontalAlignment="Left"
                         Style="{StaticResource HeaderButton}"
-                        FontSize="12"/>
+                        FontSize="{StaticResource FontSizeSmall}"/>
             </Grid>
         </Grid>
     </Border>

@@ -20,11 +20,9 @@
             <TranslateTransform x:Name="SlideTransform" Y="20"/>
         </Grid.RenderTransform>
 
-        <Border x:Name="RootBorder" Background="{DynamicResource MantleTranslucentBrush}" CornerRadius="10"
+        <Border x:Name="RootBorder" Background="{DynamicResource MantleTranslucentBrush}" CornerRadius="{StaticResource RadiusXl}"
                 BorderBrush="#22FFFFFF" BorderThickness="1">
-            <Border.Effect>
-                <DropShadowEffect Color="Black" BlurRadius="14" Opacity="0.45" ShadowDepth="2"/>
-            </Border.Effect>
+            <Border.Effect><StaticResource ResourceKey="ShadowSm"/></Border.Effect>
 
             <Grid MinHeight="70">
             <Grid.ColumnDefinitions>
@@ -33,7 +31,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Color stripe -->
-            <Border x:Name="Stripe" Grid.Column="0" CornerRadius="10,0,0,10"/>
+            <Border x:Name="Stripe" Grid.Column="0" CornerRadius="12,0,0,12"/>
 
             <!-- Content -->
             <Grid Grid.Column="1" Margin="14,10,10,10">
@@ -47,12 +45,12 @@
                 <!-- Title + Close -->
                 <Grid Grid.Row="0">
                     <TextBlock x:Name="TitleBlock" Foreground="{DynamicResource TextBrush}"
-                               FontSize="14" FontWeight="Bold"
+                               FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"
                                VerticalAlignment="Center" TextWrapping="Wrap"/>
                     <Button x:Name="CloseBtn" Content="✕"
                             HorizontalAlignment="Right" VerticalAlignment="Top"
                             Click="OnCloseClick"
-                            Cursor="Hand" FontSize="12"
+                            Cursor="Hand" FontSize="{StaticResource FontSizeSmall}"
                             Foreground="{DynamicResource Overlay0Brush}" Background="Transparent" BorderThickness="0"
                             Padding="4,2">
                         <Button.Style>
@@ -61,7 +59,7 @@
                                     <Setter.Value>
                                         <ControlTemplate TargetType="Button">
                                             <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}"
-                                                    CornerRadius="4">
+                                                    CornerRadius="{StaticResource RadiusSm}">
                                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Border>
                                             <ControlTemplate.Triggers>
@@ -80,18 +78,18 @@
 
                 <!-- Message -->
                 <TextBlock x:Name="MessageBlock" Grid.Row="1"
-                           Foreground="{DynamicResource Subtext1Brush}" FontSize="12.5"
+                           Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeBody}"
                            Margin="0,4,0,0" TextWrapping="Wrap"/>
 
                 <!-- Secondary -->
                 <TextBlock x:Name="SecondaryBlock" Grid.Row="2"
-                           Foreground="{DynamicResource Subtext0Brush}" FontSize="11.5"
+                           Foreground="{DynamicResource Subtext0Brush}" FontSize="{StaticResource FontSizeCaption}"
                            Margin="0,2,0,0" TextWrapping="Wrap"
                            Visibility="Collapsed"/>
 
                 <!-- Quote -->
                 <TextBlock x:Name="QuoteBlock" Grid.Row="3"
-                           Foreground="{DynamicResource Overlay0Brush}" FontSize="11"
+                           Foreground="{DynamicResource Overlay0Brush}" FontSize="{StaticResource FontSizeCaption}"
                            FontStyle="Italic" Margin="0,6,0,0"
                            TextWrapping="Wrap" Visibility="Collapsed"/>
             </Grid>

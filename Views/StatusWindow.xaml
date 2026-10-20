@@ -12,11 +12,9 @@
         ShowInTaskbar="True"
         Width="324" MinHeight="146" SizeToContent="Height">
 
-    <Border Background="{Binding WindowBgBrush}" CornerRadius="12"
+    <Border Background="{Binding WindowBgBrush}" CornerRadius="{StaticResource RadiusXl}"
             BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect>
-            <DropShadowEffect Color="Black" BlurRadius="16" Opacity="0.4" ShadowDepth="2"/>
-        </Border.Effect>
+        <Border.Effect><StaticResource ResourceKey="ShadowSm"/></Border.Effect>
 
         <Grid Margin="16,12,16,12">
             <Grid.RowDefinitions>
@@ -32,7 +30,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <!-- Projects only matter in work mode; drifting shows a plain label instead of the picker -->
-                <TextBlock Text="Дрейф" Foreground="{DynamicResource Overlay1Brush}" FontSize="12" FontWeight="SemiBold"
+                <TextBlock Text="Дрейф" Foreground="{DynamicResource Overlay1Brush}" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"
                            VerticalAlignment="Center" HorizontalAlignment="Left">
                     <TextBlock.Style>
                         <Style TargetType="TextBlock">
@@ -46,7 +44,7 @@
                     </TextBlock.Style>
                 </TextBlock>
                 <Button Click="OnProjectsClick" Style="{StaticResource HeaderButton}"
-                        Foreground="{DynamicResource YellowBrush}" FontSize="12" FontWeight="SemiBold"
+                        Foreground="{DynamicResource YellowBrush}" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"
                         Padding="6,2" Margin="-6,0,0,0"
                         VerticalAlignment="Center" HorizontalAlignment="Left"
                         Visibility="{Binding IsWorkMode, Converter={StaticResource BoolToVisibilityConverter}}"
@@ -72,12 +70,12 @@
                         </Button.ContextMenu>
                     </Button>
                     <Button Content="📊" Command="{Binding OpenStatisticsCommand}"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
                             Foreground="{DynamicResource BlueBrush}"
                             ToolTip="Статистика"/>
                     <Button Content="&#xE713;" Command="{Binding OpenSettingsCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
-                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="14"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="{StaticResource FontSizeLarge}"
                             ToolTip="Настройки"/>
                     <Button Content="☕" Command="{Binding ManualBreakCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
@@ -99,12 +97,12 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="13"
+                    <TextBlock Grid.Column="0" Foreground="{Binding SessionBrush}" FontSize="{StaticResource FontSizeBody}"
                                FontWeight="Bold">
                         <Run Text="{Binding SessionIcon, Mode=OneWay}"/><Run Text="{Binding SessionLabel, Mode=OneWay}"/>
                     </TextBlock>
                     <TextBlock Grid.Column="1" Text="{Binding CurrentSessionText}" Foreground="{Binding SessionBrush}"
-                               FontSize="13" FontWeight="Bold" HorizontalAlignment="Right"/>
+                               FontSize="{StaticResource FontSizeBody}" FontWeight="Bold" HorizontalAlignment="Right"/>
                 </Grid>
 
                 <Separator Grid.Row="1" Margin="0,0,0,2" Background="#33FFFFFF" Height="1"/>
@@ -125,9 +123,9 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="📊  Сегодня:" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"/>
+                    <TextBlock Grid.Column="0" Text="📊  Сегодня:" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"/>
                     <TextBlock Grid.Column="1" Text="{Binding TodayWorkedText}" Foreground="{DynamicResource TextBrush}"
-                               FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                               FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
                 <!-- Проекты за сегодня (режим «В работе») -->
@@ -140,12 +138,12 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock x:Name="NameText" Grid.Column="0" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"
+                                <TextBlock x:Name="NameText" Grid.Column="0" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
                                            TextTrimming="CharacterEllipsis" Margin="0,0,8,0">
                                     <Run Text="📁  "/><Run Text="{Binding Name, Mode=OneWay}"/>
                                 </TextBlock>
                                 <TextBlock Grid.Column="1" Text="{Binding TimeText}" Foreground="{DynamicResource TextBrush}"
-                                           FontSize="12" FontWeight="SemiBold"/>
+                                           FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"/>
                             </Grid>
                             <DataTemplate.Triggers>
                                 <DataTrigger Binding="{Binding IsCurrent}" Value="True">
@@ -165,9 +163,9 @@
                         <ColumnDefinition Width="Auto"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <TextBlock Grid.Column="0" Text="{Binding TotalLabel}" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"/>
+                    <TextBlock Grid.Column="0" Text="{Binding TotalLabel}" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"/>
                     <TextBlock Grid.Column="1" Text="{Binding TotalTimeText}" Foreground="{DynamicResource TextBrush}"
-                               FontSize="12" FontWeight="SemiBold" HorizontalAlignment="Right"/>
+                               FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold" HorizontalAlignment="Right"/>
                 </Grid>
 
             </StackPanel>
@@ -183,18 +181,18 @@
                         Command="{Binding ToggleModeCommand}"
                         HorizontalAlignment="Left"
                         Style="{StaticResource HeaderButton}"
-                        FontSize="12"/>
+                        FontSize="{StaticResource FontSizeSmall}"/>
 
                 <TextBlock Grid.Column="1" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}"
-                           FontSize="12" VerticalAlignment="Center"/>
+                           FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="6,0,0,0">
                     <Button x:Name="SoundPickerButton" Content="&#xE8D6;" Click="OnSoundPickerClick"
                             Style="{StaticResource HeaderButton}"
-                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="13"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="{StaticResource FontSizeBody}"
                             Margin="0,0,2,0" ToolTip="Выбрать фоновый звук"/>
                     <Button Command="{Binding ToggleAmbientCommand}"
-                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="12"
+                            FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="{StaticResource FontSizeSmall}"
                             ToolTip="Фоновый звук: вкл/выкл">
                         <Button.Style>
                             <Style TargetType="Button" BasedOn="{StaticResource HeaderButton}">
@@ -216,7 +214,7 @@
                        StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade"
                        Closed="OnSoundPopupClosed">
                     <Border Width="200" Background="{DynamicResource BaseBrush}" BorderBrush="#33FFFFFF"
-                            BorderThickness="1" CornerRadius="6" Padding="4"
+                            BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="4"
                             TextElement.FontFamily="{DynamicResource AppFont}">
                         <StackPanel>
                             <ItemsControl ItemsSource="{Binding AmbientGroups}">
@@ -224,7 +222,7 @@
                                     <DataTemplate>
                                         <StackPanel>
                                             <TextBlock Text="{Binding Title}" Foreground="{DynamicResource Overlay1Brush}"
-                                                       FontSize="11" Margin="12,6,12,2"/>
+                                                       FontSize="{StaticResource FontSizeCaption}" Margin="12,6,12,2"/>
                                             <ItemsControl ItemsSource="{Binding Options}">
                                                 <ItemsControl.ItemTemplate>
                                                     <DataTemplate>
@@ -247,8 +245,8 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Text="Громкость" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"/>
-                                <TextBlock Foreground="{DynamicResource Subtext0Brush}" FontSize="12" HorizontalAlignment="Right"
+                                <TextBlock Text="Громкость" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"/>
+                                <TextBlock Foreground="{DynamicResource Subtext0Brush}" FontSize="{StaticResource FontSizeSmall}" HorizontalAlignment="Right"
                                            Text="{Binding AmbientVolume, StringFormat={}{0:0}%}"/>
                                 <Slider Grid.Row="1" Margin="0,6,0,0" Style="{StaticResource VolumeSlider}"
                                         Minimum="0" Maximum="100" Value="{Binding AmbientVolume}"/>
@@ -260,4 +258,4 @@
             </Grid>
         </Grid>
     </Border>
-</Window>
+</Window>

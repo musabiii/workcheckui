@@ -6,6 +6,7 @@
     <ResourceDictionary>
         <ResourceDictionary.MergedDictionaries>
             <!-- Swapped at runtime by AppThemes.Apply; Mocha is the default -->
+            <ResourceDictionary Source="Themes/Tokens.xaml"/>
             <ResourceDictionary Source="Themes/Mocha.xaml"/>
         </ResourceDictionary.MergedDictionaries>
 
@@ -27,7 +28,7 @@
                     <ControlTemplate TargetType="ContextMenu">
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="1" CornerRadius="6" Padding="4">
+                                BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="4">
                             <StackPanel IsItemsHost="True"/>
                         </Border>
                     </ControlTemplate>
@@ -39,7 +40,7 @@
                         <Setter.Value>
                             <ControlTemplate TargetType="MenuItem">
                                 <Border x:Name="ItemBorder" Background="Transparent"
-                                        Padding="12,6" CornerRadius="4">
+                                        Padding="12,6" CornerRadius="{StaticResource RadiusSm}">
                                     <ContentPresenter ContentSource="Header"
                                                       TextElement.Foreground="{DynamicResource TextBrush}"/>
                                 </Border>
@@ -129,13 +130,13 @@
 
         <Style x:Key="SegmentRadio" TargetType="RadioButton">
             <Setter Property="Foreground" Value="{DynamicResource Subtext1Brush}"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeSmall}"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Padding" Value="12,5"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="Bg" Background="Transparent" CornerRadius="4"
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="{StaticResource RadiusSm}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center"/>
                         </Border>
@@ -157,13 +158,13 @@
         <!-- Row of a hand-made popup that looks like PopupMenu; Tag=True marks the active choice -->
         <Style x:Key="PopupItem" TargetType="Button">
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeSmall}"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="HorizontalContentAlignment" Value="Left"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="ItemBorder" Background="Transparent" Padding="12,6" CornerRadius="4">
+                        <Border x:Name="ItemBorder" Background="Transparent" Padding="12,6" CornerRadius="{StaticResource RadiusSm}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -187,7 +188,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RepeatButton">
-                        <Border Height="4" CornerRadius="2" Background="{TemplateBinding Background}"/>
+                        <Border Height="4" CornerRadius="{StaticResource RadiusXs}" Background="{TemplateBinding Background}"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -200,7 +201,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Slider">
                         <Grid Height="16">
-                            <Border Height="4" CornerRadius="2" Background="{DynamicResource Surface1Brush}"/>
+                            <Border Height="4" CornerRadius="{StaticResource RadiusXs}" Background="{DynamicResource Surface1Brush}"/>
                             <Track x:Name="PART_Track">
                                 <Track.DecreaseRepeatButton>
                                     <RepeatButton Command="Slider.DecreaseLarge" Style="{StaticResource SliderFill}"
@@ -231,14 +232,14 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{DynamicResource Overlay0Brush}"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeSubtitle}"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Padding" Value="6,2"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}" CornerRadius="4">
+                                Padding="{TemplateBinding Padding}" CornerRadius="{StaticResource RadiusSm}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -257,14 +258,14 @@
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Foreground" Value="{DynamicResource Overlay0Brush}"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeLarge}"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Padding" Value="6,2"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}" CornerRadius="4">
+                                Padding="{TemplateBinding Padding}" CornerRadius="{StaticResource RadiusSm}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -286,14 +287,14 @@
             <Setter Property="BorderBrush" Value="{DynamicResource Surface1Brush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,6"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeBody}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ScrollViewer x:Name="PART_ContentHost"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -314,14 +315,14 @@
             <Setter Property="BorderBrush" Value="{DynamicResource Surface1Brush}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="8,6"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeBody}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="PasswordBox">
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ScrollViewer x:Name="PART_ContentHost"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -339,7 +340,7 @@
             <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeBody}"/>
             <Setter Property="Padding" Value="20,8"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -347,7 +348,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bg" Background="{TemplateBinding Background}"
-                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -367,7 +368,7 @@
         <Style x:Key="SecondaryButton" TargetType="Button">
             <Setter Property="Background" Value="{DynamicResource Surface0Brush}"/>
             <Setter Property="Foreground" Value="{DynamicResource Subtext1Brush}"/>
-            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeBody}"/>
             <Setter Property="Padding" Value="20,8"/>
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -375,7 +376,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bg" Background="{TemplateBinding Background}"
-                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
