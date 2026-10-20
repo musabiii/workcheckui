@@ -1,0 +1,79 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Cyberpunk: black panels, acid yellow and cyan, hard square edges like a game HUD -->
+
+    <!-- Window background -->
+    <SolidColorBrush x:Key="BaseBrush" Color="#0D0D12"/>
+
+    <!-- Semi-transparent window background -->
+    <SolidColorBrush x:Key="BaseTranslucentBrush" Color="#E00D0D12"/>
+
+    <!-- Inset panels -->
+    <SolidColorBrush x:Key="MantleBrush" Color="#08080C"/>
+    <SolidColorBrush x:Key="MantleTranslucentBrush" Color="#EB08080C"/>
+
+    <!-- Alternating rows and stripes -->
+    <SolidColorBrush x:Key="CrustBrush" Color="#050507"/>
+
+    <!-- Status window background while drifting -->
+    <SolidColorBrush x:Key="DriftBaseBrush" Color="#1E1E22"/>
+
+    <!-- Inputs, toggles, buttons -->
+    <SolidColorBrush x:Key="Surface0Brush" Color="#1A1A22"/>
+    <SolidColorBrush x:Key="Surface1Brush" Color="#26262F"/>
+    <SolidColorBrush x:Key="Surface2Brush" Color="#34343F"/>
+    <SolidColorBrush x:Key="Surface3Brush" Color="#20202A"/>
+
+    <!-- Muted text and icons -->
+    <SolidColorBrush x:Key="Overlay0Brush" Color="#6B6B78"/>
+    <SolidColorBrush x:Key="Overlay1Brush" Color="#858592"/>
+    <SolidColorBrush x:Key="Subtext0Brush" Color="#B0B0BA"/>
+    <SolidColorBrush x:Key="Subtext1Brush" Color="#CFCFD6"/>
+    <SolidColorBrush x:Key="TextBrush" Color="#EDEDED"/>
+
+    <!-- Text on accent-colored buttons and bars -->
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#0D0D12"/>
+
+    <!-- Accents -->
+    <SolidColorBrush x:Key="GreenBrush" Color="#00FF9F"/>
+    <SolidColorBrush x:Key="GreenHoverBrush" Color="#4DFFBC"/>
+    <SolidColorBrush x:Key="YellowBrush" Color="#FCEE0A"/>
+    <SolidColorBrush x:Key="RedBrush" Color="#FF003C"/>
+    <SolidColorBrush x:Key="RedHoverBrush" Color="#FF3363"/>
+    <SolidColorBrush x:Key="RedPressedBrush" Color="#D90033"/>
+    <SolidColorBrush x:Key="RedTranslucentBrush" Color="#44FF003C"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="#00F0FF"/>
+    <SolidColorBrush x:Key="BlueHoverBrush" Color="#4DF5FF"/>
+    <SolidColorBrush x:Key="BluePressedBrush" Color="#00C8D6"/>
+    <SolidColorBrush x:Key="MauveBrush" Color="#C700FF"/>
+    <SolidColorBrush x:Key="PeachBrush" Color="#FF7A00"/>
+    <SolidColorBrush x:Key="TealBrush" Color="#00D1B2"/>
+
+    <!-- Signature color of the theme: primary button, selected segment, focus, sliders -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#FCEE0A"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#FDF24D"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#E0D300"/>
+
+    <!-- Outline of every window: a yellow HUD frame -->
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#CCFCEE0A"/>
+
+    <!-- Light overlays on top of any surface: hover, separators, chart grid, faint panels -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#2600F0FF"/>
+    <SolidColorBrush x:Key="HoverSubtleBrush" Color="#1400F0FF"/>
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#4DFCEE0A"/>
+    <SolidColorBrush x:Key="GridLineBrush" Color="#2200F0FF"/>
+    <SolidColorBrush x:Key="PanelTintBrush" Color="#0DFFFFFF"/>
+
+    <!-- Shape: no rounding at all, a faint cyan glow -->
+    <CornerRadius x:Key="RadiusXs">0</CornerRadius>
+    <CornerRadius x:Key="RadiusSm">0</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">0</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">0</CornerRadius>
+    <CornerRadius x:Key="RadiusXl">0</CornerRadius>
+    <CornerRadius x:Key="Radius2xl">0</CornerRadius>
+    <CornerRadius x:Key="RadiusXlStart">0</CornerRadius>
+    <CornerRadius x:Key="Radius2xlTop">0</CornerRadius>
+    <DropShadowEffect x:Key="ShadowSm" Color="#00F0FF" BlurRadius="16" Opacity="0.3" ShadowDepth="0"/>
+    <DropShadowEffect x:Key="ShadowMd" Color="#00F0FF" BlurRadius="20" Opacity="0.35" ShadowDepth="0"/>
+    <DropShadowEffect x:Key="ShadowLg" Color="#00F0FF" BlurRadius="28" Opacity="0.4" ShadowDepth="0"/>
+</ResourceDictionary>

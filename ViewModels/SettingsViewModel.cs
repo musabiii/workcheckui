@@ -59,77 +59,9 @@ public partial class SettingsViewModel : ObservableObject
         set { if (value) Font = AppFonts.JetBrainsMono; }
     }
 
+    // Each theme RadioButton binds here through EqualsConverter
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsMochaTheme), nameof(IsGitHubDarkTheme), nameof(IsDarculaTheme), nameof(IsGruvboxTheme),
-        nameof(IsTokyoNightTheme), nameof(IsDraculaTheme), nameof(IsNordTheme),
-        nameof(IsLatteTheme), nameof(IsGitHubLightTheme), nameof(IsSolarizedLightTheme), nameof(IsGlassTheme))]
     private string _theme = AppThemes.Mocha;
-
-    public bool IsMochaTheme
-    {
-        get => Theme == AppThemes.Mocha || !AppThemes.IsKnown(Theme);
-        set { if (value) Theme = AppThemes.Mocha; }
-    }
-
-    public bool IsGitHubDarkTheme
-    {
-        get => Theme == AppThemes.GitHubDark;
-        set { if (value) Theme = AppThemes.GitHubDark; }
-    }
-
-    public bool IsDarculaTheme
-    {
-        get => Theme == AppThemes.Darcula;
-        set { if (value) Theme = AppThemes.Darcula; }
-    }
-
-    public bool IsGruvboxTheme
-    {
-        get => Theme == AppThemes.Gruvbox;
-        set { if (value) Theme = AppThemes.Gruvbox; }
-    }
-
-    public bool IsTokyoNightTheme
-    {
-        get => Theme == AppThemes.TokyoNight;
-        set { if (value) Theme = AppThemes.TokyoNight; }
-    }
-
-    public bool IsDraculaTheme
-    {
-        get => Theme == AppThemes.Dracula;
-        set { if (value) Theme = AppThemes.Dracula; }
-    }
-
-    public bool IsNordTheme
-    {
-        get => Theme == AppThemes.Nord;
-        set { if (value) Theme = AppThemes.Nord; }
-    }
-
-    public bool IsLatteTheme
-    {
-        get => Theme == AppThemes.Latte;
-        set { if (value) Theme = AppThemes.Latte; }
-    }
-
-    public bool IsGitHubLightTheme
-    {
-        get => Theme == AppThemes.GitHubLight;
-        set { if (value) Theme = AppThemes.GitHubLight; }
-    }
-
-    public bool IsSolarizedLightTheme
-    {
-        get => Theme == AppThemes.SolarizedLight;
-        set { if (value) Theme = AppThemes.SolarizedLight; }
-    }
-
-    public bool IsGlassTheme
-    {
-        get => Theme == AppThemes.Glass;
-        set { if (value) Theme = AppThemes.Glass; }
-    }
 
     public event Action<bool>? RequestClose;
 
@@ -154,7 +86,7 @@ public partial class SettingsViewModel : ObservableObject
         NtfyEnabled = current.NtfyEnabled;
         SoundEnabled = current.SoundEnabled;
         Font = current.Font;
-        Theme = current.Theme;
+        Theme = AppThemes.IsKnown(current.Theme) ? current.Theme : AppThemes.Mocha;
     }
 
     [RelayCommand]

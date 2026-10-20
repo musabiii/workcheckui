@@ -10,9 +10,10 @@ using Color = System.Windows.Media.Color;
 
 namespace WorkCheck.Helpers;
 
-// Windows 11 draws a blurred (Acrylic) backdrop only under regular windows, not under layered ones
-// (AllowsTransparency). For glass themes a dialog is switched to WindowChrome before it is shown;
-// Windows then also draws its rounded corners and shadow, so the window's own ones are dropped.
+// Windows 11 draws a system backdrop (blurred Acrylic, or Mica tinted by the wallpaper) only under regular
+// windows, not under layered ones (AllowsTransparency). For themes with a backdrop a dialog is switched to
+// WindowChrome before it is shown; Windows then also draws its rounded corners and shadow, so the window's
+// own ones are dropped.
 public static class WindowBackdrop
 {
     private const int DwmwaUseImmersiveDarkMode = 20;
@@ -20,6 +21,7 @@ public static class WindowBackdrop
     private const int DwmwaBorderColor = 34;
     private const int DwmwaSystemBackdropType = 38;
     private const int DwmwcpRound = 2;
+    private const int DwmsbtMainWindow = 2;
     private const int DwmsbtTransientWindow = 3;
     private const uint DwmwaColorNone = 0xFFFFFFFE;
     private const int GwlStyle = -16;
@@ -31,9 +33,10 @@ public static class WindowBackdrop
     private static bool IsSupported => Environment.OSVersion.Version.Build >= 22621;
 
     // Call after InitializeComponent and before the window is shown
-    public static void ApplyIfGlass(Window window)
+    public static void Apply(Window window)
     {
-        if (!AppThemes.IsGlass(AppThemes.Current) || !IsSupported) return;
+        var backdrop = AppThemes.BackdropOf(AppThemes.Current);
+        if (backdrop == Backdrop.None || !IsSupported) return;
 
         window.AllowsTransparency = false;
         window.WindowStyle = WindowStyle.SingleBorderWindow;
@@ -64,10 +67,10 @@ public static class WindowBackdrop
             root.SetResourceReference(Border.BackgroundProperty, "BackdropTintBrush");
         }
 
-        window.SourceInitialized += (_, _) => EnableBackdrop(window);
+        window.SourceInitialized += (_, _) => EnableBackdrop(window, backdrop);
     }
 
-    private static void EnableBackdrop(Window window)
+    private static void EnableBackdrop(Window window, Backdrop backdrop)
     {
         try
         {
@@ -81,7 +84,7 @@ public static class WindowBackdrop
             var dark = Luminance(AppThemes.Color("Base")) < 0.5 ? 1 : 0;
             SetInt(hwnd, DwmwaUseImmersiveDarkMode, dark);
             SetInt(hwnd, DwmwaWindowCornerPreference, DwmwcpRound);
-            SetInt(hwnd, DwmwaSystemBackdropType, DwmsbtTransientWindow);
+            SetInt(hwnd, DwmwaSystemBackdropType, backdrop == Backdrop.Mica ? DwmsbtMainWindow : DwmsbtTransientWindow);
             // The theme draws its own light edge, so the system one is turned off
             var none = DwmwaColorNone;
             DwmSetWindowAttribute(hwnd, DwmwaBorderColor, ref none, sizeof(uint));

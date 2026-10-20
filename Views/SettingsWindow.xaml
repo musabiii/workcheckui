@@ -3,6 +3,7 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:views="clr-namespace:WorkCheck.Views"
+        xmlns:helpers="clr-namespace:WorkCheck.Helpers"
         Title="Настройки — WorkCheck"
         WindowStyle="None"
         AllowsTransparency="True"
@@ -14,6 +15,12 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        <helpers:EqualsConverter x:Key="EqualsConverter"/>
+
+        <Style x:Key="ThemeOption" TargetType="RadioButton" BasedOn="{StaticResource SegmentRadio}">
+            <Setter Property="GroupName" Value="Theme"/>
+            <Setter Property="Padding" Value="0,6"/>
+        </Style>
 
         <!-- Caption over a group of segments, e.g. dark and light themes -->
         <Style x:Key="GroupCaption" TargetType="TextBlock">
@@ -98,45 +105,46 @@
                         <TextBlock Text="Тёмные" Style="{StaticResource GroupCaption}"/>
                         <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
                             <UniformGrid Columns="4">
-                                <RadioButton Content="Catppuccin" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsMochaTheme}"/>
-                                <RadioButton Content="GitHub" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsGitHubDarkTheme}"/>
-                                <RadioButton Content="Darcula" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsDarculaTheme}"/>
-                                <RadioButton Content="Gruvbox" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsGruvboxTheme}"/>
-                                <RadioButton Content="Tokyo Night" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsTokyoNightTheme}"/>
-                                <RadioButton Content="Dracula" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsDraculaTheme}"/>
-                                <RadioButton Content="Nord" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsNordTheme}"/>
+                                <RadioButton Content="Catppuccin" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Mocha}}"/>
+                                <RadioButton Content="GitHub" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.GitHubDark}}"/>
+                                <RadioButton Content="Darcula" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Darcula}}"/>
+                                <RadioButton Content="Gruvbox" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Gruvbox}}"/>
+                                <RadioButton Content="Tokyo Night" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.TokyoNight}}"/>
+                                <RadioButton Content="Dracula" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Dracula}}"/>
+                                <RadioButton Content="Nord" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Nord}}"/>
+                                <RadioButton Content="Synthwave" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Synthwave}}"/>
+                                <RadioButton Content="Cyberpunk" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Cyberpunk}}"/>
+                                <RadioButton Content="Terminal" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Terminal}}"/>
+                                <RadioButton Content="Fluent" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.FluentDark}}"/>
+                                <RadioButton Content="Glass" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.GlassDark}}"/>
                             </UniformGrid>
                         </Border>
 
                         <TextBlock Text="Светлые" Style="{StaticResource GroupCaption}" Margin="0,12,0,4"/>
                         <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
                             <UniformGrid Columns="4">
-                                <RadioButton Content="Latte" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsLatteTheme}"/>
-                                <RadioButton Content="GitHub Light" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsGitHubLightTheme}"/>
-                                <RadioButton Content="Solarized" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsSolarizedLightTheme}"/>
-                                <RadioButton Content="Glass" GroupName="Theme"
-                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
-                                             IsChecked="{Binding IsGlassTheme}"/>
+                                <RadioButton Content="Latte" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Latte}}"/>
+                                <RadioButton Content="GitHub Light" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.GitHubLight}}"/>
+                                <RadioButton Content="Solarized" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.SolarizedLight}}"/>
+                                <RadioButton Content="Glass" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.Glass}}"/>
+                                <RadioButton Content="Fluent" Style="{StaticResource ThemeOption}"
+                                             IsChecked="{Binding Theme, Converter={StaticResource EqualsConverter}, ConverterParameter={x:Static helpers:AppThemes.FluentLight}}"/>
                             </UniformGrid>
                         </Border>
                     </StackPanel>

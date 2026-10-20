@@ -27,7 +27,7 @@ public partial class StatisticsWindow : Window
     public StatisticsWindow(DataService dataService, Func<TimeSpan> currentWork)
     {
         InitializeComponent();
-        WindowBackdrop.ApplyIfGlass(this);
+        WindowBackdrop.Apply(this);
         _dataService = dataService;
         _currentWork = currentWork;
         _currentDate = DateTime.Today;

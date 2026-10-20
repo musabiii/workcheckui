@@ -1,0 +1,80 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Terminal: a green phosphor CRT. Nearly monochrome; amber, red and teal are kept only where
+         a color has to mean something (break, inactivity, chart rows) -->
+
+    <!-- Window background -->
+    <SolidColorBrush x:Key="BaseBrush" Color="#0A0F0A"/>
+
+    <!-- Semi-transparent window background -->
+    <SolidColorBrush x:Key="BaseTranslucentBrush" Color="#E00A0F0A"/>
+
+    <!-- Inset panels -->
+    <SolidColorBrush x:Key="MantleBrush" Color="#060A06"/>
+    <SolidColorBrush x:Key="MantleTranslucentBrush" Color="#EB060A06"/>
+
+    <!-- Alternating rows and stripes -->
+    <SolidColorBrush x:Key="CrustBrush" Color="#030503"/>
+
+    <!-- Status window background while drifting -->
+    <SolidColorBrush x:Key="DriftBaseBrush" Color="#151715"/>
+
+    <!-- Inputs, toggles, buttons -->
+    <SolidColorBrush x:Key="Surface0Brush" Color="#0F1F12"/>
+    <SolidColorBrush x:Key="Surface1Brush" Color="#173A1E"/>
+    <SolidColorBrush x:Key="Surface2Brush" Color="#22552B"/>
+    <SolidColorBrush x:Key="Surface3Brush" Color="#133018"/>
+
+    <!-- Muted text and icons -->
+    <SolidColorBrush x:Key="Overlay0Brush" Color="#2E7A3E"/>
+    <SolidColorBrush x:Key="Overlay1Brush" Color="#3D9950"/>
+    <SolidColorBrush x:Key="Subtext0Brush" Color="#5CCB72"/>
+    <SolidColorBrush x:Key="Subtext1Brush" Color="#7FE08F"/>
+    <SolidColorBrush x:Key="TextBrush" Color="#B5FFC0"/>
+
+    <!-- Text on accent-colored buttons and bars -->
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#0A0F0A"/>
+
+    <!-- Accents -->
+    <SolidColorBrush x:Key="GreenBrush" Color="#33FF66"/>
+    <SolidColorBrush x:Key="GreenHoverBrush" Color="#66FF8C"/>
+    <SolidColorBrush x:Key="YellowBrush" Color="#FFB000"/>
+    <SolidColorBrush x:Key="RedBrush" Color="#FF5C5C"/>
+    <SolidColorBrush x:Key="RedHoverBrush" Color="#FF7A7A"/>
+    <SolidColorBrush x:Key="RedPressedBrush" Color="#E64A4A"/>
+    <SolidColorBrush x:Key="RedTranslucentBrush" Color="#44FF5C5C"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="#39E6C4"/>
+    <SolidColorBrush x:Key="BlueHoverBrush" Color="#66EDD3"/>
+    <SolidColorBrush x:Key="BluePressedBrush" Color="#22CCAA"/>
+    <SolidColorBrush x:Key="MauveBrush" Color="#B3FF66"/>
+    <SolidColorBrush x:Key="PeachBrush" Color="#FFB000"/>
+    <SolidColorBrush x:Key="TealBrush" Color="#2EE6A0"/>
+
+    <!-- Signature color of the theme: primary button, selected segment, focus, sliders -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#33FF66"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#66FF8C"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#1FD94F"/>
+
+    <!-- Outline of every window -->
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#8833FF66"/>
+
+    <!-- Green-tinted overlays on top of any surface: hover, separators, chart grid, faint panels -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#2233FF66"/>
+    <SolidColorBrush x:Key="HoverSubtleBrush" Color="#1233FF66"/>
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#3333FF66"/>
+    <SolidColorBrush x:Key="GridLineBrush" Color="#2233FF66"/>
+    <SolidColorBrush x:Key="PanelTintBrush" Color="#0F33FF66"/>
+
+    <!-- Shape: square like a text console, a soft green phosphor glow -->
+    <CornerRadius x:Key="RadiusXs">0</CornerRadius>
+    <CornerRadius x:Key="RadiusSm">0</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">0</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">0</CornerRadius>
+    <CornerRadius x:Key="RadiusXl">0</CornerRadius>
+    <CornerRadius x:Key="Radius2xl">0</CornerRadius>
+    <CornerRadius x:Key="RadiusXlStart">0</CornerRadius>
+    <CornerRadius x:Key="Radius2xlTop">0</CornerRadius>
+    <DropShadowEffect x:Key="ShadowSm" Color="#33FF66" BlurRadius="18" Opacity="0.3" ShadowDepth="0"/>
+    <DropShadowEffect x:Key="ShadowMd" Color="#33FF66" BlurRadius="22" Opacity="0.35" ShadowDepth="0"/>
+    <DropShadowEffect x:Key="ShadowLg" Color="#33FF66" BlurRadius="30" Opacity="0.4" ShadowDepth="0"/>
+</ResourceDictionary>

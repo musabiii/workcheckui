@@ -9,7 +9,7 @@ public partial class ConfirmWindow : Window
     private ConfirmWindow(string title, string message, string confirmText, string? cancelText)
     {
         InitializeComponent();
-        WindowBackdrop.ApplyIfGlass(this);
+        WindowBackdrop.Apply(this);
         TitleBlock.Text = title;
         MessageBlock.Text = message;
         ConfirmButton.Content = confirmText;

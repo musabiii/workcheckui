@@ -1,0 +1,83 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Windows 11 Fluent, light: Mica behind dialogs (see WindowBackdrop), white cards, the default
+         system accent, 4px controls and 8px windows -->
+
+    <!-- Window background -->
+    <SolidColorBrush x:Key="BaseBrush" Color="#F3F3F3"/>
+
+    <!-- Tint over Mica in dialogs that have it; only themes with a system backdrop define it -->
+    <SolidColorBrush x:Key="BackdropTintBrush" Color="#1AF3F3F3"/>
+
+    <!-- Semi-transparent window background -->
+    <SolidColorBrush x:Key="BaseTranslucentBrush" Color="#E6F3F3F3"/>
+
+    <!-- Inset panels: Fluent cards -->
+    <SolidColorBrush x:Key="MantleBrush" Color="#B3FFFFFF"/>
+    <SolidColorBrush x:Key="MantleTranslucentBrush" Color="#F2FFFFFF"/>
+
+    <!-- Alternating rows and stripes -->
+    <SolidColorBrush x:Key="CrustBrush" Color="#08000000"/>
+
+    <!-- Status window background while drifting -->
+    <SolidColorBrush x:Key="DriftBaseBrush" Color="#E6E6E6"/>
+
+    <!-- Inputs, toggles, buttons: subtle fills; the selected segment is white -->
+    <SolidColorBrush x:Key="Surface0Brush" Color="#0F000000"/>
+    <SolidColorBrush x:Key="Surface1Brush" Color="#FFFFFFFF"/>
+    <SolidColorBrush x:Key="Surface2Brush" Color="#29000000"/>
+    <SolidColorBrush x:Key="Surface3Brush" Color="#17000000"/>
+
+    <!-- Muted text and icons: Fluent text opacities -->
+    <SolidColorBrush x:Key="Overlay0Brush" Color="#80000000"/>
+    <SolidColorBrush x:Key="Overlay1Brush" Color="#8C000000"/>
+    <SolidColorBrush x:Key="Subtext0Brush" Color="#9B000000"/>
+    <SolidColorBrush x:Key="Subtext1Brush" Color="#B3000000"/>
+    <SolidColorBrush x:Key="TextBrush" Color="#E5000000"/>
+
+    <!-- Text on accent-colored buttons and bars -->
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF"/>
+
+    <!-- Accents -->
+    <SolidColorBrush x:Key="GreenBrush" Color="#0F7B0F"/>
+    <SolidColorBrush x:Key="GreenHoverBrush" Color="#0D6A0D"/>
+    <SolidColorBrush x:Key="YellowBrush" Color="#9D5D00"/>
+    <SolidColorBrush x:Key="RedBrush" Color="#C42B1C"/>
+    <SolidColorBrush x:Key="RedHoverBrush" Color="#A82518"/>
+    <SolidColorBrush x:Key="RedPressedBrush" Color="#8E1F14"/>
+    <SolidColorBrush x:Key="RedTranslucentBrush" Color="#33C42B1C"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="#005FB8"/>
+    <SolidColorBrush x:Key="BlueHoverBrush" Color="#1975C5"/>
+    <SolidColorBrush x:Key="BluePressedBrush" Color="#004E98"/>
+    <SolidColorBrush x:Key="MauveBrush" Color="#8764B8"/>
+    <SolidColorBrush x:Key="PeachBrush" Color="#CA5010"/>
+    <SolidColorBrush x:Key="TealBrush" Color="#038387"/>
+
+    <!-- Signature color of the theme: the default Windows accent in light mode -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#005FB8"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#1975C5"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#004E98"/>
+
+    <!-- Outline of every window: Fluent's subtle stroke -->
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#1A000000"/>
+
+    <!-- Dark overlays on top of any surface: hover, separators, chart grid, faint panels -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#0F000000"/>
+    <SolidColorBrush x:Key="HoverSubtleBrush" Color="#08000000"/>
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#14000000"/>
+    <SolidColorBrush x:Key="GridLineBrush" Color="#12000000"/>
+    <SolidColorBrush x:Key="PanelTintBrush" Color="#66FFFFFF"/>
+
+    <!-- Shape: Fluent corners, a soft shadow -->
+    <CornerRadius x:Key="RadiusXs">2</CornerRadius>
+    <CornerRadius x:Key="RadiusSm">4</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">4</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">8</CornerRadius>
+    <CornerRadius x:Key="RadiusXl">8</CornerRadius>
+    <CornerRadius x:Key="Radius2xl">8</CornerRadius>
+    <CornerRadius x:Key="RadiusXlStart">8,0,0,8</CornerRadius>
+    <CornerRadius x:Key="Radius2xlTop">8,8,0,0</CornerRadius>
+    <DropShadowEffect x:Key="ShadowSm" Color="Black" BlurRadius="24" Opacity="0.14" ShadowDepth="6"/>
+    <DropShadowEffect x:Key="ShadowMd" Color="Black" BlurRadius="28" Opacity="0.18" ShadowDepth="8"/>
+    <DropShadowEffect x:Key="ShadowLg" Color="Black" BlurRadius="36" Opacity="0.22" ShadowDepth="10"/>
+</ResourceDictionary>

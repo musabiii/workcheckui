@@ -1,0 +1,83 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Liquid Glass, after Apple's dark appearance: smoky translucent surfaces, a faint bright edge,
+         large corners, system blue. Dialogs get a real blurred backdrop (see WindowBackdrop) -->
+
+    <!-- Window background; windows without the system blur need it nearly opaque to stay readable -->
+    <SolidColorBrush x:Key="BaseBrush" Color="#EB1C1C1E"/>
+
+    <!-- Tint over the system blur in dialogs that have it; only themes with a system backdrop define it -->
+    <SolidColorBrush x:Key="BackdropTintBrush" Color="#B81C1C1E"/>
+
+    <!-- Semi-transparent window background -->
+    <SolidColorBrush x:Key="BaseTranslucentBrush" Color="#B81C1C1E"/>
+
+    <!-- Inset panels: a lighter sheet of glass -->
+    <SolidColorBrush x:Key="MantleBrush" Color="#1AFFFFFF"/>
+    <SolidColorBrush x:Key="MantleTranslucentBrush" Color="#D92C2C2E"/>
+
+    <!-- Alternating rows and stripes -->
+    <SolidColorBrush x:Key="CrustBrush" Color="#0DFFFFFF"/>
+
+    <!-- Status window background while drifting -->
+    <SolidColorBrush x:Key="DriftBaseBrush" Color="#EB2A2A2C"/>
+
+    <!-- Inputs, toggles, buttons: system gray fills; the selected segment is a darker pill so the blue text on it reads -->
+    <SolidColorBrush x:Key="Surface0Brush" Color="#3D767680"/>
+    <SolidColorBrush x:Key="Surface1Brush" Color="#3A3A3C"/>
+    <SolidColorBrush x:Key="Surface2Brush" Color="#5C767680"/>
+    <SolidColorBrush x:Key="Surface3Brush" Color="#47767680"/>
+
+    <!-- Muted text and icons -->
+    <SolidColorBrush x:Key="Overlay0Brush" Color="#7C7C80"/>
+    <SolidColorBrush x:Key="Overlay1Brush" Color="#8E8E93"/>
+    <SolidColorBrush x:Key="Subtext0Brush" Color="#AEAEB2"/>
+    <SolidColorBrush x:Key="Subtext1Brush" Color="#C7C7CC"/>
+    <SolidColorBrush x:Key="TextBrush" Color="#F5F5F7"/>
+
+    <!-- Text on accent-colored buttons and bars -->
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#FFFFFF"/>
+
+    <!-- Accents (Apple system colors, dark appearance) -->
+    <SolidColorBrush x:Key="GreenBrush" Color="#30D158"/>
+    <SolidColorBrush x:Key="GreenHoverBrush" Color="#2BBD4F"/>
+    <SolidColorBrush x:Key="YellowBrush" Color="#FF9F0A"/>
+    <SolidColorBrush x:Key="RedBrush" Color="#FF453A"/>
+    <SolidColorBrush x:Key="RedHoverBrush" Color="#FF6259"/>
+    <SolidColorBrush x:Key="RedPressedBrush" Color="#E63E34"/>
+    <SolidColorBrush x:Key="RedTranslucentBrush" Color="#44FF453A"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="#0A84FF"/>
+    <SolidColorBrush x:Key="BlueHoverBrush" Color="#3395FF"/>
+    <SolidColorBrush x:Key="BluePressedBrush" Color="#0070E0"/>
+    <SolidColorBrush x:Key="MauveBrush" Color="#BF5AF2"/>
+    <SolidColorBrush x:Key="PeachBrush" Color="#FF9F0A"/>
+    <SolidColorBrush x:Key="TealBrush" Color="#40C8E0"/>
+
+    <!-- Signature color of the theme: primary button, selected segment, focus, sliders -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#0A84FF"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#3395FF"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#0070E0"/>
+
+    <!-- Outline of every window: the faint bright edge of a glass sheet -->
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#40FFFFFF"/>
+
+    <!-- Light overlays on top of any surface: hover, separators, chart grid, faint panels -->
+    <SolidColorBrush x:Key="HoverBrush" Color="#1FFFFFFF"/>
+    <SolidColorBrush x:Key="HoverSubtleBrush" Color="#12FFFFFF"/>
+    <SolidColorBrush x:Key="SeparatorBrush" Color="#26FFFFFF"/>
+    <SolidColorBrush x:Key="GridLineBrush" Color="#1AFFFFFF"/>
+    <SolidColorBrush x:Key="PanelTintBrush" Color="#14FFFFFF"/>
+
+    <!-- Shape: large continuous corners, pill-like segments, a soft deep shadow -->
+    <CornerRadius x:Key="RadiusXs">4</CornerRadius>
+    <CornerRadius x:Key="RadiusSm">8</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">10</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">14</CornerRadius>
+    <CornerRadius x:Key="RadiusXl">22</CornerRadius>
+    <CornerRadius x:Key="Radius2xl">28</CornerRadius>
+    <CornerRadius x:Key="RadiusXlStart">22,0,0,22</CornerRadius>
+    <CornerRadius x:Key="Radius2xlTop">28,28,0,0</CornerRadius>
+    <DropShadowEffect x:Key="ShadowSm" Color="Black" BlurRadius="24" Opacity="0.35" ShadowDepth="6"/>
+    <DropShadowEffect x:Key="ShadowMd" Color="Black" BlurRadius="30" Opacity="0.4" ShadowDepth="8"/>
+    <DropShadowEffect x:Key="ShadowLg" Color="Black" BlurRadius="40" Opacity="0.45" ShadowDepth="10"/>
+</ResourceDictionary>

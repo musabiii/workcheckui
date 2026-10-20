@@ -19,9 +19,21 @@ public static class AppThemes
     public const string GitHubLight = "GitHub Light";
     public const string SolarizedLight = "Solarized Light";
     public const string Glass = "Liquid Glass";
+    public const string Synthwave = "Synthwave '84";
+    public const string Cyberpunk = "Cyberpunk";
+    public const string Terminal = "Terminal";
+    public const string FluentDark = "Fluent Dark";
+    public const string FluentLight = "Fluent Light";
+    public const string GlassDark = "Liquid Glass Dark";
 
-    // Themes whose dialogs get the system blur behind them (see WindowBackdrop)
-    private static readonly HashSet<string> GlassThemes = [Glass];
+    // Themes whose dialogs get a system backdrop behind them (see WindowBackdrop)
+    private static readonly Dictionary<string, Backdrop> Backdrops = new()
+    {
+        [Glass] = Backdrop.Acrylic,
+        [GlassDark] = Backdrop.Acrylic,
+        [FluentDark] = Backdrop.Mica,
+        [FluentLight] = Backdrop.Mica
+    };
 
     public static string Current { get; private set; } = Mocha;
 
@@ -40,7 +52,13 @@ public static class AppThemes
         [Latte] = new Uri("Themes/Latte.xaml", UriKind.Relative),
         [GitHubLight] = new Uri("Themes/GitHubLight.xaml", UriKind.Relative),
         [SolarizedLight] = new Uri("Themes/SolarizedLight.xaml", UriKind.Relative),
-        [Glass] = new Uri("Themes/Glass.xaml", UriKind.Relative)
+        [Glass] = new Uri("Themes/Glass.xaml", UriKind.Relative),
+        [Synthwave] = new Uri("Themes/Synthwave.xaml", UriKind.Relative),
+        [Cyberpunk] = new Uri("Themes/Cyberpunk.xaml", UriKind.Relative),
+        [Terminal] = new Uri("Themes/Terminal.xaml", UriKind.Relative),
+        [FluentDark] = new Uri("Themes/FluentDark.xaml", UriKind.Relative),
+        [FluentLight] = new Uri("Themes/FluentLight.xaml", UriKind.Relative),
+        [GlassDark] = new Uri("Themes/GlassDark.xaml", UriKind.Relative)
     };
 
     // Font used by the "from theme" font option. GitHub's own Mona Sans has no Cyrillic, so GitHub Dark
@@ -57,12 +75,18 @@ public static class AppThemes
         [Latte] = AppFonts.System,
         [GitHubLight] = AppFonts.System,
         [SolarizedLight] = AppFonts.JetBrainsMono,
-        [Glass] = AppFonts.System
+        [Glass] = AppFonts.System,
+        [Synthwave] = AppFonts.System,
+        [Cyberpunk] = AppFonts.JetBrainsMono,
+        [Terminal] = AppFonts.JetBrainsMono,
+        [FluentDark] = AppFonts.System,
+        [FluentLight] = AppFonts.System,
+        [GlassDark] = AppFonts.System
     };
 
     public static bool IsKnown(string theme) => Sources.ContainsKey(theme);
 
-    public static bool IsGlass(string theme) => GlassThemes.Contains(theme);
+    public static Backdrop BackdropOf(string theme) => Backdrops.GetValueOrDefault(theme, Backdrop.None);
 
     public static string FontOf(string theme) => Fonts.GetValueOrDefault(theme, AppFonts.System);
 
@@ -87,3 +111,5 @@ public static class AppThemes
 
     public static Color Color(string role) => ((SolidColorBrush)Brush(role)).Color;
 }
+
+public enum Backdrop { None, Acrylic, Mica }

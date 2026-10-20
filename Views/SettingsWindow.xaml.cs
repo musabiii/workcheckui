@@ -13,7 +13,7 @@ public partial class SettingsWindow : Window
     public SettingsWindow(DataService dataService, int? currentProjectId, SettingsTab tab = SettingsTab.Appearance)
     {
         InitializeComponent();
-        WindowBackdrop.ApplyIfGlass(this);
+        WindowBackdrop.Apply(this);
         Projects.Init(dataService, currentProjectId);
 
         var tabButton = tab switch
