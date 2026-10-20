@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Windows;
+using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -14,6 +15,12 @@ public partial class BreakOverlayWindow : Window
 {
     [DllImport("user32.dll")]
     private static extern void keybd_event(byte bVk, byte bScan, uint dwFlags, UIntPtr dwExtraInfo);
+
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int x, int y, int cx, int cy, uint flags);
+
+    private static readonly IntPtr HWND_TOPMOST = new(-1);
+    private const uint SWP_NOACTIVATE = 0x0010;
 
     private const byte VK_MEDIA_PLAY_PAUSE = 0xB3;
     private const uint KEYEVENTF_EXTENDEDKEY = 0x0001;
@@ -141,6 +148,8 @@ public partial class BreakOverlayWindow : Window
 
     private void CreateSecondaryOverlays()
     {
+        CoverScreen(this, Screen.PrimaryScreen ?? Screen.AllScreens[0]);
+
         foreach (var screen in Screen.AllScreens)
         {
             if (screen.Primary) continue;
@@ -153,14 +162,28 @@ public partial class BreakOverlayWindow : Window
                 ResizeMode = ResizeMode.NoResize,
                 Topmost = true,
                 ShowInTaskbar = false,
-                ShowActivated = false,
-                Left = screen.Bounds.Left,
-                Top = screen.Bounds.Top,
-                Width = screen.Bounds.Width,
-                Height = screen.Bounds.Height
+                ShowActivated = false
             };
+            CoverScreen(overlay, screen);
             _secondaryOverlays.Add(overlay);
         }
+    }
+
+    // Screen bounds are in device pixels while Left/Top/Width/Height are DIPs scaled by the system DPI,
+    // so on monitors with a different scale they don't match; place the window in pixels instead
+    private static void CoverScreen(Window window, Screen screen)
+    {
+        var bounds = screen.Bounds;
+        window.WindowStartupLocation = WindowStartupLocation.Manual;
+        window.Left = bounds.Left;
+        window.Top = bounds.Top;
+        window.Width = 1;
+        window.Height = 1;
+        window.SourceInitialized += (_, _) =>
+        {
+            var hwnd = new WindowInteropHelper(window).Handle;
+            SetWindowPos(hwnd, HWND_TOPMOST, bounds.Left, bounds.Top, bounds.Width, bounds.Height, SWP_NOACTIVATE);
+        };
     }
 
     public void ShowWithOverlays()

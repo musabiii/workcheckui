@@ -7,8 +7,7 @@
         Background="{DynamicResource BaseTranslucentBrush}"
         ResizeMode="NoResize"
         Topmost="True"
-        ShowInTaskbar="False"
-        WindowState="Maximized">
+        ShowInTaskbar="False">
 
     <Grid x:Name="OuterRoot" Opacity="0">
         <Border HorizontalAlignment="Center" VerticalAlignment="Center"
