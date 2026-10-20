@@ -427,7 +427,10 @@ public partial class StatusViewModel : ObservableObject
     [RelayCommand]
     private void OpenStatistics()
     {
-        var window = new StatisticsWindow(_dataService) { Owner = Application.Current.MainWindow };
+        var window = new StatisticsWindow(_dataService, () => IsWorkMode ? _tracker.CurrentSession : TimeSpan.Zero)
+        {
+            Owner = Application.Current.MainWindow
+        };
         window.ShowDialog();
     }
 

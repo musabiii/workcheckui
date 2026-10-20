@@ -10,8 +10,8 @@
         ResizeMode="CanResizeWithGrip"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterScreen"
-        Width="680" Height="440"
-        MinWidth="600" MinHeight="360">
+        Width="680" Height="560"
+        MinWidth="600" MinHeight="460">
 
     <Window.Resources>
         <Style x:Key="StatsGrid" TargetType="DataGrid">
@@ -131,6 +131,7 @@
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
                         <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
                     <Grid Grid.Row="0" Margin="0,0,0,12">
@@ -194,6 +195,51 @@
                         <views:GanttChart x:Name="Gantt" VerticalAlignment="Top"
                                          MinHeight="{Binding ViewportHeight, ElementName=GanttView}"/>
                     </ScrollViewer>
+
+                    <!-- Plan: more work from now on, or a total for today minus what is done; laid out in
+                         pomodoros over the next 6 hours -->
+                    <Grid Grid.Row="4" Margin="0,12,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Border Height="1" Background="{DynamicResource Surface1Brush}" VerticalAlignment="Top"/>
+                        <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,4">
+                            <TextBlock Text="План: поработать" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"
+                                       VerticalAlignment="Center"/>
+                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="6" Padding="2" Margin="8,0,0,0"
+                                    ToolTip="«ещё» — с этого момента; «всего» — за сегодня, с учётом уже отработанного">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton Content="ещё" GroupName="PlanMode" Style="{StaticResource SmallSegment}"
+                                                 IsChecked="True" Checked="OnPlanChanged"/>
+                                    <RadioButton x:Name="PlanTotalRadio" Content="всего" GroupName="PlanMode"
+                                                 Style="{StaticResource SmallSegment}" Checked="OnPlanChanged"/>
+                                </StackPanel>
+                            </Border>
+                            <TextBox x:Name="PlanInput" Width="56" Margin="8,0,6,0" Padding="6,2" FontSize="12"
+                                     Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
+                                     BorderBrush="{DynamicResource Surface1Brush}" CaretBrush="{DynamicResource TextBrush}"
+                                     TextChanged="OnPlanChanged"
+                                     ToolTip="Часы: 3, 2,5 или 2:30. Минуты: 90м"/>
+                            <TextBlock Text="ч" Foreground="{DynamicResource Overlay1Brush}" FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock Text="·  помидор" Margin="14,0,0,0" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"
+                                       VerticalAlignment="Center"/>
+                            <TextBox x:Name="PomodoroInput" Width="38" Margin="6,0,4,0" Padding="4,2" FontSize="12"
+                                     Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
+                                     BorderBrush="{DynamicResource Surface1Brush}" CaretBrush="{DynamicResource TextBrush}"
+                                     HorizontalContentAlignment="Center" TextChanged="OnPlanChanged" ToolTip="Длина помидора в минутах"/>
+                            <TextBlock Text="перерыв" Margin="6,0,0,0" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"
+                                       VerticalAlignment="Center"/>
+                            <TextBox x:Name="PauseInput" Width="38" Margin="6,0,4,0" Padding="4,2" FontSize="12"
+                                     Foreground="{DynamicResource TextBrush}" Background="{DynamicResource Surface0Brush}"
+                                     BorderBrush="{DynamicResource Surface1Brush}" CaretBrush="{DynamicResource TextBrush}"
+                                     HorizontalContentAlignment="Center" TextChanged="OnPlanChanged" ToolTip="Длина перерыва в минутах"/>
+                            <TextBlock Text="мин" Foreground="{DynamicResource Overlay1Brush}" FontSize="12" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock x:Name="PlanResult" Grid.Row="1" Margin="0,0,0,4" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                        <views:GanttChart x:Name="PlanChart" Grid.Row="2" ShowZoomHint="False"/>
+                    </Grid>
 
                     <!-- Productivity: work on projects as a share of all time at the computer -->
                     <TextBlock x:Name="ProductivityText" Grid.Row="3" Margin="0,10,0,0" FontSize="12"

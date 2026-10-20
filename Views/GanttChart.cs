@@ -92,6 +92,20 @@ public class GanttChart : Canvas
 
     private bool CanZoom => Columns.Count == 0 && Bars.Count > 0;
 
+    // When set, the hour scale shows exactly this span instead of fitting the bars (e.g. a plan from now on)
+    private (DateTime From, DateTime To)? _fixedRange;
+    public (DateTime From, DateTime To)? FixedRange
+    {
+        get => _fixedRange;
+        set
+        {
+            _fixedRange = value;
+            Rebuild();
+        }
+    }
+
+    public bool ShowZoomHint { get; set; } = true;
+
     public GanttChart()
     {
         ClipToBounds = true;
@@ -255,6 +269,8 @@ public class GanttChart : Canvas
     {
         if (Columns.Count > 0)
             return (Columns[0].Start, Columns[^1].End);
+        if (FixedRange is { } fixedRange)
+            return fixedRange;
 
         var first = Bars.Min(b => b.Start);
         var last = Bars.Max(b => b.End);
@@ -285,7 +301,8 @@ public class GanttChart : Canvas
     {
         if (_zoom is not { } zoom)
         {
-            Add(new TextBlock { Text = "выделите отрезок, чтобы приблизить", Foreground = HourBrush, FontSize = 10 }, 0, 2);
+            if (ShowZoomHint)
+                Add(new TextBlock { Text = "выделите отрезок, чтобы приблизить", Foreground = HourBrush, FontSize = 10 }, 0, 2);
             return;
         }
 

@@ -22,11 +22,23 @@ public partial class StatisticsWindow : Window
     private readonly DataService _dataService;
     private DateTime _currentDate;
 
-    public StatisticsWindow(DataService dataService)
+    // currentWork is the work of the running session, which is not in the database until it ends
+    public StatisticsWindow(DataService dataService, Func<TimeSpan> currentWork)
     {
         InitializeComponent();
         _dataService = dataService;
+        _currentWork = currentWork;
         _currentDate = DateTime.Today;
+
+        // "Now" moves while the window is open, so the plan is laid out again every minute
+        PlanInput.Text = _lastPlan;
+        PomodoroInput.Text = _lastPomodoro;
+        PauseInput.Text = _lastPause;
+        PlanTotalRadio.IsChecked = _lastPlanIsTotal;
+        _planTimer.Tick += (_, _) => BuildPlan();
+        _planTimer.Start();
+        Closed += (_, _) => _planTimer.Stop();
+        BuildPlan();
 
         // Rows with children start folded; the ones opened are shared by the chart and the table
         // and stay open while the window is
@@ -38,6 +50,107 @@ public partial class StatisticsWindow : Window
     }
 
     private readonly HashSet<string> _expanded = [];
+
+    private readonly Func<TimeSpan> _currentWork;
+    private readonly System.Windows.Threading.DispatcherTimer _planTimer = new() { Interval = TimeSpan.FromMinutes(1) };
+    private static readonly TimeSpan PlanWindow = TimeSpan.FromHours(6);
+
+    // Kept between openings of the window
+    private static string _lastPlan = "3";
+    private static string _lastPomodoro = "25";
+    private static string _lastPause = "5";
+    private static bool _lastPlanIsTotal;
+
+    private void OnPlanChanged(object sender, RoutedEventArgs e)
+    {
+        if (!IsLoaded) return;
+        _lastPlan = PlanInput.Text;
+        _lastPomodoro = PomodoroInput.Text;
+        _lastPause = PauseInput.Text;
+        _lastPlanIsTotal = PlanTotalRadio.IsChecked == true;
+        BuildPlan();
+    }
+
+    // Lays out the planned work from now on: pomodoros of the configured length with short breaks between
+    // them (breaks are not work), and shows when the planned work is done
+    private void BuildPlan()
+    {
+        var now = DateTime.Now;
+        PlanChart.FixedRange = (now, now + PlanWindow);
+
+        if (ParsePlan(PlanInput.Text) is not { } target)
+        {
+            PlanChart.Bars = [];
+            PlanResult.Text = "введите время, например 3 или 2:30";
+            PlanResult.Foreground = AppThemes.Brush("Overlay1");
+            return;
+        }
+
+        // "всего": the target is for the whole day, so what is already worked on projects today comes off
+        var planned = target;
+        var summary = "";
+        if (PlanTotalRadio.IsChecked == true)
+        {
+            var done = _dataService.GetTotalWorkTimeByDate(DateTime.Today, isWorkMode: true) + _currentWork();
+            summary = $"сделано {TimeFormatter.FormatShort(done)} из {TimeFormatter.FormatShort(target)}";
+            planned = target - done;
+            if (planned <= TimeSpan.Zero)
+            {
+                PlanChart.Bars = [];
+                PlanResult.Text = summary + " · план выполнен";
+                PlanResult.Foreground = AppThemes.Brush("Green");
+                return;
+            }
+            summary += $", осталось {TimeFormatter.FormatShort(planned)} · ";
+        }
+
+        // Lengths for the plan only, independent of the tracker settings; bad input falls back to 25 / 5
+        var pomodoro = TimeSpan.FromMinutes(Minutes(PomodoroInput.Text, 25, min: 1));
+        var pause = TimeSpan.FromMinutes(Minutes(PauseInput.Text, 5, min: 0));
+        var bars = new List<GanttBar>();
+        var t = now;
+        var left = planned;
+        var count = 0;
+        var breaks = TimeSpan.Zero;
+        while (left > TimeSpan.Zero)
+        {
+            var work = left < pomodoro ? left : pomodoro;
+            count++;
+            bars.Add(new GanttBar("Работа", -1, t, t + work, work,
+                $"Помидор {count}\n{t:HH:mm}–{t + work:HH:mm} · {TimeFormatter.FormatShort(work)}", ColorRole: "Blue"));
+            t += work;
+            left -= work;
+            if (left <= TimeSpan.Zero || pause <= TimeSpan.Zero) continue;
+
+            bars.Add(new GanttBar("Перерыв", -1, t, t + pause, pause,
+                $"Перерыв\n{t:HH:mm}–{t + pause:HH:mm}", ColorRole: "Teal", Order: 1));
+            t += pause;
+            breaks += pause;
+        }
+
+        PlanChart.Bars = bars;
+        PlanResult.Text = summary + $"закончу в {t:HH:mm} · помидоров: {count}, перерывы {TimeFormatter.FormatShort(breaks)}";
+        PlanResult.Foreground = AppThemes.Brush("Text");
+    }
+
+    private static int Minutes(string text, int fallback, int min) =>
+        int.TryParse(text.Trim(), out var value) && value >= min && value <= 240 ? value : fallback;
+
+    // "3" or "2,5" are hours, "2:30" is hours and minutes, "90м" is minutes; up to a day
+    private static TimeSpan? ParsePlan(string text)
+    {
+        var s = text.Trim().Replace(',', '.').ToLowerInvariant();
+        TimeSpan? result = null;
+        var hm = System.Text.RegularExpressions.Regex.Match(s, @"^(\d{1,2}):(\d{1,2})$");
+        if (hm.Success)
+            result = new TimeSpan(int.Parse(hm.Groups[1].Value), int.Parse(hm.Groups[2].Value), 0);
+        else if ((s.EndsWith("м") || s.EndsWith("мин")) && double.TryParse(s.TrimEnd('м', 'и', 'н', ' ').Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var minutes))
+            result = TimeSpan.FromMinutes(minutes);
+        else if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var hours))
+            result = TimeSpan.FromHours(hours);
+
+        return result is { } r && r > TimeSpan.Zero && r <= TimeSpan.FromHours(24) ? r : null;
+    }
 
     private void OnPeriodRowClick(object sender, MouseButtonEventArgs e)
     {
