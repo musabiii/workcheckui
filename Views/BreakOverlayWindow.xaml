@@ -12,10 +12,10 @@
 
     <Grid x:Name="OuterRoot" Opacity="0">
         <Border HorizontalAlignment="Center" VerticalAlignment="Center"
-                Background="{DynamicResource MantleTranslucentBrush}" CornerRadius="{StaticResource Radius2xl}"
-                BorderBrush="#22FFFFFF" BorderThickness="1"
+                Background="{DynamicResource MantleTranslucentBrush}" CornerRadius="{DynamicResource Radius2xl}"
+                BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1"
                 Padding="0" MinWidth="420" MaxWidth="500">
-            <Border.Effect><StaticResource ResourceKey="ShadowLg"/></Border.Effect>
+            <Border.Effect><DynamicResource ResourceKey="ShadowLg"/></Border.Effect>
 
             <Grid>
                 <Grid.RowDefinitions>
@@ -23,7 +23,7 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Border x:Name="Stripe" Grid.Row="0" CornerRadius="16,16,0,0"/>
+                <Border x:Name="Stripe" Grid.Row="0" CornerRadius="{DynamicResource Radius2xlTop}"/>
 
                 <!-- The project the break belongs to; above all three panels, so it stays in every mode -->
                 <TextBlock x:Name="ProjectBlock" Grid.Row="1" Margin="36,8,36,0" Panel.ZIndex="1"
@@ -88,7 +88,7 @@
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
                                                         Background="{DynamicResource GreenBrush}"
-                                                        CornerRadius="{StaticResource RadiusLg}"
+                                                        CornerRadius="{DynamicResource RadiusLg}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
                                                                       VerticalAlignment="Center"/>
@@ -116,7 +116,7 @@
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
                                                         Background="{DynamicResource Surface1Brush}"
-                                                        CornerRadius="{StaticResource RadiusLg}"
+                                                        CornerRadius="{DynamicResource RadiusLg}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
                                                                       VerticalAlignment="Center"/>
@@ -166,7 +166,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{StaticResource RadiusMd}"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{DynamicResource RadiusMd}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
@@ -189,7 +189,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{StaticResource RadiusMd}"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{DynamicResource RadiusMd}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
@@ -212,7 +212,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{StaticResource RadiusMd}"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{DynamicResource RadiusMd}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
@@ -235,7 +235,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{StaticResource RadiusMd}"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{DynamicResource RadiusMd}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
@@ -262,7 +262,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{StaticResource RadiusMd}"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{DynamicResource RadiusMd}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
@@ -285,7 +285,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{StaticResource RadiusMd}"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{DynamicResource RadiusMd}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
@@ -308,7 +308,7 @@
                                     <Setter Property="Template">
                                         <Setter.Value>
                                             <ControlTemplate TargetType="Button">
-                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{StaticResource RadiusMd}"
+                                                <Border x:Name="BtnBorder" Background="{DynamicResource Surface1Brush}" CornerRadius="{DynamicResource RadiusMd}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                                 </Border>
@@ -327,7 +327,7 @@
                     </StackPanel>
 
                     <!-- Break activity suggestions -->
-                    <Border Background="#11FFFFFF" CornerRadius="{StaticResource RadiusLg}"
+                    <Border Background="#11FFFFFF" CornerRadius="{DynamicResource RadiusLg}"
                             Margin="0,20,0,0" Padding="16,12">
                         <StackPanel>
                             <TextBlock Text="Чем заняться:" Foreground="{DynamicResource Subtext0Brush}"
@@ -355,7 +355,7 @@
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
                                                         Background="{DynamicResource Surface1Brush}"
-                                                        CornerRadius="{StaticResource RadiusLg}"
+                                                        CornerRadius="{DynamicResource RadiusLg}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
                                                                       VerticalAlignment="Center"/>
@@ -384,7 +384,7 @@
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
                                                         Background="{DynamicResource Surface1Brush}"
-                                                        CornerRadius="{StaticResource RadiusLg}"
+                                                        CornerRadius="{DynamicResource RadiusLg}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
                                                                       VerticalAlignment="Center"/>
@@ -466,7 +466,7 @@
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
                                                         Background="{DynamicResource Overlay0Brush}"
-                                                        CornerRadius="{StaticResource RadiusLg}"
+                                                        CornerRadius="{DynamicResource RadiusLg}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
                                                                       VerticalAlignment="Center"/>
@@ -494,7 +494,7 @@
                                             <ControlTemplate TargetType="Button">
                                                 <Border x:Name="BtnBorder"
                                                         Background="{DynamicResource GreenBrush}"
-                                                        CornerRadius="{StaticResource RadiusLg}"
+                                                        CornerRadius="{DynamicResource RadiusLg}"
                                                         Padding="{TemplateBinding Padding}">
                                                     <ContentPresenter HorizontalAlignment="Center"
                                                                       VerticalAlignment="Center"/>

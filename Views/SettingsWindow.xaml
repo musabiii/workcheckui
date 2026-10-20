@@ -9,16 +9,16 @@
         Background="Transparent"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        Width="400" Height="520"
+        Width="432" Height="552"
         ShowInTaskbar="False">
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
     </Window.Resources>
 
-    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{StaticResource RadiusXl}"
-            BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect><StaticResource ResourceKey="ShadowMd"/></Border.Effect>
+    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
+            BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1">
+        <Border.Effect><DynamicResource ResourceKey="ShadowMd"/></Border.Effect>
 
         <Grid Margin="20,16,20,16">
             <Grid.RowDefinitions>
@@ -37,7 +37,7 @@
             </Grid>
 
             <!-- Tabs -->
-            <Border Grid.Row="1" Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="3"
+            <Border Grid.Row="1" Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3"
                     Margin="0,0,0,14">
                 <Grid>
                     <Grid.ColumnDefinitions>
@@ -64,7 +64,7 @@
                               Visibility="{Binding IsChecked, ElementName=AppearanceTab, Converter={StaticResource BoolToVisibility}}">
                     <StackPanel>
                         <TextBlock Text="Шрифт" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="3">
+                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -86,27 +86,30 @@
                         </Border>
 
                         <TextBlock Text="Тема" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,4"/>
-                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="3">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <RadioButton Grid.Column="0" Content="Catppuccin" GroupName="Theme"
+                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
+                            <UniformGrid Columns="4">
+                                <RadioButton Content="Catppuccin" GroupName="Theme"
                                              Style="{StaticResource SegmentRadio}" Padding="0,6"
                                              IsChecked="{Binding IsMochaTheme}"/>
-                                <RadioButton Grid.Column="1" Content="GitHub" GroupName="Theme"
+                                <RadioButton Content="GitHub" GroupName="Theme"
                                              Style="{StaticResource SegmentRadio}" Padding="0,6"
                                              IsChecked="{Binding IsGitHubDarkTheme}"/>
-                                <RadioButton Grid.Column="2" Content="Darcula" GroupName="Theme"
+                                <RadioButton Content="Darcula" GroupName="Theme"
                                              Style="{StaticResource SegmentRadio}" Padding="0,6"
                                              IsChecked="{Binding IsDarculaTheme}"/>
-                                <RadioButton Grid.Column="3" Content="Gruvbox" GroupName="Theme"
+                                <RadioButton Content="Gruvbox" GroupName="Theme"
                                              Style="{StaticResource SegmentRadio}" Padding="0,6"
                                              IsChecked="{Binding IsGruvboxTheme}"/>
-                            </Grid>
+                                <RadioButton Content="Tokyo Night" GroupName="Theme"
+                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
+                                             IsChecked="{Binding IsTokyoNightTheme}"/>
+                                <RadioButton Content="Dracula" GroupName="Theme"
+                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
+                                             IsChecked="{Binding IsDraculaTheme}"/>
+                                <RadioButton Content="Nord" GroupName="Theme"
+                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
+                                             IsChecked="{Binding IsNordTheme}"/>
+                            </UniformGrid>
                         </Border>
                     </StackPanel>
                 </ScrollViewer>

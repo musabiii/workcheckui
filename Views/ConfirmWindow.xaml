@@ -9,7 +9,7 @@
         Topmost="True"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
-        Width="360" SizeToContent="Height">
+        Width="368" SizeToContent="Height">
 
     <Window.Resources>
         <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
@@ -18,7 +18,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bg" Background="{TemplateBinding Background}"
-                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -35,9 +35,9 @@
         </Style>
     </Window.Resources>
 
-    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{StaticResource RadiusXl}" Margin="12"
-            BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect><StaticResource ResourceKey="ShadowMd"/></Border.Effect>
+    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
+            BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1">
+        <Border.Effect><DynamicResource ResourceKey="ShadowMd"/></Border.Effect>
 
         <StackPanel Margin="20,16,20,16">
             <TextBlock x:Name="TitleBlock" Foreground="{DynamicResource TextBrush}" FontSize="{StaticResource FontSizeSubtitle}" FontWeight="Bold"

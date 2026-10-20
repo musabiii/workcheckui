@@ -12,13 +12,22 @@ public static class AppThemes
     public const string GitHubDark = "GitHub Dark";
     public const string Darcula = "Darcula";
     public const string Gruvbox = "Gruvbox Dark";
+    public const string TokyoNight = "Tokyo Night";
+    public const string Dracula = "Dracula";
+    public const string Nord = "Nord";
+
+    // Transparent space around windows for the shadow, same as WindowShadowSpace in Themes/Tokens.xaml
+    public const double WindowShadowSpace = 16;
 
     private static readonly Dictionary<string, Uri> Sources = new()
     {
         [Mocha] = new Uri("Themes/Mocha.xaml", UriKind.Relative),
         [GitHubDark] = new Uri("Themes/GitHubDark.xaml", UriKind.Relative),
         [Darcula] = new Uri("Themes/Darcula.xaml", UriKind.Relative),
-        [Gruvbox] = new Uri("Themes/Gruvbox.xaml", UriKind.Relative)
+        [Gruvbox] = new Uri("Themes/Gruvbox.xaml", UriKind.Relative),
+        [TokyoNight] = new Uri("Themes/TokyoNight.xaml", UriKind.Relative),
+        [Dracula] = new Uri("Themes/Dracula.xaml", UriKind.Relative),
+        [Nord] = new Uri("Themes/Nord.xaml", UriKind.Relative)
     };
 
     // Font used by the "from theme" font option. GitHub's own Mona Sans has no Cyrillic, so GitHub Dark
@@ -28,8 +37,13 @@ public static class AppThemes
         [Mocha] = AppFonts.System,
         [GitHubDark] = AppFonts.System,
         [Darcula] = AppFonts.JetBrainsMono,
-        [Gruvbox] = AppFonts.JetBrainsMono
+        [Gruvbox] = AppFonts.JetBrainsMono,
+        [TokyoNight] = AppFonts.JetBrainsMono,
+        [Dracula] = AppFonts.System,
+        [Nord] = AppFonts.System
     };
+
+    public static bool IsKnown(string theme) => Sources.ContainsKey(theme);
 
     public static string FontOf(string theme) => Fonts.GetValueOrDefault(theme, AppFonts.System);
 

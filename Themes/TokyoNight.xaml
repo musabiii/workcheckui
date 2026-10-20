@@ -1,0 +1,71 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Tokyo Night (night variant) -->
+
+    <!-- Window background -->
+    <SolidColorBrush x:Key="BaseBrush" Color="#1A1B26"/>
+
+    <!-- Semi-transparent window background -->
+    <SolidColorBrush x:Key="BaseTranslucentBrush" Color="#DD1A1B26"/>
+
+    <!-- Inset panels -->
+    <SolidColorBrush x:Key="MantleBrush" Color="#16161E"/>
+    <SolidColorBrush x:Key="MantleTranslucentBrush" Color="#E616161E"/>
+
+    <!-- Alternating rows and stripes -->
+    <SolidColorBrush x:Key="CrustBrush" Color="#101014"/>
+
+    <!-- Status window background while drifting -->
+    <SolidColorBrush x:Key="DriftBaseBrush" Color="#2B2B33"/>
+
+    <!-- Inputs, toggles, buttons -->
+    <SolidColorBrush x:Key="Surface0Brush" Color="#24283B"/>
+    <SolidColorBrush x:Key="Surface1Brush" Color="#343A55"/>
+    <SolidColorBrush x:Key="Surface2Brush" Color="#414868"/>
+    <SolidColorBrush x:Key="Surface3Brush" Color="#2C3148"/>
+
+    <!-- Muted text and icons -->
+    <SolidColorBrush x:Key="Overlay0Brush" Color="#565F89"/>
+    <SolidColorBrush x:Key="Overlay1Brush" Color="#737AA2"/>
+    <SolidColorBrush x:Key="Subtext0Brush" Color="#9AA5CE"/>
+    <SolidColorBrush x:Key="Subtext1Brush" Color="#A9B1D6"/>
+    <SolidColorBrush x:Key="TextBrush" Color="#C0CAF5"/>
+
+    <!-- Text on accent-colored buttons and bars -->
+    <SolidColorBrush x:Key="OnAccentBrush" Color="#1A1B26"/>
+
+    <!-- Accents -->
+    <SolidColorBrush x:Key="GreenBrush" Color="#9ECE6A"/>
+    <SolidColorBrush x:Key="GreenHoverBrush" Color="#B5DC8E"/>
+    <SolidColorBrush x:Key="YellowBrush" Color="#E0AF68"/>
+    <SolidColorBrush x:Key="RedBrush" Color="#F7768E"/>
+    <SolidColorBrush x:Key="RedHoverBrush" Color="#F993A6"/>
+    <SolidColorBrush x:Key="RedPressedBrush" Color="#E35A74"/>
+    <SolidColorBrush x:Key="RedTranslucentBrush" Color="#44F7768E"/>
+    <SolidColorBrush x:Key="BlueBrush" Color="#7AA2F7"/>
+    <SolidColorBrush x:Key="BlueHoverBrush" Color="#9DBBFA"/>
+    <SolidColorBrush x:Key="BluePressedBrush" Color="#5F8BF0"/>
+    <SolidColorBrush x:Key="MauveBrush" Color="#BB9AF7"/>
+    <SolidColorBrush x:Key="PeachBrush" Color="#FF9E64"/>
+    <SolidColorBrush x:Key="TealBrush" Color="#73DACA"/>
+
+    <!-- Signature color of the theme: primary button, selected segment, focus, sliders -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#7AA2F7"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#9DBBFA"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#5F8BF0"/>
+
+    <!-- Outline of every window -->
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#667AA2F7"/>
+
+    <!-- Shape: soft corners and a blue neon glow instead of a shadow -->
+    <CornerRadius x:Key="RadiusSm">6</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">8</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">10</CornerRadius>
+    <CornerRadius x:Key="RadiusXl">14</CornerRadius>
+    <CornerRadius x:Key="Radius2xl">18</CornerRadius>
+    <CornerRadius x:Key="RadiusXlStart">14,0,0,14</CornerRadius>
+    <CornerRadius x:Key="Radius2xlTop">18,18,0,0</CornerRadius>
+    <DropShadowEffect x:Key="ShadowSm" Color="#7AA2F7" BlurRadius="18" Opacity="0.3" ShadowDepth="0"/>
+    <DropShadowEffect x:Key="ShadowMd" Color="#7AA2F7" BlurRadius="22" Opacity="0.35" ShadowDepth="0"/>
+    <DropShadowEffect x:Key="ShadowLg" Color="#7AA2F7" BlurRadius="32" Opacity="0.4" ShadowDepth="0"/>
+</ResourceDictionary>

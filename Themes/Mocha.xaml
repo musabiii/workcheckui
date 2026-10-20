@@ -48,4 +48,12 @@
     <SolidColorBrush x:Key="MauveBrush" Color="#CBA6F7"/>
     <SolidColorBrush x:Key="PeachBrush" Color="#FAB387"/>
     <SolidColorBrush x:Key="TealBrush" Color="#94E2D5"/>
+
+    <!-- Signature color of the theme: primary button, selected segment, focus, sliders -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#CBA6F7"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#D9BEF9"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#B88EF4"/>
+
+    <!-- Outline of every window -->
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#55CBA6F7"/>
 </ResourceDictionary>

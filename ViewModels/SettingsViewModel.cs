@@ -51,12 +51,13 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsMochaTheme), nameof(IsGitHubDarkTheme), nameof(IsDarculaTheme), nameof(IsGruvboxTheme))]
+    [NotifyPropertyChangedFor(nameof(IsMochaTheme), nameof(IsGitHubDarkTheme), nameof(IsDarculaTheme), nameof(IsGruvboxTheme),
+        nameof(IsTokyoNightTheme), nameof(IsDraculaTheme), nameof(IsNordTheme))]
     private string _theme = AppThemes.Mocha;
 
     public bool IsMochaTheme
     {
-        get => Theme != AppThemes.GitHubDark && Theme != AppThemes.Darcula && Theme != AppThemes.Gruvbox;
+        get => Theme == AppThemes.Mocha || !AppThemes.IsKnown(Theme);
         set { if (value) Theme = AppThemes.Mocha; }
     }
 
@@ -76,6 +77,24 @@ public partial class SettingsViewModel : ObservableObject
     {
         get => Theme == AppThemes.Gruvbox;
         set { if (value) Theme = AppThemes.Gruvbox; }
+    }
+
+    public bool IsTokyoNightTheme
+    {
+        get => Theme == AppThemes.TokyoNight;
+        set { if (value) Theme = AppThemes.TokyoNight; }
+    }
+
+    public bool IsDraculaTheme
+    {
+        get => Theme == AppThemes.Dracula;
+        set { if (value) Theme = AppThemes.Dracula; }
+    }
+
+    public bool IsNordTheme
+    {
+        get => Theme == AppThemes.Nord;
+        set { if (value) Theme = AppThemes.Nord; }
     }
 
     public event Action<bool>? RequestClose;

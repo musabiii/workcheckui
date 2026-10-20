@@ -48,4 +48,25 @@
     <SolidColorBrush x:Key="MauveBrush" Color="#9876AA"/>
     <SolidColorBrush x:Key="PeachBrush" Color="#CC7832"/>
     <SolidColorBrush x:Key="TealBrush" Color="#299999"/>
+
+    <!-- Signature color of the theme: primary button, selected segment, focus, sliders -->
+    <SolidColorBrush x:Key="AccentBrush" Color="#CC7832"/>
+    <SolidColorBrush x:Key="AccentHoverBrush" Color="#D98F4F"/>
+    <SolidColorBrush x:Key="AccentPressedBrush" Color="#B5672A"/>
+
+    <!-- Outline of every window -->
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="#555555"/>
+
+    <!-- Shape: tight corners and a short shadow, like the IDE -->
+    <CornerRadius x:Key="RadiusXs">1</CornerRadius>
+    <CornerRadius x:Key="RadiusSm">2</CornerRadius>
+    <CornerRadius x:Key="RadiusMd">3</CornerRadius>
+    <CornerRadius x:Key="RadiusLg">4</CornerRadius>
+    <CornerRadius x:Key="RadiusXl">6</CornerRadius>
+    <CornerRadius x:Key="Radius2xl">8</CornerRadius>
+    <CornerRadius x:Key="RadiusXlStart">6,0,0,6</CornerRadius>
+    <CornerRadius x:Key="Radius2xlTop">8,8,0,0</CornerRadius>
+    <DropShadowEffect x:Key="ShadowSm" Color="Black" BlurRadius="8" Opacity="0.5" ShadowDepth="2"/>
+    <DropShadowEffect x:Key="ShadowMd" Color="Black" BlurRadius="10" Opacity="0.55" ShadowDepth="2"/>
+    <DropShadowEffect x:Key="ShadowLg" Color="Black" BlurRadius="16" Opacity="0.6" ShadowDepth="3"/>
 </ResourceDictionary>

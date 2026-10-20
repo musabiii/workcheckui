@@ -10,7 +10,7 @@
 
         <Style x:Key="ProjectRow" TargetType="Border">
             <Setter Property="Background" Value="Transparent"/>
-            <Setter Property="CornerRadius" Value="{StaticResource RadiusSm}"/>
+            <Setter Property="CornerRadius" Value="{DynamicResource RadiusSm}"/>
             <Setter Property="Padding" Value="10,2,2,2"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">

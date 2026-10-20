@@ -19,7 +19,7 @@ public partial class StatusWindow : Window
     public StatusWindow()
     {
         InitializeComponent();
-        Left = SystemParameters.WorkArea.Right - Width - 12;
+        Left = SystemParameters.WorkArea.Right - Width + AppThemes.WindowShadowSpace - 12;
         SizeChanged += OnSizeChanged;
     }
 
@@ -29,7 +29,7 @@ public partial class StatusWindow : Window
 
         // Keep the bottom edge in place when project rows appear or disappear
         if (e.PreviousSize.Height == 0)
-            Top = SystemParameters.WorkArea.Bottom - e.NewSize.Height - 12;
+            Top = SystemParameters.WorkArea.Bottom - e.NewSize.Height + AppThemes.WindowShadowSpace - 12;
         else
             Top -= e.NewSize.Height - e.PreviousSize.Height;
     }

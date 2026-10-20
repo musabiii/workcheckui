@@ -10,11 +10,11 @@
         ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="True"
-        Width="324" MinHeight="146" SizeToContent="Height">
+        Width="356" MinHeight="178" SizeToContent="Height">
 
-    <Border Background="{Binding WindowBgBrush}" CornerRadius="{StaticResource RadiusXl}"
-            BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect><StaticResource ResourceKey="ShadowSm"/></Border.Effect>
+    <Border Background="{Binding WindowBgBrush}" CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
+            BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1">
+        <Border.Effect><DynamicResource ResourceKey="ShadowSm"/></Border.Effect>
 
         <Grid Margin="16,12,16,12">
             <Grid.RowDefinitions>
@@ -201,7 +201,7 @@
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding IsAmbientPlaying}" Value="True">
                                         <Setter Property="Content" Value="&#xE769;"/>
-                                        <Setter Property="Foreground" Value="{DynamicResource GreenBrush}"/>
+                                        <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
                                     </DataTrigger>
                                 </Style.Triggers>
                             </Style>
@@ -213,8 +213,8 @@
                        Placement="Top" HorizontalOffset="-150" VerticalOffset="-4"
                        StaysOpen="False" AllowsTransparency="True" PopupAnimation="Fade"
                        Closed="OnSoundPopupClosed">
-                    <Border Width="200" Background="{DynamicResource BaseBrush}" BorderBrush="#33FFFFFF"
-                            BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="4"
+                    <Border Width="200" Background="{DynamicResource BaseBrush}" BorderBrush="{DynamicResource WindowBorderBrush}"
+                            BorderThickness="1" CornerRadius="{DynamicResource RadiusMd}" Padding="4"
                             TextElement.FontFamily="{DynamicResource AppFont}">
                         <StackPanel>
                             <ItemsControl ItemsSource="{Binding AmbientGroups}">

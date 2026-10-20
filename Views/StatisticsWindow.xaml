@@ -10,8 +10,8 @@
         ResizeMode="CanResizeWithGrip"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterScreen"
-        Width="680" Height="560"
-        MinWidth="600" MinHeight="460">
+        Width="712" Height="592"
+        MinWidth="632" MinHeight="492">
 
     <Window.Resources>
         <Style x:Key="StatsGrid" TargetType="DataGrid">
@@ -74,7 +74,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Chip" Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="10,3">
+                        <Border x:Name="Chip" Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="10,3">
                             <ContentPresenter/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -89,9 +89,9 @@
         </Style>
     </Window.Resources>
 
-    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{StaticResource RadiusXl}"
-            BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect><StaticResource ResourceKey="ShadowSm"/></Border.Effect>
+    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
+            BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1">
+        <Border.Effect><DynamicResource ResourceKey="ShadowSm"/></Border.Effect>
 
         <Grid Margin="20">
             <Grid.RowDefinitions>
@@ -111,7 +111,7 @@
                     <Button Content="◀" Click="OnPreviousClick" Cursor="Hand"
                             Padding="10,4" FontSize="{StaticResource FontSizeLarge}" FontWeight="Bold"
                             Style="{StaticResource CloseButton}"/>
-                    <TextBlock x:Name="DateText" Text="05.03.2026" Foreground="{DynamicResource GreenBrush}"
+                    <TextBlock x:Name="DateText" Text="05.03.2026" Foreground="{DynamicResource AccentBrush}"
                                FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold"
                                VerticalAlignment="Center"
                                Margin="12,0"/>
@@ -123,7 +123,7 @@
                             VerticalAlignment="Center" Margin="8,0,0,0"/>
                 </StackPanel>
 
-                <Border Grid.Column="1" Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="3"
+                <Border Grid.Column="1" Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3"
                         HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,12,0">
                     <StackPanel Orientation="Horizontal">
                         <RadioButton x:Name="DayPeriodRadio" Content="День" GroupName="Period"
@@ -144,7 +144,7 @@
             </Grid>
 
             <!-- Summary -->
-            <Border Grid.Row="1" Background="{DynamicResource MantleBrush}" CornerRadius="{StaticResource RadiusLg}" Padding="16">
+            <Border Grid.Row="1" Background="{DynamicResource MantleBrush}" CornerRadius="{DynamicResource RadiusLg}" Padding="16">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -176,7 +176,7 @@
                     <Grid Grid.Row="1" Margin="0,0,0,8">
                         <TextBlock Text="Сессии:" Foreground="{DynamicResource Overlay0Brush}" FontSize="{StaticResource FontSizeSmall}" VerticalAlignment="Center"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="2" Margin="0,0,8,0">
+                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2" Margin="0,0,8,0">
                                 <StackPanel Orientation="Horizontal">
                                     <RadioButton x:Name="AllSessionsRadio" Content="Все" GroupName="SessionFilter"
                                                  Style="{StaticResource SmallSegment}" IsChecked="True"
@@ -186,7 +186,7 @@
                                                  Checked="OnFilterChanged"/>
                                 </StackPanel>
                             </Border>
-                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="2" Margin="0,0,8,0"
+                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2" Margin="0,0,8,0"
                                     ToolTip="Как показывать перерывы и время не у компа">
                                 <StackPanel Orientation="Horizontal">
                                     <RadioButton Content="По типу" GroupName="Grouping"
@@ -197,7 +197,7 @@
                                                  Checked="OnFilterChanged"/>
                                 </StackPanel>
                             </Border>
-                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="2">
+                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2">
                                 <StackPanel Orientation="Horizontal">
                                     <RadioButton x:Name="ListViewRadio" Content="Список" GroupName="SessionView"
                                                  Style="{StaticResource SmallSegment}"
@@ -229,7 +229,7 @@
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,16,0,8">
                             <TextBlock Text="План: поработать" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
                                        VerticalAlignment="Center"/>
-                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="2" Margin="8,0,0,0"
+                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2" Margin="8,0,0,0"
                                     ToolTip="«ещё» — с этого момента; «всего» — за сегодня, с учётом уже отработанного">
                                 <StackPanel Orientation="Horizontal">
                                     <RadioButton x:Name="PlanMoreRadio" Content="ещё" GroupName="PlanMode" Style="{StaticResource SmallSegment}"
@@ -262,7 +262,7 @@
                         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,12">
                             <TextBlock Text="Заполнение:" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}"
                                        VerticalAlignment="Center"/>
-                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{StaticResource RadiusMd}" Padding="2" Margin="8,0,12,0">
+                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="2" Margin="8,0,12,0">
                                 <StackPanel Orientation="Horizontal">
                                     <RadioButton x:Name="PlanAutoRadio" Content="авто" GroupName="PlanFill"
                                                  Style="{StaticResource SmallSegment}" IsChecked="True" Checked="OnPlanChanged"/>

@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.Windows;
 using Application = System.Windows.Application;
+using WorkCheck.Helpers;
 using WorkCheck.Models;
 using WorkCheck.Views;
 
@@ -17,7 +18,9 @@ public class NotificationService
     private const double DefaultStatusWindowHeight = 146;
 
     private static double StatusWindowHeight =>
-        Application.Current.MainWindow is { ActualHeight: > 0 } w ? w.ActualHeight : DefaultStatusWindowHeight;
+        Application.Current.MainWindow is { ActualHeight: > 0 } w
+            ? w.ActualHeight - 2 * AppThemes.WindowShadowSpace
+            : DefaultStatusWindowHeight;
 
     public void Show(NotificationType type, string title, string message,
         string? secondary = null, string? quote = null)

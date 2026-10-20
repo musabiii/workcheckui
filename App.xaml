@@ -22,13 +22,13 @@
         <Style x:Key="PopupMenu" TargetType="ContextMenu" BasedOn="{StaticResource {x:Type ContextMenu}}">
             <Setter Property="Background" Value="{DynamicResource BaseBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
-            <Setter Property="BorderBrush" Value="#33FFFFFF"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource WindowBorderBrush}"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="ContextMenu">
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="1" CornerRadius="{StaticResource RadiusMd}" Padding="4">
+                                BorderThickness="1" CornerRadius="{DynamicResource RadiusMd}" Padding="4">
                             <StackPanel IsItemsHost="True"/>
                         </Border>
                     </ControlTemplate>
@@ -40,7 +40,7 @@
                         <Setter.Value>
                             <ControlTemplate TargetType="MenuItem">
                                 <Border x:Name="ItemBorder" Background="Transparent"
-                                        Padding="12,6" CornerRadius="{StaticResource RadiusSm}">
+                                        Padding="12,6" CornerRadius="{DynamicResource RadiusSm}">
                                     <ContentPresenter ContentSource="Header"
                                                       TextElement.Foreground="{DynamicResource TextBrush}"/>
                                 </Border>
@@ -136,7 +136,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RadioButton">
-                        <Border x:Name="Bg" Background="Transparent" CornerRadius="{StaticResource RadiusSm}"
+                        <Border x:Name="Bg" Background="Transparent" CornerRadius="{DynamicResource RadiusSm}"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center"/>
                         </Border>
@@ -146,7 +146,7 @@
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
                                 <Setter TargetName="Bg" Property="Background" Value="{DynamicResource Surface1Brush}"/>
-                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -164,7 +164,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="ItemBorder" Background="Transparent" Padding="12,6" CornerRadius="{StaticResource RadiusSm}">
+                        <Border x:Name="ItemBorder" Background="Transparent" Padding="12,6" CornerRadius="{DynamicResource RadiusSm}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -188,7 +188,7 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="RepeatButton">
-                        <Border Height="4" CornerRadius="{StaticResource RadiusXs}" Background="{TemplateBinding Background}"/>
+                        <Border Height="4" CornerRadius="{DynamicResource RadiusXs}" Background="{TemplateBinding Background}"/>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
@@ -201,11 +201,11 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Slider">
                         <Grid Height="16">
-                            <Border Height="4" CornerRadius="{StaticResource RadiusXs}" Background="{DynamicResource Surface1Brush}"/>
+                            <Border Height="4" CornerRadius="{DynamicResource RadiusXs}" Background="{DynamicResource Surface1Brush}"/>
                             <Track x:Name="PART_Track">
                                 <Track.DecreaseRepeatButton>
                                     <RepeatButton Command="Slider.DecreaseLarge" Style="{StaticResource SliderFill}"
-                                                  Background="{DynamicResource GreenBrush}"/>
+                                                  Background="{DynamicResource AccentBrush}"/>
                                 </Track.DecreaseRepeatButton>
                                 <Track.IncreaseRepeatButton>
                                     <RepeatButton Command="Slider.IncreaseLarge" Style="{StaticResource SliderFill}"
@@ -239,7 +239,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}" CornerRadius="{StaticResource RadiusSm}">
+                                Padding="{TemplateBinding Padding}" CornerRadius="{DynamicResource RadiusSm}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -265,7 +265,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border Background="{TemplateBinding Background}"
-                                Padding="{TemplateBinding Padding}" CornerRadius="{StaticResource RadiusSm}">
+                                Padding="{TemplateBinding Padding}" CornerRadius="{DynamicResource RadiusSm}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
@@ -294,12 +294,12 @@
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ScrollViewer x:Name="PART_ContentHost"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -322,12 +322,12 @@
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ScrollViewer x:Name="PART_ContentHost"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsFocused" Value="True">
-                                <Setter Property="BorderBrush" Value="{DynamicResource BlueBrush}"/>
+                                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -337,7 +337,7 @@
 
         <!-- ========== Primary button (Сохранить) ========== -->
         <Style x:Key="PrimaryButton" TargetType="Button">
-            <Setter Property="Background" Value="{DynamicResource BlueBrush}"/>
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}"/>
             <Setter Property="Foreground" Value="{DynamicResource OnAccentBrush}"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="FontSize" Value="{StaticResource FontSizeBody}"/>
@@ -348,15 +348,15 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bg" Background="{TemplateBinding Background}"
-                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource BlueHoverBrush}"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource AccentHoverBrush}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource BluePressedBrush}"/>
+                                <Setter TargetName="Bg" Property="Background" Value="{DynamicResource AccentPressedBrush}"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -376,7 +376,7 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
                         <Border x:Name="Bg" Background="{TemplateBinding Background}"
-                                CornerRadius="{StaticResource RadiusMd}" Padding="{TemplateBinding Padding}">
+                                CornerRadius="{DynamicResource RadiusMd}" Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         </Border>
                         <ControlTemplate.Triggers>

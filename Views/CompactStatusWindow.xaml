@@ -9,11 +9,11 @@
         ResizeMode="NoResize"
         Topmost="True"
         ShowInTaskbar="False"
-        Width="220" Height="36">
+        Width="252" Height="68">
 
-    <Border Background="{Binding WindowBgBrush}" CornerRadius="{StaticResource RadiusXl}"
-            BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect><StaticResource ResourceKey="ShadowSm"/></Border.Effect>
+    <Border Background="{Binding WindowBgBrush}" CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
+            BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1">
+        <Border.Effect><DynamicResource ResourceKey="ShadowSm"/></Border.Effect>
 
         <Grid Margin="12,0,4,0">
             <Grid.ColumnDefinitions>

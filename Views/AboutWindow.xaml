@@ -8,12 +8,12 @@
         Background="Transparent"
         ResizeMode="NoResize"
         WindowStartupLocation="CenterScreen"
-        Width="440" Height="340"
+        Width="472" Height="372"
         ShowInTaskbar="False">
 
-    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{StaticResource RadiusXl}"
-            BorderBrush="#33FFFFFF" BorderThickness="1">
-        <Border.Effect><StaticResource ResourceKey="ShadowMd"/></Border.Effect>
+    <Border Background="{DynamicResource BaseBrush}" CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
+            BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1">
+        <Border.Effect><DynamicResource ResourceKey="ShadowMd"/></Border.Effect>
 
         <Grid Margin="20,16,20,16">
             <Grid.RowDefinitions>

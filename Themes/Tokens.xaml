@@ -2,7 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!-- Theme-independent tokens; colors live in the per-theme files -->
+    <!-- Tokens shared by all themes; colors live in the per-theme files. A theme file may override
+         Radius* and Shadow* to give the theme its own shape, so those are used via DynamicResource -->
 
     <sys:Double x:Key="FontSizeCaption">11</sys:Double>
     <sys:Double x:Key="FontSizeSmall">12</sys:Double>
@@ -20,6 +21,12 @@
     <CornerRadius x:Key="RadiusLg">8</CornerRadius>
     <CornerRadius x:Key="RadiusXl">12</CornerRadius>
     <CornerRadius x:Key="Radius2xl">16</CornerRadius>
+    <!-- Color stripes along one edge of a rounded window -->
+    <CornerRadius x:Key="RadiusXlStart">12,0,0,12</CornerRadius>
+    <CornerRadius x:Key="Radius2xlTop">16,16,0,0</CornerRadius>
+
+    <!-- Transparent space around a window so its shadow or glow isn't clipped; AppThemes.WindowShadowSpace in code -->
+    <Thickness x:Key="WindowShadowSpace">16</Thickness>
 
     <DropShadowEffect x:Key="ShadowSm" Color="Black" BlurRadius="16" Opacity="0.4" ShadowDepth="2"/>
     <DropShadowEffect x:Key="ShadowMd" Color="Black" BlurRadius="20" Opacity="0.5" ShadowDepth="3"/>

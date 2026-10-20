@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using WorkCheck.Helpers;
 
 namespace WorkCheck.Views;
 
@@ -17,8 +18,8 @@ public partial class CompactStatusWindow : Window
     private void PositionBottomRight()
     {
         var workArea = SystemParameters.WorkArea;
-        Left = workArea.Right - Width - 12;
-        Top = workArea.Bottom - Height - 12;
+        Left = workArea.Right - Width + AppThemes.WindowShadowSpace - 12;
+        Top = workArea.Bottom - Height + AppThemes.WindowShadowSpace - 12;
     }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

@@ -20,9 +20,9 @@
             <TranslateTransform x:Name="SlideTransform" Y="20"/>
         </Grid.RenderTransform>
 
-        <Border x:Name="RootBorder" Background="{DynamicResource MantleTranslucentBrush}" CornerRadius="{StaticResource RadiusXl}"
-                BorderBrush="#22FFFFFF" BorderThickness="1">
-            <Border.Effect><StaticResource ResourceKey="ShadowSm"/></Border.Effect>
+        <Border x:Name="RootBorder" Background="{DynamicResource MantleTranslucentBrush}" CornerRadius="{DynamicResource RadiusXl}"
+                BorderBrush="{DynamicResource WindowBorderBrush}" BorderThickness="1">
+            <Border.Effect><DynamicResource ResourceKey="ShadowSm"/></Border.Effect>
 
             <Grid MinHeight="70">
             <Grid.ColumnDefinitions>
@@ -31,7 +31,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Color stripe -->
-            <Border x:Name="Stripe" Grid.Column="0" CornerRadius="12,0,0,12"/>
+            <Border x:Name="Stripe" Grid.Column="0" CornerRadius="{DynamicResource RadiusXlStart}"/>
 
             <!-- Content -->
             <Grid Grid.Column="1" Margin="14,10,10,10">
@@ -59,7 +59,7 @@
                                     <Setter.Value>
                                         <ControlTemplate TargetType="Button">
                                             <Border Background="{TemplateBinding Background}" Padding="{TemplateBinding Padding}"
-                                                    CornerRadius="{StaticResource RadiusSm}">
+                                                    CornerRadius="{DynamicResource RadiusSm}">
                                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                             </Border>
                                             <ControlTemplate.Triggers>
