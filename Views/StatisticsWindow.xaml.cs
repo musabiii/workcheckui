@@ -6,6 +6,7 @@ using WorkCheck.Helpers;
 using WorkCheck.Models;
 using WorkCheck.Services;
 using Binding = System.Windows.Data.Binding;
+using Button = System.Windows.Controls.Button;
 
 namespace WorkCheck.Views;
 
@@ -34,7 +35,8 @@ public partial class StatisticsWindow : Window
         PlanInput.Text = _lastPlan;
         PomodoroInput.Text = _lastPomodoro;
         PauseInput.Text = _lastPause;
-        PlanTotalRadio.IsChecked = _lastPlanIsTotal;
+        (_lastPlanIsTotal ? PlanTotalRadio : PlanMoreRadio).IsChecked = true;
+        (_lastPlanIsManual ? PlanManualRadio : PlanAutoRadio).IsChecked = true;
         _planTimer.Tick += (_, _) => BuildPlan();
         _planTimer.Start();
         Closed += (_, _) => _planTimer.Stop();
@@ -60,6 +62,44 @@ public partial class StatisticsWindow : Window
     private static string _lastPomodoro = "25";
     private static string _lastPause = "5";
     private static bool _lastPlanIsTotal;
+    private static bool _lastPlanIsManual;
+
+    // The manual plan: blocks of work and break in minutes, in order, kept while the app runs. They are
+    // laid out up to the target, so a lower target or more work done just cuts them shorter.
+    private static readonly List<(int Work, int Pause)> ManualBlocks = [];
+
+    // Whether the laid-out manual plan already fills the target; adding more is then ignored
+    private bool _manualFull;
+
+    private void OnAddBlockClick(object sender, RoutedEventArgs e) =>
+        AddBlock(Minutes(PomodoroInput.Text, 25, min: 0), Minutes(PauseInput.Text, 5, min: 0));
+
+    private void OnAddPresetClick(object sender, RoutedEventArgs e)
+    {
+        if (sender is not Button { Tag: string preset }) return;
+        var parts = preset.Split('/');
+        AddBlock(int.Parse(parts[0]), int.Parse(parts[1]));
+    }
+
+    private void AddBlock(int work, int pause)
+    {
+        if (_manualFull || work + pause == 0) return;
+        ManualBlocks.Add((work, pause));
+        BuildPlan();
+    }
+
+    private void OnRemoveBlockClick(object sender, RoutedEventArgs e)
+    {
+        if (ManualBlocks.Count == 0) return;
+        ManualBlocks.RemoveAt(ManualBlocks.Count - 1);
+        BuildPlan();
+    }
+
+    private void OnClearBlocksClick(object sender, RoutedEventArgs e)
+    {
+        ManualBlocks.Clear();
+        BuildPlan();
+    }
 
     private void OnPlanChanged(object sender, RoutedEventArgs e)
     {
@@ -68,21 +108,23 @@ public partial class StatisticsWindow : Window
         _lastPomodoro = PomodoroInput.Text;
         _lastPause = PauseInput.Text;
         _lastPlanIsTotal = PlanTotalRadio.IsChecked == true;
+        _lastPlanIsManual = PlanManualRadio.IsChecked == true;
         BuildPlan();
     }
 
-    // Lays out the planned work from now on: pomodoros of the configured length with short breaks between
-    // them (breaks are not work), and shows when the planned work is done
+    // Lays out the work still to plan from now on, in pomodoros with breaks between them (breaks are not
+    // work): automatically, or from the blocks added by hand, and shows when it is done
     private void BuildPlan()
     {
         var now = DateTime.Now;
         PlanChart.FixedRange = (now, now + PlanWindow);
+        var manual = PlanManualRadio.IsChecked == true;
+        ManualPanel.Visibility = manual ? Visibility.Visible : Visibility.Collapsed;
+        _manualFull = false;
 
         if (ParsePlan(PlanInput.Text) is not { } target)
         {
-            PlanChart.Bars = [];
-            PlanResult.Text = "введите время, например 3 или 2:30";
-            PlanResult.Foreground = AppThemes.Brush("Overlay1");
+            ShowPlan(now, [], "введите время, например 3 или 2:30", "Overlay1");
             return;
         }
 
@@ -96,14 +138,22 @@ public partial class StatisticsWindow : Window
             planned = target - done;
             if (planned <= TimeSpan.Zero)
             {
-                PlanChart.Bars = [];
-                PlanResult.Text = summary + " · план выполнен";
-                PlanResult.Foreground = AppThemes.Brush("Green");
+                _manualFull = true;
+                ShowPlan(now, [], summary + " · план выполнен", "Green");
                 return;
             }
-            summary += $", осталось {TimeFormatter.FormatShort(planned)} · ";
+            // the manual line says "из <остаток>" itself
+            summary += manual ? " · " : $", осталось {TimeFormatter.FormatShort(planned)} · ";
         }
 
+        if (manual)
+            BuildManualPlan(now, planned, summary);
+        else
+            BuildAutoPlan(now, planned, summary);
+    }
+
+    private void BuildAutoPlan(DateTime now, TimeSpan planned, string summary)
+    {
         // Lengths for the plan only, independent of the tracker settings; bad input falls back to 25 / 5
         var pomodoro = TimeSpan.FromMinutes(Minutes(PomodoroInput.Text, 25, min: 1));
         var pause = TimeSpan.FromMinutes(Minutes(PauseInput.Text, 5, min: 0));
@@ -125,9 +175,7 @@ public partial class StatisticsWindow : Window
         }
         else if (running >= pomodoro && pause > TimeSpan.Zero)
         {
-            bars.Add(new GanttBar("Перерыв", -1, t, t + pause, pause,
-                $"Перерыв: помидор уже идёт {TimeFormatter.FormatShort(running)}\n{t:HH:mm}–{t + pause:HH:mm}",
-                ColorRole: "Teal", Order: 1));
+            bars.Add(BreakBar(t, pause, $"Перерыв: помидор уже идёт {TimeFormatter.FormatShort(running)}"));
             t += pause;
             breaks += pause;
             current = "сначала перерыв · ";
@@ -138,23 +186,79 @@ public partial class StatisticsWindow : Window
             var length = count == 0 ? firstWork : pomodoro;
             var work = left < length ? left : length;
             count++;
-            var title = count == 1 && firstWork < pomodoro ? "Текущий помидор" : $"Помидор {count}";
-            bars.Add(new GanttBar("Работа", -1, t, t + work, work,
-                $"{title}\n{t:HH:mm}–{t + work:HH:mm} · {TimeFormatter.FormatShort(work)}", ColorRole: "Blue"));
+            bars.Add(WorkBar(t, work, count == 1 && firstWork < pomodoro ? "Текущий помидор" : $"Помидор {count}"));
             t += work;
             left -= work;
             if (left <= TimeSpan.Zero || pause <= TimeSpan.Zero) continue;
 
-            bars.Add(new GanttBar("Перерыв", -1, t, t + pause, pause,
-                $"Перерыв\n{t:HH:mm}–{t + pause:HH:mm}", ColorRole: "Teal", Order: 1));
+            bars.Add(BreakBar(t, pause, "Перерыв"));
             t += pause;
             breaks += pause;
         }
 
+        ShowPlan(now, bars, summary + current +
+            $"закончу в {t:HH:mm} · помидоров: {count}, перерывы {TimeFormatter.FormatShort(breaks)}", "Text");
+    }
+
+    // The added blocks one after another from now, cut where the planned work is reached: the last
+    // pomodoro is shortened and nothing after it is laid out
+    private void BuildManualPlan(DateTime now, TimeSpan planned, string summary)
+    {
+        var bars = new List<GanttBar>();
+        var t = now;
+        var work = TimeSpan.Zero;
+        var breaks = TimeSpan.Zero;
+        for (var i = 0; i < ManualBlocks.Count && work < planned; i++)
+        {
+            var (w, p) = ManualBlocks[i];
+            if (w > 0)
+            {
+                var length = TimeSpan.FromMinutes(w);
+                if (length > planned - work) length = planned - work;
+                bars.Add(WorkBar(t, length, $"Блок {i + 1}: {w}/{p}"));
+                t += length;
+                work += length;
+                if (work >= planned) break;
+            }
+            if (p > 0)
+            {
+                var length = TimeSpan.FromMinutes(p);
+                bars.Add(BreakBar(t, length, w == 0 ? "Обед / перерыв" : "Перерыв"));
+                t += length;
+                breaks += length;
+            }
+        }
+
+        _manualFull = work >= planned;
+        if (ManualBlocks.Count == 0)
+        {
+            ShowPlan(now, bars, summary + "добавляйте блоки кнопками, пока не наберётся нужное время", "Overlay1");
+            return;
+        }
+
+        var text = $"набрано {TimeFormatter.FormatShort(work)} из {TimeFormatter.FormatShort(planned)}" +
+                   (_manualFull ? "" : $", не хватает {TimeFormatter.FormatShort(planned - work)}") +
+                   $" · перерывы {TimeFormatter.FormatShort(breaks)} · закончу в {t:HH:mm}" +
+                   (_manualFull ? " · время заполнено" : "");
+        ShowPlan(now, bars, summary + text, _manualFull ? "Green" : "Text");
+    }
+
+    private static GanttBar WorkBar(DateTime start, TimeSpan length, string title) =>
+        new("Работа", -1, start, start + length, length,
+            $"{title}\n{start:HH:mm}–{start + length:HH:mm} · {TimeFormatter.FormatShort(length)}", ColorRole: "Blue");
+
+    private static GanttBar BreakBar(DateTime start, TimeSpan length, string title) =>
+        new("Перерыв", -1, start, start + length, length,
+            $"{title}\n{start:HH:mm}–{start + length:HH:mm}", ColorRole: "Teal", Order: 1);
+
+    // Both rows are always there (hidden placeholders when empty), so the empty plan still shows its scale
+    private void ShowPlan(DateTime now, List<GanttBar> bars, string text, string role)
+    {
+        bars.Add(new GanttBar("Работа", -1, now, now, TimeSpan.Zero, "", Hidden: true));
+        bars.Add(new GanttBar("Перерыв", -1, now, now, TimeSpan.Zero, "", Order: 1, Hidden: true));
         PlanChart.Bars = bars;
-        PlanResult.Text = summary + current +
-            $"закончу в {t:HH:mm} · помидоров: {count}, перерывы {TimeFormatter.FormatShort(breaks)}";
-        PlanResult.Foreground = AppThemes.Brush("Text");
+        PlanResult.Text = text;
+        PlanResult.Foreground = AppThemes.Brush(role);
     }
 
     private static int Minutes(string text, int fallback, int min) =>

@@ -64,6 +64,29 @@
             <Setter Property="Padding" Value="10,3"/>
             <Setter Property="FontSize" Value="11"/>
         </Style>
+
+        <!-- Small buttons of the manual plan -->
+        <Style x:Key="PlanChip" TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource Subtext1Brush}"/>
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,0,6,0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Chip" Background="{DynamicResource Surface0Brush}" CornerRadius="6" Padding="10,3">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Chip" Property="Background" Value="{DynamicResource Surface1Brush}"/>
+                                <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Border Background="{DynamicResource BaseBrush}" CornerRadius="12"
@@ -203,6 +226,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Border Height="1" Background="{DynamicResource Surface1Brush}" VerticalAlignment="Top"/>
                         <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,10,0,4">
@@ -211,7 +235,7 @@
                             <Border Background="{DynamicResource Surface0Brush}" CornerRadius="6" Padding="2" Margin="8,0,0,0"
                                     ToolTip="«ещё» — с этого момента; «всего» — за сегодня, с учётом уже отработанного">
                                 <StackPanel Orientation="Horizontal">
-                                    <RadioButton Content="ещё" GroupName="PlanMode" Style="{StaticResource SmallSegment}"
+                                    <RadioButton x:Name="PlanMoreRadio" Content="ещё" GroupName="PlanMode" Style="{StaticResource SmallSegment}"
                                                  IsChecked="True" Checked="OnPlanChanged"/>
                                     <RadioButton x:Name="PlanTotalRadio" Content="всего" GroupName="PlanMode"
                                                  Style="{StaticResource SmallSegment}" Checked="OnPlanChanged"/>
@@ -237,8 +261,32 @@
                                      HorizontalContentAlignment="Center" TextChanged="OnPlanChanged" ToolTip="Длина перерыва в минутах"/>
                             <TextBlock Text="мин" Foreground="{DynamicResource Overlay1Brush}" FontSize="12" VerticalAlignment="Center"/>
                         </StackPanel>
-                        <TextBlock x:Name="PlanResult" Grid.Row="1" Margin="0,0,0,4" FontSize="12" TextTrimming="CharacterEllipsis"/>
-                        <views:GanttChart x:Name="PlanChart" Grid.Row="2" ShowZoomHint="False"/>
+                        <!-- Fill: automatic pomodoros, or blocks added by hand; works with both ещё and всего -->
+                        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,6">
+                            <TextBlock Text="Заполнение:" Foreground="{DynamicResource Subtext1Brush}" FontSize="12"
+                                       VerticalAlignment="Center"/>
+                            <Border Background="{DynamicResource Surface0Brush}" CornerRadius="6" Padding="2" Margin="8,0,12,0">
+                                <StackPanel Orientation="Horizontal">
+                                    <RadioButton x:Name="PlanAutoRadio" Content="авто" GroupName="PlanFill"
+                                                 Style="{StaticResource SmallSegment}" IsChecked="True" Checked="OnPlanChanged"/>
+                                    <RadioButton x:Name="PlanManualRadio" Content="вручную" GroupName="PlanFill"
+                                                 Style="{StaticResource SmallSegment}" Checked="OnPlanChanged"/>
+                                </StackPanel>
+                            </Border>
+                        <!-- Manual plan: each click appends one block of work and break -->
+                        <StackPanel x:Name="ManualPanel" Orientation="Horizontal" Visibility="Collapsed">
+                            <Button Content="+ Добавить" Style="{StaticResource PlanChip}" Click="OnAddBlockClick"
+                                    ToolTip="Добавить блок из полей «помидор» и «перерыв»"/>
+                            <Button Content="25/5" Tag="25/5" Style="{StaticResource PlanChip}" Click="OnAddPresetClick"/>
+                            <Button Content="50/10" Tag="50/10" Style="{StaticResource PlanChip}" Click="OnAddPresetClick"/>
+                            <Button Content="Обед 60" Tag="0/60" Style="{StaticResource PlanChip}" Click="OnAddPresetClick"
+                                    ToolTip="Час перерыва без работы"/>
+                            <Button Content="↶ Убрать" Style="{StaticResource PlanChip}" Click="OnRemoveBlockClick" Margin="12,0,6,0"/>
+                            <Button Content="Очистить" Style="{StaticResource PlanChip}" Click="OnClearBlocksClick"/>
+                        </StackPanel>
+                        </StackPanel>
+                        <TextBlock x:Name="PlanResult" Grid.Row="2" Margin="0,0,0,4" FontSize="12" TextTrimming="CharacterEllipsis"/>
+                        <views:GanttChart x:Name="PlanChart" Grid.Row="3" ShowZoomHint="False"/>
                     </Grid>
 
                     <!-- Productivity: work on projects as a share of all time at the computer -->
