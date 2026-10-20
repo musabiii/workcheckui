@@ -9,6 +9,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>WorkCheck</RootNamespace>
     <AssemblyName>WorkCheck</AssemblyName>
+    <ApplicationIcon>files\app.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
