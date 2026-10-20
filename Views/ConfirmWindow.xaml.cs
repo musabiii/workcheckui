@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
+using WorkCheck.Helpers;
 
 namespace WorkCheck.Views;
 
@@ -8,6 +9,7 @@ public partial class ConfirmWindow : Window
     private ConfirmWindow(string title, string message, string confirmText, string? cancelText)
     {
         InitializeComponent();
+        WindowBackdrop.ApplyIfGlass(this);
         TitleBlock.Text = title;
         MessageBlock.Text = message;
         ConfirmButton.Content = confirmText;

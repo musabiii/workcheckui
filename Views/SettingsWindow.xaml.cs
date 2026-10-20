@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Windows.Input;
+using WorkCheck.Helpers;
 using WorkCheck.Services;
 using WorkCheck.ViewModels;
 
@@ -12,6 +13,7 @@ public partial class SettingsWindow : Window
     public SettingsWindow(DataService dataService, int? currentProjectId, SettingsTab tab = SettingsTab.Appearance)
     {
         InitializeComponent();
+        WindowBackdrop.ApplyIfGlass(this);
         Projects.Init(dataService, currentProjectId);
 
         var tabButton = tab switch

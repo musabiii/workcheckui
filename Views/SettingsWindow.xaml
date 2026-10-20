@@ -134,6 +134,9 @@
                                 <RadioButton Content="Solarized" GroupName="Theme"
                                              Style="{StaticResource SegmentRadio}" Padding="0,6"
                                              IsChecked="{Binding IsSolarizedLightTheme}"/>
+                                <RadioButton Content="Glass" GroupName="Theme"
+                                             Style="{StaticResource SegmentRadio}" Padding="0,6"
+                                             IsChecked="{Binding IsGlassTheme}"/>
                             </UniformGrid>
                         </Border>
                     </StackPanel>

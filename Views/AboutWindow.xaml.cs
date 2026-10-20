@@ -13,6 +13,7 @@ public partial class AboutWindow : Window
     public AboutWindow(string dbPath)
     {
         InitializeComponent();
+        WindowBackdrop.ApplyIfGlass(this);
 
         _appPath = Environment.ProcessPath ?? Assembly.GetExecutingAssembly().Location;
         _dbPath = dbPath;
