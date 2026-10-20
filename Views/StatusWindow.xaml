@@ -57,7 +57,8 @@
                         </Button.ContextMenu>
                     </Button>
                     <Button Content="📊" Command="{Binding OpenStatisticsCommand}"
-                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                            Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
+                            Foreground="{DynamicResource BlueBrush}"
                             ToolTip="Статистика"/>
                     <Button Content="&#xE713;" Command="{Binding OpenSettingsCommand}"
                             Style="{StaticResource HeaderButton}" Margin="0,0,2,0"
