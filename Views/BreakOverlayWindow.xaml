@@ -21,24 +21,26 @@
         </Style>
 
         <Style x:Key="OverlayPanel" TargetType="StackPanel">
-            <Setter Property="Grid.Row" Value="1"/>
-            <Setter Property="Margin" Value="36,28,36,32"/>
+            <Setter Property="Grid.Row" Value="2"/>
+            <Setter Property="Margin" Value="36,24,36,32"/>
         </Style>
         <Style x:Key="ButtonRow" TargetType="StackPanel">
             <Setter Property="Orientation" Value="Horizontal"/>
             <Setter Property="HorizontalAlignment" Value="Center"/>
         </Style>
 
-        <Style x:Key="TotalLabel" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="{DynamicResource Subtext1Brush}"/>
-            <Setter Property="FontSize" Value="{StaticResource FontSizeSubtitle}"/>
-            <Setter Property="HorizontalAlignment" Value="Right"/>
-            <Setter Property="Margin" Value="0,2,6,2"/>
-        </Style>
+        <!-- A stat in the totals row: the value on top, its caption under it -->
         <Style x:Key="TotalValue" TargetType="TextBlock">
-            <Setter Property="FontSize" Value="{StaticResource FontSizeSubtitle}"/>
+            <Setter Property="FontFamily" Value="{DynamicResource TimerFont}"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeTitle}"/>
             <Setter Property="FontWeight" Value="Bold"/>
-            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="TotalLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Overlay0Brush}"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeSmall}"/>
+            <Setter Property="HorizontalAlignment" Value="Center"/>
+            <Setter Property="Margin" Value="0,2,0,0"/>
         </Style>
 
         <Style x:Key="SuggestionItem" TargetType="TextBlock">
@@ -62,16 +64,20 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="6"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
 
                         <Border x:Name="Stripe" Grid.Row="0" CornerRadius="{DynamicResource Radius2xlTop}"/>
 
-                        <!-- The project the break belongs to; above all three panels, so it stays in every mode -->
-                        <TextBlock x:Name="ProjectBlock" Grid.Row="1" Margin="36,8,36,0" Panel.ZIndex="1"
-                                   HorizontalAlignment="Center" VerticalAlignment="Top"
-                                   Foreground="{DynamicResource YellowBrush}" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"
-                                   TextTrimming="CharacterEllipsis" Visibility="Collapsed"/>
+                        <!-- The project the break belongs to (work mode only); its own row above the panels, so it stays in every mode -->
+                        <Border x:Name="ProjectChip" Grid.Row="1" Margin="36,20,36,0" Visibility="Collapsed"
+                                HorizontalAlignment="Center" Padding="10,3"
+                                Background="{DynamicResource PanelTintBrush}" CornerRadius="{DynamicResource RadiusMd}">
+                            <TextBlock x:Name="ProjectBlock"
+                                       Foreground="{DynamicResource YellowBrush}" FontSize="{StaticResource FontSizeSmall}" FontWeight="SemiBold"
+                                       TextTrimming="CharacterEllipsis"/>
+                        </Border>
 
                         <!-- Prompt mode -->
                         <StackPanel x:Name="PromptPanel" Style="{StaticResource OverlayPanel}">
@@ -177,26 +183,23 @@
                                        FontSize="{StaticResource FontSizeDisplay}" FontWeight="Bold"
                                        HorizontalAlignment="Center"/>
 
-                            <Grid x:Name="TotalsGrid" HorizontalAlignment="Center" Margin="0,8,0,0" Visibility="Collapsed">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Grid.Row="0" Text="Всего вне компьютера:" Style="{StaticResource TotalLabel}"/>
-                                <TextBlock Grid.Row="0" Grid.Column="1" x:Name="TotalAwayValue" Style="{StaticResource TotalValue}"
-                                           Foreground="{DynamicResource RedBrush}"/>
-                                <TextBlock Grid.Row="1" Text="Сегодня:" Style="{StaticResource TotalLabel}"/>
-                                <TextBlock Grid.Row="1" Grid.Column="1" x:Name="TodayValue" Style="{StaticResource TotalValue}"
-                                           Foreground="{DynamicResource GreenBrush}"/>
-                                <TextBlock Grid.Row="2" Text="Общее время:" Style="{StaticResource TotalLabel}"/>
-                                <TextBlock Grid.Row="2" Grid.Column="1" x:Name="GrandTotalValue" Style="{StaticResource TotalValue}"
-                                           Foreground="{DynamicResource BlueBrush}"/>
-                            </Grid>
+                            <Border x:Name="TotalsGrid" Margin="0,16,0,0" Padding="8,10" Visibility="Collapsed"
+                                    Background="{DynamicResource PanelTintBrush}" CornerRadius="{DynamicResource RadiusLg}">
+                                <UniformGrid Columns="3">
+                                    <StackPanel>
+                                        <TextBlock x:Name="TodayValue" Style="{StaticResource TotalValue}" Foreground="{DynamicResource GreenBrush}"/>
+                                        <TextBlock Text="работа сегодня" Style="{StaticResource TotalLabel}"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock x:Name="TotalAwayValue" Style="{StaticResource TotalValue}" Foreground="{DynamicResource RedBrush}"/>
+                                        <TextBlock Text="вне компьютера" Style="{StaticResource TotalLabel}"/>
+                                    </StackPanel>
+                                    <StackPanel>
+                                        <TextBlock x:Name="GrandTotalValue" Style="{StaticResource TotalValue}" Foreground="{DynamicResource BlueBrush}"/>
+                                        <TextBlock Text="всего" Style="{StaticResource TotalLabel}"/>
+                                    </StackPanel>
+                                </UniformGrid>
+                            </Border>
 
                             <TextBlock x:Name="QuoteBlock" Margin="0,20,0,4"
                                        Foreground="{DynamicResource Subtext0Brush}"

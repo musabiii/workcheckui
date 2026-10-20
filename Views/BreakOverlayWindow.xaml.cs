@@ -65,7 +65,7 @@ public partial class BreakOverlayWindow : Window
         set
         {
             ProjectBlock.Text = $"📁  {value}";
-            ProjectBlock.Visibility = string.IsNullOrWhiteSpace(value) ? Visibility.Collapsed : Visibility.Visible;
+            ProjectChip.Visibility = string.IsNullOrWhiteSpace(value) ? Visibility.Collapsed : Visibility.Visible;
         }
     }
 
@@ -292,8 +292,7 @@ public partial class BreakOverlayWindow : Window
 
     private void UpdateLateTimerDisplay()
     {
-        if (FindName("LateTimerBlock") is System.Windows.Controls.TextBlock lateTimerBlock)
-            lateTimerBlock.Text = _lateTime.ToString(@"hh\:mm\:ss");
+        LateTimerBlock.Text = FormatTimer(_lateTime);
 
         if (_awayBase.HasValue && _todayBase.HasValue)
         {
@@ -306,10 +305,11 @@ public partial class BreakOverlayWindow : Window
 
     private void UpdateCountdownDisplay()
     {
-        CountdownBlock.Text = _remaining.TotalHours >= 1
-            ? _remaining.ToString(@"h\:mm\:ss")
-            : _remaining.ToString(@"m\:ss");
+        CountdownBlock.Text = FormatTimer(_remaining);
     }
+
+    private static string FormatTimer(TimeSpan time) =>
+        time.TotalHours >= 1 ? time.ToString(@"h\:mm\:ss") : time.ToString(@"m\:ss");
 
     private void Dismiss(bool choseBreak)
     {
