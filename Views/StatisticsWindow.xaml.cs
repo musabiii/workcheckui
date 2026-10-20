@@ -112,12 +112,35 @@ public partial class StatisticsWindow : Window
         var left = planned;
         var count = 0;
         var breaks = TimeSpan.Zero;
+
+        // A pomodoro already running in work mode: what is left of it comes first, or a break right away
+        // if it has run its full length
+        var running = _currentWork();
+        var firstWork = pomodoro;
+        var current = "";
+        if (running > TimeSpan.Zero && running < pomodoro)
+        {
+            firstWork = pomodoro - running;
+            current = $"текущий помидор: ещё {TimeFormatter.FormatShort(firstWork)} · ";
+        }
+        else if (running >= pomodoro && pause > TimeSpan.Zero)
+        {
+            bars.Add(new GanttBar("Перерыв", -1, t, t + pause, pause,
+                $"Перерыв: помидор уже идёт {TimeFormatter.FormatShort(running)}\n{t:HH:mm}–{t + pause:HH:mm}",
+                ColorRole: "Teal", Order: 1));
+            t += pause;
+            breaks += pause;
+            current = "сначала перерыв · ";
+        }
+
         while (left > TimeSpan.Zero)
         {
-            var work = left < pomodoro ? left : pomodoro;
+            var length = count == 0 ? firstWork : pomodoro;
+            var work = left < length ? left : length;
             count++;
+            var title = count == 1 && firstWork < pomodoro ? "Текущий помидор" : $"Помидор {count}";
             bars.Add(new GanttBar("Работа", -1, t, t + work, work,
-                $"Помидор {count}\n{t:HH:mm}–{t + work:HH:mm} · {TimeFormatter.FormatShort(work)}", ColorRole: "Blue"));
+                $"{title}\n{t:HH:mm}–{t + work:HH:mm} · {TimeFormatter.FormatShort(work)}", ColorRole: "Blue"));
             t += work;
             left -= work;
             if (left <= TimeSpan.Zero || pause <= TimeSpan.Zero) continue;
@@ -129,7 +152,8 @@ public partial class StatisticsWindow : Window
         }
 
         PlanChart.Bars = bars;
-        PlanResult.Text = summary + $"закончу в {t:HH:mm} · помидоров: {count}, перерывы {TimeFormatter.FormatShort(breaks)}";
+        PlanResult.Text = summary + current +
+            $"закончу в {t:HH:mm} · помидоров: {count}, перерывы {TimeFormatter.FormatShort(breaks)}";
         PlanResult.Foreground = AppThemes.Brush("Text");
     }
 
