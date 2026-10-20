@@ -264,7 +264,7 @@ public partial class StatusViewModel : ObservableObject
     }
 
     // The tracker is paused during a break countdown, so these come from the overlay instead of Tick
-    private void OnBreakCountdownEnded() => SendRemote("☕ Перерыв окончен, пора возвращаться!");
+    private void OnBreakCountdownEnded() => SendRemote($"☕ Перерыв окончен, пора возвращаться!\n{Quotes.GetRandom()}");
 
     private void OnStillAwayAfterBreak()
     {
