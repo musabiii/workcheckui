@@ -14,6 +14,25 @@
 
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+
+        <!-- Caption over a group of segments, e.g. dark and light themes -->
+        <Style x:Key="GroupCaption" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource Overlay1Brush}"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeCaption}"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <!-- A number setting on one line: label on the left, a short field on the right -->
+        <Style x:Key="NumberInput" TargetType="TextBox" BasedOn="{StaticResource TextInput}">
+            <Setter Property="Width" Value="72"/>
+            <Setter Property="Grid.Column" Value="1"/>
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+        <Style x:Key="NumberLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="{DynamicResource TextBrush}"/>
+            <Setter Property="FontSize" Value="{StaticResource FontSizeBody}"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+        </Style>
     </Window.Resources>
 
     <Border Background="{DynamicResource BaseBrush}" CornerRadius="{DynamicResource RadiusXl}" Margin="{StaticResource WindowShadowSpace}"
@@ -38,23 +57,17 @@
 
             <!-- Tabs -->
             <Border Grid.Row="1" Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3"
-                    Margin="0,0,0,14">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <RadioButton x:Name="AppearanceTab" Grid.Column="0" Content="Оформление" GroupName="Tab"
+                    Margin="0,0,0,16">
+                <UniformGrid Columns="4">
+                    <RadioButton x:Name="AppearanceTab" Content="Оформление" GroupName="Tab"
                                  Style="{StaticResource SegmentRadio}" Padding="0,6"/>
-                    <RadioButton x:Name="TimersTab" Grid.Column="1" Content="Таймеры" GroupName="Tab"
+                    <RadioButton x:Name="TimersTab" Content="Таймеры" GroupName="Tab"
                                  Style="{StaticResource SegmentRadio}" Padding="0,6"/>
-                    <RadioButton x:Name="NotificationsTab" Grid.Column="2" Content="Уведомления" GroupName="Tab"
+                    <RadioButton x:Name="NotificationsTab" Content="Уведомления" GroupName="Tab"
                                  Style="{StaticResource SegmentRadio}" Padding="0,6"/>
-                    <RadioButton x:Name="ProjectsTab" Grid.Column="3" Content="Проекты" GroupName="Tab"
+                    <RadioButton x:Name="ProjectsTab" Content="Проекты" GroupName="Tab"
                                  Style="{StaticResource SegmentRadio}" Padding="0,6"/>
-                </Grid>
+                </UniformGrid>
             </Border>
 
             <!-- Tab pages -->
@@ -63,29 +76,26 @@
                               Padding="0,0,4,0"
                               Visibility="{Binding IsChecked, ElementName=AppearanceTab, Converter={StaticResource BoolToVisibility}}">
                     <StackPanel>
-                        <TextBlock Text="Шрифт" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
+                        <TextBlock Text="Шрифт" Style="{StaticResource FieldLabel}"/>
                         <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <RadioButton Grid.Column="0" Content="Из темы" GroupName="Font"
+                            <UniformGrid Columns="3">
+                                <RadioButton Content="Из темы" GroupName="Font"
                                              Style="{StaticResource SegmentRadio}" Padding="0,6"
                                              IsChecked="{Binding IsThemeFont}"/>
-                                <RadioButton Grid.Column="1" Content="Системный" GroupName="Font"
+                                <!-- Each option is shown in its own font -->
+                                <RadioButton Content="Системный" GroupName="Font"
                                              Style="{StaticResource SegmentRadio}" Padding="0,6"
                                              FontFamily="Segoe UI"
                                              IsChecked="{Binding IsSystemFont}"/>
-                                <RadioButton Grid.Column="2" Content="JetBrains Mono" GroupName="Font"
+                                <RadioButton Content="JetBrains Mono" GroupName="Font"
                                              Style="{StaticResource SegmentRadio}" Padding="0,6"
                                              FontFamily="pack://application:,,,/files/fonts/#JetBrains Mono"
                                              IsChecked="{Binding IsJetBrainsMonoFont}"/>
-                            </Grid>
+                            </UniformGrid>
                         </Border>
 
-                        <TextBlock Text="Тема" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,4"/>
+                        <TextBlock Text="Тема" Style="{StaticResource FieldLabel}" Margin="0,16,0,8"/>
+                        <TextBlock Text="Тёмные" Style="{StaticResource GroupCaption}"/>
                         <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
                             <UniformGrid Columns="4">
                                 <RadioButton Content="Catppuccin" GroupName="Theme"
@@ -111,7 +121,9 @@
                                              IsChecked="{Binding IsNordTheme}"/>
                             </UniformGrid>
                         </Border>
-                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3" Margin="0,4,0,0">
+
+                        <TextBlock Text="Светлые" Style="{StaticResource GroupCaption}" Margin="0,12,0,4"/>
+                        <Border Background="{DynamicResource Surface0Brush}" CornerRadius="{DynamicResource RadiusMd}" Padding="3">
                             <UniformGrid Columns="4">
                                 <RadioButton Content="Latte" GroupName="Theme"
                                              Style="{StaticResource SegmentRadio}" Padding="0,6"
@@ -126,111 +138,134 @@
                         </Border>
                     </StackPanel>
                 </ScrollViewer>
+
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                               Padding="0,0,4,0"
                               Visibility="{Binding IsChecked, ElementName=TimersTab, Converter={StaticResource BoolToVisibility}}">
                     <StackPanel>
-                        <TextBlock Text="Pomodoro (мин)" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-                        <TextBox Text="{Binding PomodoroMinutes, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource DarkTextBox}"/>
+                        <Border Style="{StaticResource SettingsCard}">
+                            <StackPanel>
+                                <TextBlock Text="Работа" Style="{StaticResource SectionTitle}"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Pomodoro, мин" Style="{StaticResource NumberLabel}"/>
+                                    <TextBox Text="{Binding PomodoroMinutes, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource NumberInput}"/>
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Pomodoro 2, мин" Style="{StaticResource NumberLabel}"/>
+                                    <TextBox Text="{Binding Pomodoro2Minutes, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource NumberInput}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
 
-                        <TextBlock Text="Pomodoro 2 (мин)" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,4"/>
-                        <TextBox Text="{Binding Pomodoro2Minutes, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource DarkTextBox}"/>
-
-                        <TextBlock Text="Короткий перерыв (мин)" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,4"/>
-                        <TextBox Text="{Binding ShortBreakMinutes, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource DarkTextBox}"/>
-
-                        <TextBlock Text="Неактивность (мин)" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,4"/>
-                        <TextBox Text="{Binding InactivityMinutes, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource DarkTextBox}"/>
+                        <Border Style="{StaticResource SettingsCard}" Margin="0">
+                            <StackPanel>
+                                <TextBlock Text="Перерывы" Style="{StaticResource SectionTitle}"/>
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Короткий перерыв, мин" Style="{StaticResource NumberLabel}"/>
+                                    <TextBox Text="{Binding ShortBreakMinutes, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource NumberInput}"/>
+                                </Grid>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="Неактивность, мин" Style="{StaticResource NumberLabel}"/>
+                                    <TextBox Text="{Binding InactivityMinutes, UpdateSourceTrigger=PropertyChanged}"
+                                             Style="{StaticResource NumberInput}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
+
                 <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                               Padding="0,0,4,0"
                               Visibility="{Binding IsChecked, ElementName=NotificationsTab, Converter={StaticResource BoolToVisibility}}">
                     <StackPanel>
-                        <TextBlock Text="Telegram" Foreground="{DynamicResource TextBrush}" FontSize="{StaticResource FontSizeBody}" FontWeight="SemiBold" Margin="0,0,0,8"/>
-                        <TextBlock Text="Bot Token" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-                        <PasswordBox x:Name="TokenBox" Style="{StaticResource DarkPasswordBox}"/>
+                        <Border Style="{StaticResource SettingsCard}">
+                            <StackPanel>
+                                <TextBlock Text="Telegram" Style="{StaticResource SectionTitle}"/>
+                                <CheckBox Content="Отправлять в Telegram" IsChecked="{Binding TelegramEnabled}" Margin="0,0,0,12"/>
 
-                        <TextBlock Text="Chat ID" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,4"/>
-                        <TextBox Text="{Binding TelegramChatId, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource DarkTextBox}"/>
+                                <TextBlock Text="Bot Token" Style="{StaticResource FieldLabel}"/>
+                                <PasswordBox x:Name="TokenBox" Style="{StaticResource PasswordInput}"/>
 
-                        <TextBlock Text="SOCKS5 Прокси (user:pass@host:port)" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,4"/>
-                        <TextBox Text="{Binding ProxyUrl, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource DarkTextBox}" ToolTip="Пример: botuser:BotPass2024@213.193.199.106:1080"/>
+                                <TextBlock Text="Chat ID" Style="{StaticResource FieldLabel}" Margin="0,12,0,4"/>
+                                <TextBox Text="{Binding TelegramChatId, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource TextInput}"/>
 
-                        <Grid Margin="0,10,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding TestStatus}"
-                                       Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeCaption}"
-                                       VerticalAlignment="Center" TextWrapping="Wrap"/>
-                            <Button Grid.Column="1" Content="Тест"
-                                    Style="{StaticResource SecondaryButton}"
-                                    Click="OnTestTelegramClick"/>
-                        </Grid>
+                                <TextBlock Text="SOCKS5 прокси (user:pass@host:port)" Style="{StaticResource FieldLabel}" Margin="0,12,0,4"/>
+                                <TextBox Text="{Binding ProxyUrl, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource TextInput}" ToolTip="Пример: user:password@203.0.113.10:1080"/>
 
-                        <CheckBox Content="Отправлять в Telegram"
-                                  IsChecked="{Binding TelegramEnabled}"
-                                  Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,12,0,0">
-                            <CheckBox.Style>
-                                <Style TargetType="CheckBox">
-                                    <Setter Property="Cursor" Value="Hand"/>
-                                </Style>
-                            </CheckBox.Style>
-                        </CheckBox>
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding TestStatus}" Margin="0,0,8,0"
+                                               Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeCaption}"
+                                               VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                    <Button Grid.Column="1" Content="Тест"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Click="OnTestTelegramClick"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
 
-                        <TextBlock Text="ntfy" Foreground="{DynamicResource TextBrush}" FontSize="{StaticResource FontSizeBody}" FontWeight="SemiBold" Margin="0,22,0,8"/>
-                        <TextBlock Text="Сервер" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,0,0,4"/>
-                        <TextBox Text="{Binding NtfyServer, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource DarkTextBox}" ToolTip="Пусто — https://ntfy.sh. Свой сервер: https://ntfy.example.com"/>
+                        <Border Style="{StaticResource SettingsCard}">
+                            <StackPanel>
+                                <TextBlock Text="ntfy" Style="{StaticResource SectionTitle}"/>
+                                <CheckBox Content="Отправлять в ntfy" IsChecked="{Binding NtfyEnabled}" Margin="0,0,0,12"/>
 
-                        <TextBlock Text="Подписка (топик)" Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,10,0,4"/>
-                        <TextBox Text="{Binding NtfyTopic, UpdateSourceTrigger=PropertyChanged}"
-                                 Style="{StaticResource DarkTextBox}"
-                                 ToolTip="Имя топика, на который подписано приложение ntfy на телефоне. На ntfy.sh лучше выбрать трудноугадываемое"/>
+                                <TextBlock Text="Сервер" Style="{StaticResource FieldLabel}"/>
+                                <TextBox Text="{Binding NtfyServer, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource TextInput}" ToolTip="Пусто — https://ntfy.sh. Свой сервер: https://ntfy.example.com"/>
 
-                        <Grid Margin="0,10,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Column="0" Text="{Binding NtfyTestStatus}"
-                                       Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeCaption}"
-                                       VerticalAlignment="Center" TextWrapping="Wrap"/>
-                            <Button Grid.Column="1" Content="Тест"
-                                    Style="{StaticResource SecondaryButton}"
-                                    Command="{Binding TestNtfyCommand}"/>
-                        </Grid>
+                                <TextBlock Text="Подписка (топик)" Style="{StaticResource FieldLabel}" Margin="0,12,0,4"/>
+                                <TextBox Text="{Binding NtfyTopic, UpdateSourceTrigger=PropertyChanged}"
+                                         Style="{StaticResource TextInput}"
+                                         ToolTip="Имя топика, на который подписано приложение ntfy на телефоне. На ntfy.sh лучше выбрать трудноугадываемое"/>
 
-                        <CheckBox Content="Отправлять в ntfy"
-                                  IsChecked="{Binding NtfyEnabled}"
-                                  Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,12,0,0">
-                            <CheckBox.Style>
-                                <Style TargetType="CheckBox">
-                                    <Setter Property="Cursor" Value="Hand"/>
-                                </Style>
-                            </CheckBox.Style>
-                        </CheckBox>
+                                <Grid Margin="0,12,0,0">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding NtfyTestStatus}" Margin="0,0,8,0"
+                                               Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeCaption}"
+                                               VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                    <Button Grid.Column="1" Content="Тест"
+                                            Style="{StaticResource SecondaryButton}"
+                                            Command="{Binding TestNtfyCommand}"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
 
-                        <TextBlock Text="Звук" Foreground="{DynamicResource TextBrush}" FontSize="{StaticResource FontSizeBody}" FontWeight="SemiBold" Margin="0,22,0,0"/>
-                        <CheckBox Content="Звуковое уведомление о конце перерыва"
-                                  IsChecked="{Binding SoundEnabled}"
-                                  Foreground="{DynamicResource Subtext1Brush}" FontSize="{StaticResource FontSizeSmall}" Margin="0,12,0,0">
-                            <CheckBox.Style>
-                                <Style TargetType="CheckBox">
-                                    <Setter Property="Cursor" Value="Hand"/>
-                                </Style>
-                            </CheckBox.Style>
-                        </CheckBox>
+                        <Border Style="{StaticResource SettingsCard}" Margin="0">
+                            <StackPanel>
+                                <TextBlock Text="Звук" Style="{StaticResource SectionTitle}"/>
+                                <CheckBox Content="Звуковое уведомление о конце перерыва" IsChecked="{Binding SoundEnabled}"/>
+                            </StackPanel>
+                        </Border>
                     </StackPanel>
                 </ScrollViewer>
+
                 <views:ProjectsPanel x:Name="Projects"
                                      Visibility="{Binding IsChecked, ElementName=ProjectsTab, Converter={StaticResource BoolToVisibility}}"/>
             </Grid>
