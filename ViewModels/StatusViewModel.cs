@@ -434,7 +434,8 @@ public partial class StatusViewModel : ObservableObject
         {
             Owner = Application.Current.MainWindow
         };
-        window.ShowDialog();
+        window.Show();
+        window.Activate();
     }
 
     public IReadOnlyList<Project> GetProjects() => _dataService.GetAllProjects().Where(p => !p.IsArchived).ToList();

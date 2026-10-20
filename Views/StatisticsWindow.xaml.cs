@@ -42,6 +42,14 @@ public partial class StatisticsWindow : Window
         Closed += (_, _) => _planTimer.Stop();
         BuildPlan();
 
+        // Read-only window: a click anywhere else closes it. Deactivated also fires while closing,
+        // and Close() during closing throws
+        Closing += (_, _) => _closing = true;
+        Deactivated += (_, _) =>
+        {
+            if (!_closing) Close();
+        };
+
         // Rows with children start folded; the ones opened are shared by the chart and the table
         // and stay open while the window is
         Gantt.Expanded = _expanded;
@@ -70,6 +78,8 @@ public partial class StatisticsWindow : Window
 
     // Whether the laid-out manual plan already fills the target; adding more is then ignored
     private bool _manualFull;
+
+    private bool _closing;
 
     private void OnAddBlockClick(object sender, RoutedEventArgs e) =>
         AddBlock(Minutes(PomodoroInput.Text, 25, min: 0), Minutes(PauseInput.Text, 5, min: 0));
@@ -741,9 +751,5 @@ public partial class StatisticsWindow : Window
         _ => _currentDate.AddDays(direction)
     };
 
-    private void OnCloseClick(object sender, RoutedEventArgs e)
-    {
-        DialogResult = true;
-        Close();
-    }
+    private void OnCloseClick(object sender, RoutedEventArgs e) => Close();
 }
