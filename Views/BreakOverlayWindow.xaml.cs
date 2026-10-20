@@ -141,6 +141,15 @@ public partial class BreakOverlayWindow : Window
         UpdateChoiceCountdownDisplay();
     }
 
+    // Typing a description means the user is here and deciding: don't start the break under their hands
+    private void OnDescriptionChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+    {
+        if (_choiceTimer is not { IsEnabled: true } || DescriptionBox.Text.Length == 0) return;
+
+        _choiceTimer.Stop();
+        ChoiceCountdownBlock.Text = "Отсчёт остановлен";
+    }
+
     private void UpdateChoiceCountdownDisplay()
     {
         ChoiceCountdownBlock.Text = $"Перерыв через {_choiceRemaining.Seconds}...";
@@ -215,6 +224,11 @@ public partial class BreakOverlayWindow : Window
         TimerPanel.Visibility = Visibility.Visible;
         ModeSelectionPanel.Visibility = Visibility.Collapsed;
         Stripe.Background = AppThemes.Brush(BreakStripeRole);
+
+        // SessionDescription doesn't notify, so carry over what was typed on the prompt by hand
+        TimerDescriptionBox.Text = SessionDescription;
+        TimerDescriptionBox.CaretIndex = SessionDescription.Length;
+        TimerDescriptionBox.Focus();
 
         StartCountdown(_breakDuration);
 
@@ -352,9 +366,10 @@ public partial class BreakOverlayWindow : Window
         Dismiss(choseBreak: false);
     }
 
+    // The break has already begun, so cutting it short still ends the session: it is saved with its description
     private void OnCancelBreakClick(object sender, RoutedEventArgs e)
     {
-        Dismiss(choseBreak: false);
+        Dismiss(choseBreak: true);
     }
 
     private void OnDriftClick(object sender, RoutedEventArgs e)

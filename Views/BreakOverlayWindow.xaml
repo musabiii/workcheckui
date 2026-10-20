@@ -96,7 +96,7 @@
                                        FontSize="{StaticResource FontSizeTitle}" FontWeight="Bold"
                                        HorizontalAlignment="Center"/>
 
-                            <TextBox x:Name="DescriptionBox" Style="{StaticResource TextInput}"
+                            <TextBox x:Name="DescriptionBox" Style="{StaticResource TextInput}" TextChanged="OnDescriptionChanged"
                                      FontSize="{StaticResource FontSizeLarge}" Padding="12,10"
                                      Margin="0,20,0,0" Height="80" MaxLength="500"
                                      TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto">
@@ -144,6 +144,16 @@
                                 <Button Content="+30 мин" Click="OnAdd30Min" Style="{StaticResource ChipButton}"/>
                             </StackPanel>
 
+                            <!-- Optional: describe the session that just ended (the only chance on a manual break) -->
+                            <TextBlock Text="Над чем работали?" Style="{StaticResource FieldLabel}" Margin="0,20,0,4"/>
+                            <TextBox x:Name="TimerDescriptionBox" Style="{StaticResource TextInput}"
+                                     FontSize="{StaticResource FontSizeBody}" Padding="10,6" Height="52" MaxLength="500"
+                                     TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto">
+                                <TextBox.Text>
+                                    <Binding Path="SessionDescription" RelativeSource="{RelativeSource AncestorType=Window}" UpdateSourceTrigger="PropertyChanged"/>
+                                </TextBox.Text>
+                            </TextBox>
+
                             <!-- Break activity suggestions -->
                             <Border Background="{DynamicResource PanelTintBrush}" CornerRadius="{DynamicResource RadiusLg}"
                                     Margin="0,20,0,0" Padding="16,12">
@@ -151,14 +161,17 @@
                                     <TextBlock Text="Чем заняться:" Margin="0,0,0,6"
                                                Foreground="{DynamicResource Subtext0Brush}"
                                                FontSize="{StaticResource FontSizeBody}" FontWeight="SemiBold"/>
-                                    <TextBlock Text="•  Разомни шею" Style="{StaticResource SuggestionItem}"/>
-                                    <TextBlock Text="•  10 приседаний" Style="{StaticResource SuggestionItem}"/>
-                                    <TextBlock Text="•  Разминка для глаз" Style="{StaticResource SuggestionItem}"/>
-                                    <TextBlock Text="•  Выпей воды" Style="{StaticResource SuggestionItem}"/>
-                                    <TextBlock Text="•  Убери стол" Style="{StaticResource SuggestionItem}"/>
-                                    <TextBlock Text="•  Приоритеты на следующий час" Style="{StaticResource SuggestionItem}"/>
-                                    <TextBlock Text="•  Планы на вечер" Style="{StaticResource SuggestionItem}"/>
-                                    <TextBlock Text="•  Посчитай траты" Style="{StaticResource SuggestionItem}"/>
+                                    <!-- Two columns keep the card short enough for a laptop screen at 150% -->
+                                    <UniformGrid Columns="2">
+                                        <TextBlock Text="•  Разомни шею" Style="{StaticResource SuggestionItem}"/>
+                                        <TextBlock Text="•  Убери стол" Style="{StaticResource SuggestionItem}"/>
+                                        <TextBlock Text="•  10 приседаний" Style="{StaticResource SuggestionItem}"/>
+                                        <TextBlock Text="•  Приоритеты на час" Style="{StaticResource SuggestionItem}"/>
+                                        <TextBlock Text="•  Разминка для глаз" Style="{StaticResource SuggestionItem}"/>
+                                        <TextBlock Text="•  Планы на вечер" Style="{StaticResource SuggestionItem}"/>
+                                        <TextBlock Text="•  Выпей воды" Style="{StaticResource SuggestionItem}"/>
+                                        <TextBlock Text="•  Посчитай траты" Style="{StaticResource SuggestionItem}"/>
+                                    </UniformGrid>
                                 </StackPanel>
                             </Border>
 
